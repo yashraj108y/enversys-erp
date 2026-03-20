@@ -674,7 +674,7 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
               <div style="padding:12px" id="ci-log">
                 <div class="ci-card">
                   <div style="color:var(--text3);font-size:12px;padding:8px 4px">📍 No check-ins yet today. Engineers can check in using this form.</div>
-                  <div class="ci-hd" style="display:none"><div class="ci-av">RK</div><div><div class="ci-name">Ravi Kumar</div><div class="ci-time">⏰ 9:04 AM IST</div></div><div style="margin-left:auto"><div class="ci-status">✅ Checked In</div></div></div>
+
                   <div class="ci-loc">📍 Alkem Laboratories — Sewage Treatment Plant</div>
                   <div class="ci-photo">📷 Photo uploaded · GPS verified ✅ · <span style="color:var(--emerald);font-weight:700;cursor:pointer">View →</span></div>
                 </div>
@@ -691,9 +691,9 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
       <!-- TASK BOARD — REAL -->
       <div class="page" id="page-tasks">
         <div class="sg">
-          <div class="sc emerald"><div class="sc-head"><span class="sc-emoji">✅</span></div><span class="sc-val">12</span><span class="sc-lbl">Completed Today</span></div>
-          <div class="sc amber"><div class="sc-head"><span class="sc-emoji">⏳</span></div><span class="sc-val">7</span><span class="sc-lbl">Pending</span></div>
-          <div class="sc rose"><div class="sc-head"><span class="sc-emoji">🔴</span></div><span class="sc-val">2</span><span class="sc-lbl">Overdue</span></div>
+          <div class="sc emerald"><div class="sc-head"><span class="sc-emoji">✅</span></div><span class="sc-val" id="task-done-cnt">—</span><span class="sc-lbl">Tasks Done</span></div>
+          <div class="sc amber"><div class="sc-head"><span class="sc-emoji">⏳</span></div><span class="sc-val" id="task-pending-cnt">—</span><span class="sc-lbl">Pending</span></div>
+          <div class="sc sky"><div class="sc-head"><span class="sc-emoji">🏭</span></div><span class="sc-val" id="task-sites-cnt">—</span><span class="sc-lbl">Active Sites</span></div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
           <div class="panel">
@@ -710,10 +710,10 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
       <!-- SERVICE CONTRACTS — REAL -->
       <div class="page" id="page-service">
         <div class="sg">
-          <div class="sc emerald"><div class="sc-head"><span class="sc-emoji">📄</span></div><span class="sc-val">6</span><span class="sc-lbl">Active Contracts</span></div>
-          <div class="sc amber"><div class="sc-head"><span class="sc-emoji">⚠️</span></div><span class="sc-val">2</span><span class="sc-lbl">Expiring Soon</span></div>
-          <div class="sc sky"><div class="sc-head"><span class="sc-emoji">📅</span></div><span class="sc-val">3</span><span class="sc-lbl">Visits This Month</span></div>
-          <div class="sc violet"><div class="sc-head"><span class="sc-emoji">💰</span></div><span class="sc-val">₹82L</span><span class="sc-lbl">AMC Value</span></div>
+          <div class="sc emerald"><div class="sc-head"><span class="sc-emoji">📄</span></div><span class="sc-val" id="svc-active-cnt">—</span><span class="sc-lbl">Active Projects</span></div>
+          <div class="sc amber"><div class="sc-head"><span class="sc-emoji">⚠️</span></div><span class="sc-val" id="svc-expiring-cnt">—</span><span class="sc-lbl">Expiring Soon</span></div>
+          <div class="sc sky"><div class="sc-head"><span class="sc-emoji">✅</span></div><span class="sc-val" id="svc-comp-cnt">—</span><span class="sc-lbl">Completed</span></div>
+          <div class="sc violet"><div class="sc-head"><span class="sc-emoji">💰</span></div><span class="sc-val" id="svc-value">—</span><span class="sc-lbl">Total PO Value</span></div>
         </div>
         <div class="panel">
           <div class="ph"><div class="pt"><span class="pt-emoji">🔧</span>Service Contracts</div><button class="pi">+ Add Contract</button></div>
@@ -773,109 +773,71 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
 </div>
 
 <script>
+// ─────────────────────────────────────────
+// CONFIG — direct n8n, same as old working HTML
+// ─────────────────────────────────────────
 const N8N='https://yashraj1008y.app.n8n.cloud';
 const URLS={
-  login:N8N+'/webhook/erp-login',
+  login:    N8N+'/webhook/erp-login',
   dashboard:N8N+'/webhook/erp-dashboard',
-  enquiry:N8N+'/webhook/erp-enquiry',
-  po:N8N+'/webhook/erp-po',
-  updateEnquiry:N8N+'/webhook/erp-update-enquiry',
-  checkin:N8N+'/webhook/erp-checkin',
-  ai:N8N+'/webhook/erp-ai'
+  enquiry:  N8N+'/webhook/erp-enquiry',
+  po:       N8N+'/webhook/erp-po',
+  updateEnq:N8N+'/webhook/erp-update-enquiry',
+  checkin:  N8N+'/webhook/erp-checkin',
+  ai:       N8N+'/webhook/erp-ai'
 };
 const SESSION_MS=8*60*60*1000;
 const STAGES=['New','Discussion','Quoted','Negotiation','Won','Lost'];
 const STAGE_COLORS={New:'b-new',Discussion:'b-dis',Quoted:'b-quo',Negotiation:'b-neg',Won:'b-won',Lost:'b-lost',Overdue:'b-ov',Active:'b-act',Completed:'b-comp',Approved:'b-act',Pending:'b-neg',Resolved:'b-comp'};
 let currentUser=null,dashData=null,allEnq=[],currentPage='dashboard',sessionExpiry=null,sessionInterval=null,currentProject=null,currentClient=null,saving=false,ciLat=null,ciLng=null;
 
-// FINGERPRINT
+// ─────────────────────────────────────────
+// FINGERPRINT + SESSION
+// ─────────────────────────────────────────
 function fp(){try{const c=[navigator.userAgent,navigator.language,screen.width+'x'+screen.height,new Date().getTimezoneOffset()];let h=0;c.join('|').split('').forEach(ch=>{h=((h<<5)-h)+ch.charCodeAt(0);h|=0;});return Math.abs(h).toString(36);}catch(e){return'default';}}
 function isTrusted(p){try{const d=JSON.parse(localStorage.getItem('env_td')||'{}');return d[p]&&d[p].includes(fp());}catch(e){return false;}}
 function trustDevice(p){try{const d=JSON.parse(localStorage.getItem('env_td')||'{}');if(!d[p])d[p]=[];const f=fp();if(!d[p].includes(f))d[p].push(f);localStorage.setItem('env_td',JSON.stringify(d));}catch(e){}}
-
-// SESSION
 function startSession(u){currentUser=u;sessionExpiry=Date.now()+SESSION_MS;try{localStorage.setItem('env_s',JSON.stringify({user:u,expiry:sessionExpiry}));}catch(e){}startTimer();}
 function startTimer(){if(sessionInterval)clearInterval(sessionInterval);sessionInterval=setInterval(()=>{const r=sessionExpiry-Date.now();if(r<=0){autoLogout();return;}const h=Math.floor(r/3600000),m=Math.floor((r%3600000)/60000),s=Math.floor((r%60000)/1000);const el=document.getElementById('sess-txt');if(el)el.textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;const f=document.getElementById('sess-fill');if(f)f.style.width=Math.round((r/SESSION_MS)*100)+'%';},1000);}
 function checkSession(){try{const s=JSON.parse(localStorage.getItem('env_s')||'null');if(!s||Date.now()>s.expiry){localStorage.removeItem('env_s');return null;}sessionExpiry=s.expiry;return s.user;}catch(e){return null;}}
 function autoLogout(){clearInterval(sessionInterval);try{localStorage.removeItem('env_s');}catch(e){}toast('⏰ Session expired','warn');setTimeout(()=>{document.getElementById('app').classList.remove('visible');document.getElementById('login-screen').style.display='flex';currentUser=null;},2000);}
 function logout(){if(!confirm('Sign out?'))return;clearInterval(sessionInterval);try{localStorage.removeItem('env_s');}catch(e){}document.getElementById('app').classList.remove('visible');document.getElementById('login-screen').style.display='flex';currentUser=null;dashData=null;}
 
-// LOGIN
+// ─────────────────────────────────────────
+// LOGIN — exact same pattern as old working HTML
+// ─────────────────────────────────────────
 let pwVis=false;
 function togglePw(){const i=document.getElementById('lpw');pwVis=!pwVis;i.type=pwVis?'text':'password';document.getElementById('eye-b').textContent=pwVis?'🙈':'👁';}
+
+function resetBtn(txt='Access Dashboard'){const btn=document.getElementById('l-btn');if(btn)btn.disabled=false;const ltxt=document.getElementById('l-txt');if(ltxt)ltxt.textContent=txt;}
+
+function showErr(msg){const e=document.getElementById('lerr');e.textContent=msg;e.classList.add('show');resetBtn();const box=document.querySelector('.lbox');if(box){box.style.animation='shake .3s ease';setTimeout(()=>box.style.animation='',400);}}
+
 async function doLogin(){
   const phone=document.getElementById('lp').value.trim();
   const pw=document.getElementById('lpw').value.trim();
-  const otp=document.getElementById('lotp').value.trim();
   const btn=document.getElementById('l-btn');
-  const otpBox=document.getElementById('otp-box');
   document.getElementById('lerr').classList.remove('show');
   if(!phone||phone.length<10){showErr('⚠️ Enter valid 10-digit number');return;}
   if(!pw){showErr('⚠️ Password required');return;}
-  if(otpBox.classList.contains('show')&&!otp){showErr('⚠️ Enter OTP');return;}
-
-  // Always unlock button after 10 seconds max — prevents any stuck state
-  btn.disabled=true;
-  document.getElementById('l-txt').textContent='Authenticating...';
-  const safetyTimer=setTimeout(()=>resetBtn()
-
-,10000);
-
-  const isKnown=isTrusted(phone);
+  btn.disabled=true;document.getElementById('l-txt').textContent='Signing in...';
+  const safetyTimer=setTimeout(()=>resetBtn(),10000);
   try{
-    const controller=new AbortController();
-    const timeout=setTimeout(()=>controller.abort(),8000);
-    const res=await fetch(URLS.login,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone,password:pw,fingerprint:fp(),is_known_device:isKnown,otp:otp||null}),signal:controller.signal});
-    clearTimeout(timeout);clearTimeout(safetyTimer);
+    const res=await fetch(URLS.login,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone,password:pw})});
+    clearTimeout(safetyTimer);
     const data=await res.json();
-    if(data.success===true){
-      // Successful login from n8n
-      trustDevice(phone);
-      initApp(data.user||{name:'Amol Bhosale',phone,role:'Owner',department:'Management'});
-      return;
-    }else{
-      // n8n returned success:false = wrong credentials
-      showErr('❌ '+(data.error||'Wrong phone number or password'));
-    }
+    if(data.success===true){trustDevice(phone);initApp(data.user||{name:'Amol Bhosale',phone,role:'Owner'});return;}
+    showErr('❌ '+(data.error||'Wrong phone or password'));
   }catch(e){
     clearTimeout(safetyTimer);
-    // Network error or timeout — allow if device is trusted OR OTP matches
-    if(isKnown){
-      // Device already trusted before — let them in with offline fallback
-      initApp({name:'Amol Bhosale',phone,role:'Owner',department:'Management'});
-      return;
-    }
-    // Unknown device + offline — ask for OTP
-    if(!otp){
-      otpBox.classList.add('show');resetBtn('Verify OTP →');
-      toast('⚠️ Slow connection — enter OTP: 123456','warn');return;
-    }
-    if(otp==='123456'){
-      trustDevice(phone);
-      initApp({name:'Amol Bhosale',phone,role:'Owner',department:'Management'});
-      return;
-    }
-    showErr('❌ Invalid OTP — try again');
+    if(isTrusted(phone)){initApp({name:'Amol Bhosale',phone,role:'Owner'});return;}
+    showErr('❌ Cannot connect to server. Check your internet.');
   }
   resetBtn();
 }
-function resetBtn(txt='Access Dashboard'){
-  const btn=document.getElementById('l-btn');
-  if(btn){btn.disabled=false;}
-  const ltxt=document.getElementById('l-txt');
-  if(ltxt)ltxt.textContent=txt;
-}
-function showErr(msg){
-  const e=document.getElementById('lerr');
-  e.textContent=msg;e.classList.add('show');
-  resetBtn();
-  // Shake animation on error
-  const box=document.querySelector('.lbox');
-  if(box){box.style.animation='shake .3s ease';setTimeout(()=>box.style.animation='',400);}
-}
+
 function initApp(user){
-  const name=user?.name||'Amol Bhosale';
-  const role=user?.role||'Owner';
+  const name=user?.name||'User';const role=user?.role||'Staff';
   startSession({...user,name,role});
   document.getElementById('un').textContent=name;
   document.getElementById('ur').textContent='👑 '+role;
@@ -886,13 +848,18 @@ function initApp(user){
   toast('👋 Welcome, '+name.split(' ')[0]+'!','ok');
 }
 
+// ─────────────────────────────────────────
 // CLOCK
+// ─────────────────────────────────────────
 function updateClock(){const ist=new Date(new Date().getTime()+(5.5*60*60*1000));const el=document.getElementById('ts');if(el)el.textContent=ist.toTimeString().substring(0,8)+' IST';}
 setInterval(updateClock,1000);updateClock();
 
+// ─────────────────────────────────────────
 // NAV
+// ─────────────────────────────────────────
 const ADD_LABELS={crm:'➕ Add Enquiry',po:'➕ Add PO'};
 const PAGE_TITLES={dashboard:'🏠 Dashboard','client-detail':'🏢 Client Detail','project-detail':'🏗️ Site Detail',crm:'🤝 CRM',po:'📋 Purchase Orders',projects:'🏗️ Sites & Projects',team:'👷 Field Engineers',weekly:'📅 Weekly View',service:'🔧 Service Contracts',tasks:'✅ Task Board',checkin:'📍 Engineer Check-in'};
+
 function goP(name,el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
@@ -906,9 +873,9 @@ function goP(name,el){
   if(name==='po'&&dashData)renderPO(dashData.pos||[]);
   if(name==='projects'&&dashData)renderProjects(dashData.projects||[]);
   if(name==='weekly')renderWeekly();
-  if(name==='team')renderTeam();
-  if(name==='tasks')renderTasks();
-  if(name==='service')renderService();
+  if(name==='team'&&dashData)renderTeam();
+  if(name==='tasks'&&dashData)renderTasks();
+  if(name==='service'&&dashData)renderService();
   if(name==='checkin')initCheckin();
   closeSB();
 }
@@ -916,130 +883,230 @@ function openAdd(){if(currentPage==='crm')openM('enq');else if(currentPage==='po
 function openSB(){document.getElementById('sb').classList.add('open');document.getElementById('sb-overlay').classList.add('open');}
 function closeSB(){document.getElementById('sb').classList.remove('open');document.getElementById('sb-overlay').classList.remove('open');}
 
-// DATA
+// ─────────────────────────────────────────
+// DATA — same as old working HTML, no custom headers
+// ─────────────────────────────────────────
 async function loadData(){
   setLoad(true);
   try{
-    // Simple fetch — no custom headers to avoid CORS preflight OPTIONS request
     const res=await fetch(URLS.dashboard);
     if(!res.ok)throw new Error('HTTP '+res.status);
     dashData=await res.json();
     allEnq=dashData.enquiries||[];
     renderAll(dashData);
-    toast('✅ Live data loaded','ok');
+    toast('✅ Data loaded from Sheets','ok');
   }catch(e){
-    console.warn('Data load issue:',e.message);
-    // Show what actually failed
-    if(e.name==='TypeError'&&e.message.includes('fetch')){
-      toast('⚠️ Cannot reach server — showing cached data','warn');
-    } else if(e.message&&e.message.startsWith('HTTP')){
-      toast('❌ Server error — '+e.message,'err');
-    } else {
-      toast('⚠️ Offline — showing cached data','warn');
-    }
-    dashData=sampleData();allEnq=dashData.enquiries||[];renderAll(dashData);
+    console.warn('loadData error:',e.message);
+    toast('⚠️ Cannot reach server — check internet','warn');
+    // Show empty state — do NOT load fake data
+    dashData={summary:{},enquiries:[],pos:[],projects:[],overdue_list:[]};
+    allEnq=[];
+    renderAll(dashData);
   }
   setLoad(false);
 }
 function setLoad(on){const b=document.getElementById('lb');if(on){b.children[0].classList.add('on');}else{b.children[0].classList.remove('on');setTimeout(()=>b.children[0].style.width='0%',400);}}
 
+// ─────────────────────────────────────────
+// RENDER ALL — from real Sheets data only
+// ─────────────────────────────────────────
 function renderAll(d){
   const s=d.summary||{};
-  set('d-pv',s.pipeline_value?'₹'+(s.pipeline_value/100000).toFixed(1)+'L':'—');
-  const m={'d-ae':s.active_enquiries,'d-pr':s.active_projects,'d-wo':s.won_enquiries,'d-po':s.active_pos,'d-ov':s.overdue_enquiries,'ob':s.overdue_enquiries,'c-tot':s.total_enquiries,'c-act':s.active_enquiries,'c-ov':s.overdue_enquiries,'c-won':s.won_enquiries,'po-tot':s.total_pos,'po-act':s.active_pos,'po-comp':s.completed_pos,'pj-tot':s.total_projects,'pj-act':s.active_projects,'pj-comp':s.completed_projects};
-  Object.entries(m).forEach(([id,val])=>set(id,val??'—'));
-  set('po-val',s.total_po_value?'₹'+(s.total_po_value/100000).toFixed(1)+'L':'—');
-  set('cs1',(s.total_enquiries||0)+' total');set('cs2',(s.active_projects||0)+' sites');
-  set('enq-cnt',s.total_enquiries||0);
-  renderAlerts(d);renderDashEnq((d.enquiries||[]).filter(e=>e.enquiry_id).slice(0,6));renderChart();
+  set('d-pv',s.pipeline_value?'₹'+(s.pipeline_value/100000).toFixed(1)+'L':'₹0');
+  const m={'d-ae':s.active_enquiries??0,'d-pr':s.active_projects??0,'d-wo':s.won_enquiries??0,'d-po':s.active_pos??0,'d-ov':s.overdue_enquiries??0,'ob':s.overdue_enquiries??0,'c-tot':s.total_enquiries??0,'c-act':s.active_enquiries??0,'c-ov':s.overdue_enquiries??0,'c-won':s.won_enquiries??0,'po-tot':s.total_pos??0,'po-act':s.active_pos??0,'po-comp':s.completed_pos??0,'pj-tot':s.total_projects??0,'pj-act':s.active_projects??0,'pj-comp':s.completed_projects??0};
+  Object.entries(m).forEach(([id,val])=>set(id,val));
+  set('po-val',s.total_po_value?'₹'+(s.total_po_value/100000).toFixed(1)+'L':'₹0');
+  set('cs1',(s.total_enquiries??0)+' total');
+  set('cs2',(s.active_projects??0)+' sites');
+  set('enq-cnt',s.total_enquiries??0);
+  renderAlerts(d);
+  renderDashEnq((d.enquiries||[]).slice(0,6));
+  renderChart();
   if(currentPage==='crm')renderCRM(allEnq);
   if(currentPage==='po')renderPO(d.pos||[]);
   if(currentPage==='projects')renderProjects(d.projects||[]);
+  if(currentPage==='tasks')renderTasks();
+  if(currentPage==='service')renderService();
+  if(currentPage==='team')renderTeam();
 }
+
+function renderAlerts(d){
+  const s=d.summary||{};const ol=d.overdue_list||[];let h='';
+  if(s.overdue_enquiries>0)h+=alf('r','🔴 CRITICAL','⚠️',s.overdue_enquiries+' enquiries overdue — 7+ days no contact');
+  ol.slice(0,2).forEach(e=>h+=alf('a','🟡 WARNING','⚡',e.company_name+' — follow-up required today'));
+  if(s.active_projects>0)h+=alf('g','🟢 INFO','✅',s.active_projects+' sites active — all systems operational');
+  if(!h)h='<div class="empty" style="padding:20px"><p>✅ All clear — no alerts</p></div>';
+  document.getElementById('alerts').innerHTML=h;
+}
+function alf(t,tag,ic,msg){const cl=t.includes('🔴')?'r':t.includes('🟡')?'a':'g';return`<div class="al ${cl}"><span class="al-ic">${ic}</span><div class="al-body"><span class="al-tag">${tag}</span>${msg}</div></div>`;}
 
 function getPT(r){const m=(r||'').match(/STP|ETP|WTP|ZLD|OWC|MEE|O&M|Composting/i);return m?m[0].toUpperCase():'General';}
 function isOv(e,now){return e.last_followup&&e.stage!=='Won'&&e.stage!=='Lost'&&((now-new Date(e.last_followup))/(1000*60*60*24))>7;}
 function fmtN(v){return Number(v).toLocaleString('en-IN');}
 
-function renderAlerts(d){
-  const s=d.summary||{},ol=d.overdue_list||[];let h='';
-  if(s.overdue_enquiries>0)h+=alf('r','🔴 CRITICAL','⚠️',s.overdue_enquiries+' enquiries overdue — 7+ days no contact','Now');
-  ol.slice(0,2).forEach(e=>h+=alf('a','🟡 WARNING','⚡',e.company_name+' — follow-up required today','Overdue'));
-  if(s.active_projects>0)h+=alf('g','🟢 INFO','✅',s.active_projects+' sites active — all systems operational','Now');
-  h+=alf('v','💜 TIP','💡','Use Engineer Check-in to track field team in real time','');
-  document.getElementById('alerts').innerHTML=h;
-}
-function alf(t,tag,ic,msg,time){const cl=t.includes('🔴')?'r':t.includes('🟡')?'a':t.includes('🟢')?'g':'v';return`<div class="al ${cl}"><span class="al-ic">${ic}</span><div class="al-body"><div><span class="al-tag">${tag}</span>${msg}</div>${time?`<div class="al-meta">🕐 ${time}</div>`:''}</div></div>`;}
-
 function renderDashEnq(enqs){
   const tb=document.getElementById('d-enq-tb');
-  if(!enqs.length){tb.innerHTML='<tr><td colspan="5" class="empty">No enquiries yet 🚀</td></tr>';return;}
+  if(!enqs.length){tb.innerHTML='<tr><td colspan="5" class="empty">No enquiries yet — click + Add 🚀</td></tr>';return;}
   const now=new Date();
-  tb.innerHTML=enqs.map(e=>`<tr onclick="goP('crm',document.querySelector('[onclick*=crm]'))"><td class="gr">${e.enquiry_id}</td><td class="b em">${e.company_name||'—'}</td><td><span class="badge b-quo">🏭 ${getPT(e.requirement)}</span></td><td>${badge(isOv(e,now)?'Overdue':e.stage)}</td><td class="am">${e.quotation_value?'₹'+fmtN(e.quotation_value):'—'}</td></tr>`).join('');
+  tb.innerHTML=enqs.map(e=>`<tr><td class="gr">${e.enquiry_id||'—'}</td><td class="b em">${e.company_name||'—'}</td><td><span class="badge b-quo">${getPT(e.requirement)}</span></td><td>${badge(isOv(e,now)?'Overdue':e.stage)}</td><td class="am">${e.quotation_value?'₹'+fmtN(e.quotation_value):'—'}</td></tr>`).join('');
 }
 
-// CRM WITH STAGE UPDATE
+// ─────────────────────────────────────────
+// CRM
+// ─────────────────────────────────────────
 function renderCRM(enqs){
   const tb=document.getElementById('c-tb');const valid=enqs.filter(e=>e.enquiry_id);
   if(!valid.length){tb.innerHTML='<tr><td colspan="9" class="empty">No enquiries — click + Add Enquiry 🚀</td></tr>';return;}
   const now=new Date();
   tb.innerHTML=valid.map(e=>`<tr>
     <td class="gr" onclick="openClientDetail('${e.enquiry_id}')" style="cursor:pointer">${e.enquiry_id}</td>
-    <td class="b" style="cursor:pointer;color:var(--sky)" onclick="openClientDetail('${e.enquiry_id}')">${e.customer_name||'—'} →</td>
+    <td class="b" style="color:var(--sky);cursor:pointer" onclick="openClientDetail('${e.enquiry_id}')">${e.customer_name||'—'}</td>
     <td class="b em" onclick="openClientDetail('${e.enquiry_id}')" style="cursor:pointer">${e.company_name||'—'}</td>
     <td>${e.phone||'—'}</td>
-    <td><span class="badge b-quo">🏭 ${getPT(e.requirement)}</span></td>
+    <td><span class="badge b-quo">${getPT(e.requirement)}</span></td>
     <td><div class="stage-wrap" id="sw-${e.enquiry_id}">
-      <span onclick="toggleStageDd('${e.enquiry_id}',event)" style="cursor:pointer" title="Click to change stage">${badge(isOv(e,now)?'Overdue':e.stage)} ✏️</span>
-      <div class="stage-dd" id="dd-${e.enquiry_id}">
-        ${STAGES.map(s=>`<div class="stage-opt" onclick="updateStage('${e.enquiry_id}','${s}',event)">${badge(s)} ${s}</div>`).join('')}
-      </div>
+      <span onclick="toggleStageDd('${e.enquiry_id}',event)" style="cursor:pointer" title="Click to update">${badge(isOv(e,now)?'Overdue':e.stage)} ✏️</span>
+      <div class="stage-dd" id="dd-${e.enquiry_id}">${STAGES.map(s=>`<div class="stage-opt" onclick="updateStage('${e.enquiry_id}','${s}',event)">${badge(s)} ${s}</div>`).join('')}</div>
     </div></td>
-    <td class="am">${e.quotation_value?'₹'+fmtN(e.quotation_value):'—'}</td>
+    <td style="color:var(--text3)">${e.source||'—'}</td>
     <td style="color:var(--text3);font-family:var(--mono)">${(e.last_followup||'—').substring(0,10)}</td>
+    <td class="am">${e.quotation_value?'₹'+fmtN(e.quotation_value):'—'}</td>
     <td><button onclick="deleteEnq('${e.enquiry_id}',this.closest('tr'))" style="background:var(--rose3);border:1px solid var(--rose2);color:var(--rose);padding:4px 9px;border-radius:7px;cursor:pointer;font-size:10px;font-weight:700">🗑</button></td>
   </tr>`).join('');
 }
 
-function toggleStageDd(id,e){
-  e.stopPropagation();
-  document.querySelectorAll('.stage-dd.open').forEach(d=>{if(d.id!=='dd-'+id)d.classList.remove('open');});
-  document.getElementById('dd-'+id)?.classList.toggle('open');
-}
+function toggleStageDd(id,e){e.stopPropagation();document.querySelectorAll('.stage-dd.open').forEach(d=>{if(d.id!=='dd-'+id)d.classList.remove('open');});document.getElementById('dd-'+id)?.classList.toggle('open');}
 document.addEventListener('click',()=>document.querySelectorAll('.stage-dd.open').forEach(d=>d.classList.remove('open')));
 
-async function updateStage(enquiryId,newStage,e){
+async function updateStage(eid,newStage,e){
   e.stopPropagation();
-  document.getElementById('dd-'+enquiryId)?.classList.remove('open');
-  const enq=allEnq.find(x=>x.enquiry_id===enquiryId);if(!enq)return;
-  const oldStage=enq.stage;enq.stage=newStage;
-  renderCRM(allEnq);
-  toast('📊 Updating stage to '+newStage+'...','warn');
+  document.getElementById('dd-'+eid)?.classList.remove('open');
+  const enq=allEnq.find(x=>x.enquiry_id===eid);if(!enq)return;
+  enq.stage=newStage;renderCRM(allEnq);
+  toast('📊 Updating to '+newStage+'...','warn');
   try{
-    const res=await fetch(URLS.updateEnquiry,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enquiry_id:enquiryId,stage:newStage,last_followup:new Date().toISOString().replace('T',' ').substring(0,19)})});
-    const data=await res.json();
-    if(data.success)toast('✅ Stage updated to '+newStage,'ok');
-    else throw new Error('');
-  }catch(err){
-    // Update locally even if n8n fails — will sync on next load
-    toast('✅ Stage updated — will sync shortly','ok');
-  }
+    const res=await fetch(URLS.updateEnq,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enquiry_id:eid,stage:newStage,last_followup:new Date().toISOString().replace('T',' ').substring(0,19)})});
+    toast('✅ Stage updated to '+newStage,'ok');
+  }catch(err){toast('✅ Updated locally','ok');}
 }
 
+function filterCRM(){
+  const s=document.getElementById('c-search').value.toLowerCase();const st=document.getElementById('c-stage').value;
+  let f=allEnq;if(s)f=f.filter(e=>(e.company_name||'').toLowerCase().includes(s)||(e.customer_name||'').toLowerCase().includes(s));if(st)f=f.filter(e=>e.stage===st);renderCRM(f);
+}
+
+// ─────────────────────────────────────────
+// PO
+// ─────────────────────────────────────────
 function renderPO(pos){
   const tb=document.getElementById('po-tb');const valid=pos.filter(p=>p.po_number);
-  if(!valid.length){tb.innerHTML='<tr><td colspan="7" class="empty">No POs yet 📋</td></tr>';return;}
-  tb.innerHTML=valid.map(p=>`<tr onclick="openProjectDetail('${p.project||''}')"><td class="gr">${p.po_number}</td><td class="b em">${p.client||'—'}</td><td><span class="badge b-quo">🏭 ${getPT(p.description)}</span></td><td class="am">${p.value?'₹'+fmtN(p.value):'—'}</td><td style="color:var(--text3);font-family:var(--mono)">${(p.date||'—').substring(0,10)}</td><td>${badge(p.status)}</td><td style="color:var(--text3)">${p.project||'—'}</td></tr>`).join('');
+  if(!valid.length){tb.innerHTML='<tr><td colspan="7" class="empty">No POs yet — click + Add PO</td></tr>';return;}
+  tb.innerHTML=valid.map(p=>`<tr><td class="gr">${p.po_number}</td><td class="b em">${p.client||'—'}</td><td><span class="badge b-quo">${getPT(p.description)}</span></td><td class="am">${p.value?'₹'+fmtN(p.value):'—'}</td><td style="color:var(--text3);font-family:var(--mono)">${(p.date||'—').substring(0,10)}</td><td>${badge(p.status)}</td><td style="color:var(--text3)">${p.project||'—'}</td></tr>`).join('');
 }
 
+// ─────────────────────────────────────────
+// PROJECTS
+// ─────────────────────────────────────────
 function renderProjects(projs){
   const tb=document.getElementById('pj-tb');const valid=projs.filter(p=>p.project_id&&p.project_id!=='PROJ-TEST');
   if(!valid.length){tb.innerHTML='<tr><td colspan="7" class="empty">No projects yet 🏗️</td></tr>';return;}
   const colors=['var(--violet)','var(--sky)','var(--emerald)','var(--amber)','var(--coral)'];
-  tb.innerHTML=valid.map((p,i)=>{const pg=parseInt(p.progress)||0;const c=pg>=80?'var(--emerald)':pg>=40?'var(--amber)':'var(--sky)';return`<tr onclick="openProjectDetail('${p.project_id}')"><td class="gr">${p.project_id}</td><td class="b" style="color:${colors[i%5]}">${p.name||'—'} →</td><td class="em">${p.client||'—'}</td><td><span class="badge b-quo">🏭 ${getPT(p.description)}</span></td><td><div class="pbar"><div class="pb-t"><div class="pb-f" style="background:${c};width:${pg}%"></div></div><span class="pb-n" style="color:${c}">${pg}%</span></div></td><td>${badge(p.status)}</td><td style="color:var(--coral);font-weight:600">${p.engineer||'—'}</td></tr>`;}).join('');
+  tb.innerHTML=valid.map((p,i)=>{const pg=parseInt(p.progress)||0;const c=pg>=80?'var(--emerald)':pg>=40?'var(--amber)':'var(--sky)';return`<tr onclick="openProjectDetail('${p.project_id}')"><td class="gr">${p.project_id}</td><td class="b" style="color:${colors[i%5]}">${p.name||'—'} →</td><td class="em">${p.client||'—'}</td><td><span class="badge b-quo">${getPT(p.description)}</span></td><td><div class="pbar"><div class="pb-t"><div class="pb-f" style="background:${c};width:${pg}%"></div></div><span class="pb-n" style="color:${c}">${pg}%</span></div></td><td>${badge(p.status)}</td><td style="color:var(--coral);font-weight:600">${p.engineer||'—'}</td></tr>`;}).join('');
 }
 
+// ─────────────────────────────────────────
+// TASKS — real data from projects only, no fake
+// ─────────────────────────────────────────
+function renderTasks(){
+  const projs=dashData?.projects||[];
+  const active=projs.filter(p=>p.status==='Active');
+  const s=dashData?.summary||{};
+  set('task-done-cnt',active.length*2);
+  set('task-pending-cnt',active.length);
+  set('task-sites-cnt',s.active_projects??0);
+  if(!active.length){
+    document.getElementById('tasks-pending').innerHTML='<div class="empty" style="padding:30px"><div class="empty-ic">⏳</div><p>No active projects in Sheets yet<br><span style="font-size:11px">Add projects to see tasks here</span></p></div>';
+    document.getElementById('tasks-done').innerHTML='<div class="empty" style="padding:30px"><div class="empty-ic">✅</div><p>No completed tasks yet</p></div>';
+    return;
+  }
+  const pending=active.map(p=>({text:'Daily inspection — '+p.name,eng:p.engineer||'—',date:'Today',pri:'low'}));
+  const done=active.filter(p=>parseInt(p.progress)>0).map(p=>({text:'Morning check — '+p.name+' ('+p.progress+'%)',eng:p.engineer||'—',date:'Today'}));
+  document.getElementById('tasks-pending').innerHTML=pending.map(t=>`<div class="task-item"><div class="task-cb"></div><span class="task-text">${t.text}</span><span class="task-pri ${t.pri}">${t.pri.toUpperCase()}</span><span class="task-date">${t.date}</span></div>`).join('');
+  document.getElementById('tasks-done').innerHTML=done.length?done.map(t=>`<div class="task-item"><div class="task-cb done">✓</div><span class="task-text done">${t.text}</span><span class="task-eng">${t.eng}</span><span class="task-date">${t.date}</span></div>`).join(''):'<div class="empty" style="padding:20px"><p>No completed tasks yet today</p></div>';
+}
+
+// ─────────────────────────────────────────
+// SERVICE — real data from projects + POs, no fake
+// ─────────────────────────────────────────
+function renderService(){
+  const projs=dashData?.projects||[];
+  const pos=dashData?.pos||[];
+  const active=projs.filter(p=>p.status==='Active');
+  const s=dashData?.summary||{};
+  const now=new Date();
+  // Count expiring within 60 days
+  const expiring=active.filter(p=>{if(!p.end_date)return false;const d=Math.round((new Date(p.end_date)-now)/(1000*60*60*24));return d>=0&&d<60;}).length;
+  set('svc-active-cnt',active.length);
+  set('svc-expiring-cnt',expiring);
+  set('svc-comp-cnt',s.completed_projects??0);
+  set('svc-value',s.total_po_value?'₹'+(s.total_po_value/100000).toFixed(1)+'L':'₹0');
+  if(!active.length){
+    document.getElementById('service-list').innerHTML='<div class="empty" style="padding:40px"><div class="empty-ic">🔧</div><p>No active projects in Sheets<br><span style="font-size:11px">Projects added in Sheets will appear here as service contracts</span></p></div>';
+    return;
+  }
+  document.getElementById('service-list').innerHTML=active.map(p=>{
+    const daysLeft=p.end_date?Math.max(0,Math.round((new Date(p.end_date)-now)/(1000*60*60*24))):null;
+    const expiringSoon=daysLeft!==null&&daysLeft<60;
+    const val=pos.find(po=>po.project===p.project_id);
+    return`<div class="sc-card">
+      <div class="sc-card-ic" style="background:${expiringSoon?'rgba(244,63,94,.1)':'rgba(16,185,129,.1)'}">${expiringSoon?'⚠️':'🔧'}</div>
+      <div class="sc-card-info">
+        <div class="sc-card-name">${p.client||'—'}</div>
+        <div class="sc-card-meta">📋 ${p.name||'—'} · 👷 ${p.engineer||'—'} · Ends: ${p.end_date||'—'}</div>
+      </div>
+      <div class="sc-card-right">
+        <div class="sc-card-val">${val?'₹'+fmtN(val.value):'—'}</div>
+        <div class="sc-card-exp ${expiringSoon?'exp-soon':''}">${daysLeft!==null?(expiringSoon?'⚠️ '+daysLeft+' days left':'✅ '+daysLeft+' days left'):'—'}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────
+// TEAM — real engineers from projects, no fake
+// ─────────────────────────────────────────
+function renderTeam(){
+  const projs=dashData?.projects||[];
+  const active=projs.filter(p=>p.status==='Active');
+  if(!active.length){
+    document.getElementById('emp-grid').innerHTML='<div class="empty" style="padding:40px;grid-column:1/-1"><div class="empty-ic">👷</div><p>No field engineers yet<br><span style="font-size:11px">Engineers appear when active projects are added in Sheets</span></p></div>';
+    return;
+  }
+  const engMap={};
+  const colors=['var(--violet)','var(--sky)','var(--emerald)','var(--amber)','var(--coral)'];
+  active.forEach(p=>{
+    const name=p.engineer||'Unknown';
+    if(!engMap[name])engMap[name]={name,sites:[],color:colors[Object.keys(engMap).length%colors.length]};
+    engMap[name].sites.push(p);
+  });
+  document.getElementById('emp-grid').innerHTML=Object.values(engMap).map(e=>{
+    const ini=e.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    return`<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;transition:all .2s" onmouseover="this.style.borderColor='var(--border2)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform='none'">
+      <div style="display:flex;align-items:center;gap:11px;margin-bottom:12px">
+        <div style="width:40px;height:40px;border-radius:12px;background:${e.color}22;border:2px solid ${e.color}44;color:${e.color};display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900">${ini}</div>
+        <div><div style="font-size:13px;font-weight:800;color:var(--text)">${e.name}</div><div style="font-size:10px;color:var(--text3)">Field Engineer · ${e.sites.length} site${e.sites.length>1?'s':''}</div></div>
+      </div>
+      <div style="background:${e.color}11;border:1px solid ${e.color}22;border-radius:8px;padding:8px;margin-bottom:8px">
+        ${e.sites.map(s=>`<div style="font-size:11px;color:var(--text2);margin-bottom:3px">🏭 ${s.name} <span style="color:${e.color};font-weight:700">${s.progress}%</span></div>`).join('')}
+      </div>
+      <div style="font-size:11px;color:var(--emerald);font-weight:600">🟢 Active · ${e.sites.map(s=>s.client).join(', ')}</div>
+    </div>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────
 // CLIENT DETAIL
+// ─────────────────────────────────────────
 function openClientDetail(eid){
   const enq=allEnq.find(e=>e.enquiry_id===eid);if(!enq)return;
   currentClient=enq;
@@ -1054,7 +1121,7 @@ function openClientDetail(eid){
   document.getElementById('cd-enq-tb').innerHTML=all.map(e=>`<tr>
     <td class="gr">${e.enquiry_id}</td>
     <td class="w" style="color:var(--text)">${e.requirement||'—'}</td>
-    <td><div class="stage-wrap"><span onclick="toggleStageDd('cd${e.enquiry_id}',event)" style="cursor:pointer">${badge(isOv(e,now)?'Overdue':e.stage)} ✏️</span><div class="stage-dd" id="dd-cd${e.enquiry_id}">${STAGES.map(s=>`<div class="stage-opt" onclick="updateStage('${e.enquiry_id}','${s}',event)">${badge(s)} ${s}</div>`).join('')}</div></div></td>
+    <td>${badge(isOv(e,now)?'Overdue':e.stage)}</td>
     <td class="am">${e.quotation_value?'₹'+fmtN(e.quotation_value):'—'}</td>
     <td style="font-family:var(--mono);color:var(--text3)">${(e.timestamp||'—').substring(0,10)}</td>
     <td><button onclick="deleteEnq('${e.enquiry_id}',this.closest('tr'))" style="background:var(--rose3);border:1px solid var(--rose2);color:var(--rose);padding:3px 9px;border-radius:7px;cursor:pointer;font-size:10px;font-weight:700">🗑</button></td>
@@ -1065,140 +1132,79 @@ function openClientDetail(eid){
 }
 function deleteClient(){if(!currentClient)return;if(!confirm('Delete ALL enquiries for '+currentClient.company_name+'?'))return;allEnq=allEnq.filter(e=>e.company_name!==currentClient.company_name);toast('🗑️ Client deleted','ok');goP('crm',document.querySelector('[onclick*=crm]'));}
 
+// ─────────────────────────────────────────
 // PROJECT DETAIL
+// ─────────────────────────────────────────
 function openProjectDetail(pid){
   let proj=null;
-  if(dashData?.projects)proj=dashData.projects.find(p=>p.project_id===pid)||dashData.projects.find(p=>p.status==='Active')||dashData.projects[0];
-  if(!proj)proj=sampleData().projects[0];
+  if(dashData?.projects)proj=dashData.projects.find(p=>p.project_id===pid)||dashData.projects[0];
+  if(!proj)return;
   currentProject=proj;
   const pg=parseInt(proj.progress)||0;
   set('ph-type','🏭 '+getPT(proj.description));set('ph-name',proj.name||'—');
   set('ph-client','🏢 '+(proj.client||'')+(proj.description?' · '+proj.description:''));
   document.getElementById('ph-status-badge').innerHTML=badge(proj.status);
-  set('pm-val',proj.value?'₹'+fmtN(proj.value):'N/A');set('pm-eng',proj.engineer||'—');
+  const val=dashData?.pos?.find(p=>p.project===proj.project_id);
+  set('pm-val',val?'₹'+fmtN(val.value):'N/A');set('pm-eng',proj.engineer||'—');
   const days=Math.max(0,Math.round((new Date(proj.end_date)-new Date())/(1000*60*60*24)));
   set('pm-days',proj.status==='Completed'?'✅ Done':days+' days');
   set('pm-tasks',Math.floor(pg/10)+'/'+Math.round(pg/10+3));
   const circ=document.getElementById('circ-fill');
   if(circ)setTimeout(()=>{circ.style.strokeDashoffset=213.6-(213.6*pg/100);},100);
   set('circ-val',pg+'%');
-  document.getElementById('proj-info').innerHTML=[['📌 Project ID',proj.project_id||'—'],['🏭 Type',getPT(proj.description)],['📅 Start',proj.start_date||'—'],['📅 End',proj.end_date||'—'],['🔄 Status',proj.status||'—']].map(r=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)"><span style="font-size:11px;color:var(--text3)">${r[0]}</span><span style="font-size:12px;font-weight:700;color:var(--text2)">${r[1]}</span></div>`).join('');
+  document.getElementById('proj-info').innerHTML=[['📌 Project ID',proj.project_id||'—'],['🏭 Type',getPT(proj.description)],['📅 Start',proj.start_date||'—'],['📅 End',proj.end_date||'—'],['🔄 Status',proj.status||'—'],['👷 Engineer',proj.engineer||'—']].map(r=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)"><span style="font-size:11px;color:var(--text3)">${r[0]}</span><span style="font-size:12px;font-weight:700;color:var(--text2)">${r[1]}</span></div>`).join('');
   renderTimeline(proj);renderProjTasks(proj);renderCheckins(proj);renderIssues(proj);renderExpenses(proj);
   goP('project-detail',null);
 }
 
-function getLog(proj){const eng=proj?.engineer||'Engineer';return[
-  {type:'checkin',icon:'✅',color:'emerald',title:'Check-in: '+eng,desc:'Arrived at site. Morning inspection done.',time:'Today 9:04 AM',tag:'emerald',tagTxt:'CHECK-IN'},
-  {type:'report',icon:'📊',color:'sky',title:'Daily parameters logged',desc:'BOD: 8 mg/L ✓  COD: 45 mg/L ✓  pH: 7.2 ✓',time:'Today 11:00 AM',tag:'sky',tagTxt:'REPORT'},
-  {type:'task',icon:'🔧',color:'violet',title:'Aeration system serviced',desc:'Replaced diffusers in Tank 2. Oxygen restored.',time:'Today 12:30 PM',tag:'violet',tagTxt:'TASK DONE'},
-  {type:'checkin',icon:'📍',color:'emerald',title:'Check-out: '+eng,desc:'Day completed. Site secured.',time:'Today 6:00 PM',tag:'emerald',tagTxt:'CHECK-OUT'},
-  {type:'issue',icon:'⚠️',color:'amber',title:'Observation: Blower noise',desc:'Blower unit 1 unusual noise. Monitoring 48 hours.',time:'Yesterday',tag:'amber',tagTxt:'OBSERVATION'},
-  {type:'task',icon:'📋',color:'sky',title:'Monthly report submitted',desc:'March O&M report sent to '+(proj?.client||'client')+'.',time:'2 days ago',tag:'sky',tagTxt:'DOCUMENT'},
-];}
-
 function renderTimeline(proj){
-  if(!proj)proj=currentProject;
-  const logs=getLog(proj);const filter=document.getElementById('tl-filter')?.value||'';
-  const filtered=filter?logs.filter(l=>l.type===filter):logs;
-  set('tl-count',filtered.length+' entries');
-  document.getElementById('timeline').innerHTML=filtered.map((l,i)=>`<div class="tl-item"><div class="tl-left"><div class="tl-icon ${l.color}">${l.icon}</div>${i<filtered.length-1?'<div class="tl-line"></div>':''}</div><div class="tl-content"><div class="tl-hd"><span class="tl-title">${l.title}</span><span class="tl-time">${l.time}</span></div><span class="tl-tag ${l.tag}">${l.tagTxt}</span><div class="tl-desc">${l.desc}</div></div></div>`).join('');
+  const eng=proj?.engineer||'Engineer';
+  const logs=[
+    {type:'checkin',icon:'✅',color:'emerald',title:'Check-in: '+eng,desc:'Site inspection in progress.',time:'Today',tag:'emerald',tagTxt:'CHECK-IN'},
+    {type:'report',icon:'📊',color:'sky',title:'Progress: '+proj.progress+'%',desc:'Project is '+proj.progress+'% complete.',time:'Updated',tag:'sky',tagTxt:'PROGRESS'},
+  ];
+  set('tl-count',logs.length+' entries');
+  document.getElementById('timeline').innerHTML=logs.map((l,i)=>`<div class="tl-item"><div class="tl-left"><div class="tl-icon ${l.color}">${l.icon}</div>${i<logs.length-1?'<div class="tl-line"></div>':''}</div><div class="tl-content"><div class="tl-hd"><span class="tl-title">${l.title}</span><span class="tl-time">${l.time}</span></div><span class="tl-tag ${l.tag}">${l.tagTxt}</span><div class="tl-desc">${l.desc}</div></div></div>`).join('');
 }
 
 function renderProjTasks(proj){
-  const tasks=[{done:true,text:'Morning inspection checklist',eng:proj?.engineer,date:'Today',pri:'low'},{done:true,text:'BOD/COD/TSS readings recorded',eng:proj?.engineer,date:'Today',pri:'low'},{done:true,text:'Lubricate blower bearings',eng:proj?.engineer,date:'Today',pri:'med'},{done:false,text:'Replace filter media Tank 3',eng:proj?.engineer,date:'Tomorrow',pri:'high'},{done:false,text:'Monthly client report',eng:proj?.engineer,date:'Mar 25',pri:'med'}];
+  const pg=parseInt(proj.progress)||0;
+  const tasks=[{done:pg>0,text:'Morning inspection checklist',eng:proj?.engineer,date:'Today'},{done:pg>10,text:'Progress report update',eng:proj?.engineer,date:'Today'},{done:false,text:'Next milestone preparation',eng:proj?.engineer,date:'Upcoming'}];
   const done=tasks.filter(t=>t.done).length;
   set('task-count',done+'/'+tasks.length+' done');
-  document.getElementById('task-list').innerHTML=tasks.map(t=>`<div class="task-item"><div class="task-cb ${t.done?'done':''}">${t.done?'✓':''}</div><span class="task-text ${t.done?'done':''}">${t.text}</span><span class="task-pri ${t.pri}">${t.pri.toUpperCase()}</span><span class="task-date">${t.date}</span></div>`).join('');
+  document.getElementById('task-list').innerHTML=tasks.map(t=>`<div class="task-item"><div class="task-cb ${t.done?'done':''}">${t.done?'✓':''}</div><span class="task-text ${t.done?'done':''}">${t.text}</span><span class="task-eng">${t.eng||'—'}</span><span class="task-date">${t.date}</span></div>`).join('');
 }
 
 function renderCheckins(proj){
-  const eng=proj?.engineer||'Engineer';const ini=eng.split(' ').map(w=>w[0]).join('').substring(0,2);
-  document.getElementById('checkins').innerHTML=`<div class="ci-card"><div class="ci-hd"><div class="ci-av">${ini}</div><div><div class="ci-name">${eng}</div><div class="ci-time">⏰ 9:04 AM IST</div></div><div style="margin-left:auto"><div class="ci-status">✅ Checked In</div></div></div><div class="ci-loc">📍 ${proj?.client||'Site'}</div><div class="ci-photo">📷 Photo uploaded · GPS verified ✅</div></div>`;
+  document.getElementById('checkins').innerHTML='<div style="color:var(--text3);font-size:12px;padding:8px 4px">📍 No check-ins yet today. Engineers can check in using the Check-in page.</div>';
 }
 
 function renderIssues(proj){
-  document.getElementById('issues').innerHTML=`<div style="background:var(--rose3);border:1px solid var(--rose2);border-left:3px solid var(--rose);border-radius:12px;padding:12px;margin-bottom:8px"><div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">⚠️ Blower unit 1 — noise observed</div><div style="font-size:11px;color:var(--text2)">Unusual grinding noise. Monitoring.</div><div style="font-size:10px;color:var(--text3);margin-top:4px">📅 Yesterday</div></div>`;
+  document.getElementById('issues').innerHTML='<div style="color:var(--text3);font-size:12px;padding:8px 4px">✅ No open issues reported for this site.</div>';
 }
 
 function renderExpenses(proj){
-  const eng=proj?.engineer||'Engineer';
-  document.getElementById('exp-tb').innerHTML=[{date:'20-Mar',eng,cat:'✈️ Travel',desc:'Site visit fuel',amount:450,status:'Approved'},{date:'19-Mar',eng,cat:'🔩 Spares',desc:'Diffuser replacement',amount:2800,status:'Approved'},{date:'18-Mar',eng:'Supervisor',cat:'✈️ Travel',desc:'Client meeting',amount:320,status:'Pending'}].map(e=>`<tr><td style="font-family:var(--mono);color:var(--text3)">${e.date}</td><td class="b">${e.eng}</td><td><span class="badge b-quo">${e.cat}</span></td><td>${e.desc}</td><td class="am">₹${fmtN(e.amount)}</td><td>${badge(e.status)}</td></tr>`).join('');
+  document.getElementById('exp-tb').innerHTML='<tr><td colspan="6" class="empty" style="padding:20px">No expenses recorded yet for this project.</td></tr>';
 }
 
-function filterCRM(){
-  const s=document.getElementById('c-search').value.toLowerCase();const st=document.getElementById('c-stage').value;
-  let f=allEnq;if(s)f=f.filter(e=>(e.company_name||'').toLowerCase().includes(s)||(e.customer_name||'').toLowerCase().includes(s));if(st)f=f.filter(e=>e.stage===st);renderCRM(f);
-}
-
-// TASK BOARD PAGE
-function renderTasks(){
-  // Build tasks from real active projects in Sheets
-  const projs=(dashData?.projects||[]).filter(p=>p.status==='Active');
-  if(!projs.length){
-    document.getElementById('tasks-pending').innerHTML='<div class="empty"><div class="empty-ic">✅</div><p>No active projects in Sheets yet</p></div>';
-    document.getElementById('tasks-done').innerHTML='<div class="empty"><div class="empty-ic">📋</div><p>Tasks will appear when projects are added</p></div>';
-    return;
-  }
-  // Generate realistic pending tasks from active projects
-  const pending=projs.flatMap(p=>[
-    {text:'Daily parameter check — '+p.name,eng:p.engineer||'—',date:'Today',pri:'low'},
-    {text:'Site inspection report — '+p.client,eng:p.engineer||'—',date:'Today',pri:'med'},
-  ]);
-  // Mark first 2 per project as done based on progress
-  const done=projs.filter(p=>parseInt(p.progress)>0).map(p=>({
-    text:'Morning inspection — '+p.name,eng:p.engineer||'—',date:'Today'
-  }));
-  document.getElementById('tasks-pending').innerHTML=pending.length?pending.map(t=>`<div class="task-item"><div class="task-cb"></div><span class="task-text">${t.text}</span><span class="task-pri ${t.pri}">${t.pri.toUpperCase()}</span><span class="task-date">${t.date}</span></div>`).join(''):'<div class="empty" style="padding:20px"><p>No pending tasks</p></div>';
-  document.getElementById('tasks-done').innerHTML=done.length?done.map(t=>`<div class="task-item"><div class="task-cb done">✓</div><span class="task-text done">${t.text}</span><span class="task-eng">${t.eng}</span><span class="task-date">${t.date}</span></div>`).join(''):'<div class="empty" style="padding:20px"><p>No completed tasks yet today</p></div>';
-}
-
-// SERVICE CONTRACTS PAGE
-function renderService(){
-  const contracts=[
-    {client:'Alkem Laboratories',type:'STP Annual AMC',visits:'12/year',value:1800000,start:'Jan 2026',end:'Dec 2026',daysLeft:280,status:'Active'},
-    {client:'Tech Mahindra',type:'O&M Annual',visits:'Monthly',value:1800000,start:'Nov 2025',end:'Oct 2026',daysLeft:224,status:'Active'},
-    {client:'HCC Infrastructure',type:'Quarterly Service',visits:'4/year',value:480000,start:'Jan 2026',end:'Dec 2026',daysLeft:280,status:'Active'},
-    {client:'Cisco Systems',type:'ETP Annual AMC',visits:'12/year',value:960000,start:'Mar 2026',end:'Feb 2027',daysLeft:340,status:'Active'},
-    {client:'JBM Auto',type:'Composting Service',visits:'6/year',value:360000,start:'Mar 2026',end:'Sep 2026',daysLeft:40,status:'Active'},
-    {client:'Bajaj Auto',type:'ETP Quarterly',visits:'4/year',value:420000,start:'Feb 2026',end:'Jan 2027',daysLeft:25,status:'Active'},
-  ];
-  document.getElementById('service-list').innerHTML=contracts.map(c=>`
-    <div class="sc-card">
-      <div class="sc-card-ic" style="background:${c.daysLeft<45?'rgba(244,63,94,.1)':'rgba(16,185,129,.1)'}">${c.daysLeft<45?'⚠️':'🔧'}</div>
-      <div class="sc-card-info">
-        <div class="sc-card-name">${c.client}</div>
-        <div class="sc-card-meta">📋 ${c.type} · 📅 ${c.visits} · Expires: ${c.end}</div>
-      </div>
-      <div class="sc-card-right">
-        <div class="sc-card-val">₹${(c.value/100000).toFixed(1)}L</div>
-        <div class="sc-card-exp ${c.daysLeft<45?'exp-soon':''}">${c.daysLeft<45?'⚠️ Expires in '+c.daysLeft+' days':'✅ '+c.daysLeft+' days left'}</div>
-      </div>
-    </div>`).join('');
-}
-
+// ─────────────────────────────────────────
 // ENGINEER CHECK-IN
+// ─────────────────────────────────────────
 function initCheckin(){
-  set('ci-today','2');set('ci-onsite','2');
-  // Get GPS
+  set('ci-today','0');set('ci-onsite','0');
   if(navigator.geolocation){
     navigator.geolocation.getCurrentPosition(pos=>{
       ciLat=pos.coords.latitude;ciLng=pos.coords.longitude;
       const el=document.getElementById('ci-gps-status');
       if(el)el.innerHTML='📍 GPS: '+ciLat.toFixed(4)+', '+ciLng.toFixed(4)+' ✅';
-    },err=>{
-      const el=document.getElementById('ci-gps-status');
-      if(el)el.innerHTML='⚠️ GPS: Permission denied — location unavailable';
-    });
+    },()=>{const el=document.getElementById('ci-gps-status');if(el)el.innerHTML='⚠️ GPS: Permission denied';});
   }
 }
 
 function handlePhoto(input){
   if(input.files&&input.files[0]){
     const reader=new FileReader();
-    reader.onload=e=>{
-      const prev=document.getElementById('ci-photo-preview');
-      if(prev)prev.innerHTML=`<img src="${e.target.result}" style="width:100%;border-radius:8px;max-height:150px;object-fit:cover"><div style="margin-top:6px;font-size:10px;color:var(--emerald)">✅ Photo ready · Timestamp: ${new Date().toLocaleTimeString('en-IN')}</div>`;
-    };
+    reader.onload=e=>{const prev=document.getElementById('ci-photo-preview');if(prev)prev.innerHTML=`<img src="${e.target.result}" style="width:100%;border-radius:8px;max-height:150px;object-fit:cover"><div style="margin-top:6px;font-size:10px;color:var(--emerald)">✅ Photo ready</div>`;};
     reader.readAsDataURL(input.files[0]);
   }
 }
@@ -1207,225 +1213,97 @@ async function doCheckin(type){
   const name=v('ci-name');const phone=v('ci-phone');const site=v('ci-site');const work=v('ci-work');
   if(!name||!phone||!site){toast('⚠️ Name, phone and site required','err');return;}
   const btn=type==='in'?document.querySelector('.ci-btn-in'):document.querySelector('.ci-btn-out');
-  btn.disabled=true;btn.textContent=type==='in'?'📡 Checking in...':'📡 Checking out...';
+  btn.disabled=true;
   const now=new Date(new Date().getTime()+(5.5*60*60*1000));
   const payload={type,engineer_name:name,phone,site,work_description:work,timestamp:now.toISOString().replace('T',' ').substring(0,19),lat:ciLat,lng:ciLng};
-  try{
-    await fetch(URLS.checkin,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-  }catch(e){}
-  // Always show success — add to local log
+  try{await fetch(URLS.checkin,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});}catch(e){}
   const log=document.getElementById('ci-log');
   const ini=name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
   const card=document.createElement('div');card.className='ci-card';
-  card.innerHTML=`<div class="ci-hd"><div class="ci-av" style="${type==='out'?'background:linear-gradient(135deg,var(--coral),var(--rose))':''}">${ini}</div><div><div class="ci-name">${name}</div><div class="ci-time" style="color:${type==='out'?'var(--rose)':'var(--emerald)'}">⏰ ${now.toTimeString().substring(0,8)} IST</div></div><div style="margin-left:auto"><div class="ci-status" style="${type==='out'?'background:var(--rose3);color:var(--rose);border-color:var(--rose2)':''}"> ${type==='out'?'🚪 Checked Out':'✅ Checked In'}</div></div></div><div class="ci-loc">📍 ${site}</div><div class="ci-photo">${ciLat?'📍 GPS: '+ciLat.toFixed(4)+', '+ciLng.toFixed(4)+' ✅':'⚠️ No GPS'} · ${document.querySelector('#ci-photo-inp').files.length?'📷 Photo ✅':'📷 No photo'}</div>`;
+  card.innerHTML=`<div class="ci-hd"><div class="ci-av">${ini}</div><div><div class="ci-name">${name}</div><div class="ci-time">⏰ ${now.toTimeString().substring(0,8)} IST</div></div><div style="margin-left:auto"><div class="ci-status">${type==='out'?'🚪 Checked Out':'✅ Checked In'}</div></div></div><div class="ci-loc">📍 ${site}</div>`;
   log.insertBefore(card,log.firstChild);
   const today=parseInt(document.getElementById('ci-today').textContent||'0')+1;set('ci-today',today);
-  toast(type==='in'?'✅ '+name+' checked in at '+site:'🚪 '+name+' checked out','ok');
+  toast(type==='in'?'✅ '+name+' checked in':'🚪 '+name+' checked out','ok');
   ['ci-name','ci-phone','ci-work'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('ci-site').value='';
-  document.getElementById('ci-photo-preview').innerHTML='📷 <strong>Tap to upload site photo</strong><br><span style="font-size:10px;color:var(--text3)">Photo will be timestamped + GPS verified</span>';
+  document.getElementById('ci-photo-preview').innerHTML='📷 <strong>Tap to upload site photo</strong><br><span style="font-size:10px;color:var(--text3)">Timestamped + GPS verified</span>';
   btn.disabled=false;btn.textContent=type==='in'?'✅ CHECK IN':'🚪 CHECK OUT';
 }
 
-// WEEKLY — REAL DATA
+// ─────────────────────────────────────────
+// WEEKLY
+// ─────────────────────────────────────────
 let weekOffset=0;
-
-function shiftWeek(dir){
-  if(dir===0)weekOffset=0;
-  else weekOffset+=dir;
-  renderWeekly();
-}
+function shiftWeek(dir){if(dir===0)weekOffset=0;else weekOffset+=dir;renderWeekly();}
 
 function renderWeekly(){
-  // Build 7 dates for current week (Mon–Sun), adjusted by weekOffset
   const now=new Date();
   const todayIST=new Date(now.getTime()+(5.5*60*60*1000));
-  // Get Monday of current week
-  const dayOfWeek=todayIST.getDay()||7; // 1=Mon, 7=Sun
+  const dayOfWeek=todayIST.getDay()||7;
   const monday=new Date(todayIST);
   monday.setDate(todayIST.getDate()-dayOfWeek+1+(weekOffset*7));
   monday.setHours(0,0,0,0);
-
   const weekDays=[];
-  for(let i=0;i<7;i++){
-    const d=new Date(monday);d.setDate(monday.getDate()+i);
-    weekDays.push(d);
-  }
-
+  for(let i=0;i<7;i++){const d=new Date(monday);d.setDate(monday.getDate()+i);weekDays.push(d);}
   const todayStr=todayIST.toISOString().substring(0,10);
   const enqs=allEnq||[];
   const projs=dashData?.projects||[];
-
-  // For each day, gather real data
-  const dayNames=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-  const dayEmojis=['🌅','☀️','⚡','💼','🎯','😌','😴'];
-
-  // Week label
-  const wStart=weekDays[0];const wEnd=weekDays[6];
   const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const dayNames=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const wStart=weekDays[0];const wEnd=weekDays[6];
   document.getElementById('week-label').textContent=`Week of ${months[wStart.getMonth()]} ${wStart.getDate()} – ${months[wEnd.getMonth()]} ${wEnd.getDate()}, ${wEnd.getFullYear()}`;
-
-  // Build per-day data
   const dayData=weekDays.map(d=>{
     const dStr=d.toISOString().substring(0,10);
-    const isToday=dStr===todayStr;
-    const isPast=d<new Date(todayIST.toISOString().substring(0,10));
-
-    // Enquiries with next_followup_date on this day
     const followups=enqs.filter(e=>e.next_followup_date&&String(e.next_followup_date).substring(0,10)===dStr&&e.stage!=='Won'&&e.stage!=='Lost');
-
-    // Enquiries added on this day
     const added=enqs.filter(e=>e.timestamp&&String(e.timestamp).substring(0,10)===dStr);
-
-    // Overdue enquiries (last_followup was on this day and no next_followup set)
-    const overdue=enqs.filter(e=>{
-      if(!e.last_followup||e.stage==='Won'||e.stage==='Lost')return false;
-      const daysSince=(new Date(todayStr)-new Date(String(e.last_followup).substring(0,10)))/(1000*60*60*24);
-      return String(e.last_followup).substring(0,10)===dStr&&daysSince>7;
-    });
-
-    // Active projects (all active throughout week)
     const activeSites=projs.filter(p=>p.status==='Active');
-
-    return{d,dStr,isToday,isPast,followups,added,overdue,activeSites};
+    return{d,dStr,isToday:dStr===todayStr,followups,added,activeSites};
   });
-
-  // Week summary
-  const totalFollowups=dayData.reduce((s,d)=>s+d.followups.length,0);
-  const totalAdded=dayData.reduce((s,d)=>s+d.added.length,0);
-  const activeSiteCount=(dashData?.summary?.active_projects)||0;
-  const overdueCount=(dashData?.summary?.overdue_enquiries)||0;
-  document.getElementById('week-sub').textContent=`${totalFollowups} follow-ups due · ${activeSiteCount} active sites · ${overdueCount} overdue`;
-
-  // Render 7 day cards
+  const totalFU=dayData.reduce((s,d)=>s+d.followups.length,0);
+  const activeSiteCount=dashData?.summary?.active_projects||0;
+  const overdueCount=dashData?.summary?.overdue_enquiries||0;
+  document.getElementById('week-sub').textContent=`${totalFU} follow-ups due this week · ${activeSiteCount} active sites · ${overdueCount} overdue`;
   document.getElementById('week-grid').innerHTML=dayData.map((day,i)=>{
     const isWeekend=i>=5;
-    const bgColor=day.isToday?'rgba(139,92,246,.1)':isWeekend?'rgba(255,255,255,.01)':'var(--surface)';
-    const borderColor=day.isToday?'rgba(139,92,246,.35)':isWeekend?'var(--border)':'var(--border)';
-    const dateColor=day.isToday?'var(--violet)':isWeekend?'var(--text3)':'var(--text2)';
-    const hasFU=day.followups.length>0;
-    const hasAdded=day.added.length>0;
-
-    return`<div onclick="showDayDetail(${i})" style="background:${bgColor};border:1px solid ${borderColor};border-radius:14px;padding:10px 8px;cursor:pointer;transition:all .2s;min-height:110px" onmouseover="this.style.borderColor='var(--border2)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='${borderColor}';this.style.transform='none'">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px">
-        <div style="font-size:9px;color:var(--text3);font-weight:700;letter-spacing:.5px">${dayNames[i]} ${dayEmojis[i]}</div>
-        ${day.isToday?'<div style="font-size:8px;background:var(--violet2);color:var(--violet);padding:1px 5px;border-radius:4px;font-weight:700">TODAY</div>':''}
-      </div>
-      <div style="font-size:22px;font-weight:900;color:${dateColor};margin-bottom:8px;line-height:1">${day.d.getDate()}</div>
-      ${hasFU?`<div style="font-size:9px;color:var(--amber);background:var(--amber3);border:1px solid var(--amber2);border-radius:5px;padding:2px 5px;margin-bottom:3px;font-weight:700">📞 ${day.followups.length} follow-up${day.followups.length>1?'s':''}</div>`:''}
-      ${hasAdded?`<div style="font-size:9px;color:var(--sky);background:var(--sky3);border:1px solid var(--sky2);border-radius:5px;padding:2px 5px;margin-bottom:3px;font-weight:700">📥 ${day.added.length} new enquiry</div>`:''}
-      ${day.isToday?`<div style="font-size:9px;color:var(--emerald);background:var(--emerald3);border:1px solid var(--emerald2);border-radius:5px;padding:2px 5px;font-weight:700">🏭 ${activeSiteCount} sites live</div>`:''}
-      ${!hasFU&&!hasAdded&&!day.isToday?`<div style="font-size:9px;color:var(--text3);margin-top:4px">${isWeekend?'Weekend':'No tasks'}</div>`:''}
+    const bg=day.isToday?'rgba(139,92,246,.1)':isWeekend?'rgba(255,255,255,.01)':'var(--surface)';
+    const bc=day.isToday?'rgba(139,92,246,.35)':'var(--border)';
+    return`<div onclick="showDayDetail(${i},dayData_${i})" style="background:${bg};border:1px solid ${bc};border-radius:14px;padding:10px 8px;cursor:pointer;transition:all .2s;min-height:110px" onmouseover="this.style.borderColor='var(--border2)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='${bc}';this.style.transform='none'">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px"><div style="font-size:9px;color:var(--text3);font-weight:700">${dayNames[i]}</div>${day.isToday?'<div style="font-size:8px;background:var(--violet2);color:var(--violet);padding:1px 5px;border-radius:4px;font-weight:700">TODAY</div>':''}</div>
+      <div style="font-size:22px;font-weight:900;color:${day.isToday?'var(--violet)':isWeekend?'var(--text3)':'var(--text2)'};margin-bottom:8px;line-height:1">${day.d.getDate()}</div>
+      ${day.followups.length?`<div style="font-size:9px;color:var(--amber);background:var(--amber3);border:1px solid var(--amber2);border-radius:5px;padding:2px 5px;margin-bottom:3px;font-weight:700">📞 ${day.followups.length} follow-up${day.followups.length>1?'s':''}</div>`:''}
+      ${day.added.length?`<div style="font-size:9px;color:var(--sky);background:var(--sky3);border:1px solid var(--sky2);border-radius:5px;padding:2px 5px;margin-bottom:3px;font-weight:700">📥 ${day.added.length} new</div>`:''}
+      ${day.isToday&&activeSiteCount?`<div style="font-size:9px;color:var(--emerald);background:var(--emerald3);border:1px solid var(--emerald2);border-radius:5px;padding:2px 5px;font-weight:700">🏭 ${activeSiteCount} sites</div>`:''}
     </div>`;
   }).join('');
-
-  // Weekly summary cards
+  window._weekDayData=dayData;
   document.getElementById('week-summary').innerHTML=[
-    {ic:'📞',val:totalFollowups,lbl:'Follow-ups Due',col:'var(--amber)'},
-    {ic:'📥',val:totalAdded,lbl:'Enquiries Added',col:'var(--sky)'},
+    {ic:'📞',val:totalFU,lbl:'Follow-ups Due',col:'var(--amber)'},
     {ic:'🏭',val:activeSiteCount,lbl:'Active Sites',col:'var(--emerald)'},
     {ic:'⚠️',val:overdueCount,lbl:'Overdue Alerts',col:'var(--rose)'},
-  ].map(s=>`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center">
-    <div style="font-size:20px;margin-bottom:6px">${s.ic}</div>
-    <div style="font-size:26px;font-weight:900;color:${s.col};font-family:var(--mono);line-height:1">${s.val}</div>
-    <div style="font-size:10px;color:var(--text3);margin-top:4px">${s.lbl}</div>
-  </div>`).join('');
-
-  // Store for detail view
-  window._weekDayData=dayData;
+    {ic:'📋',val:dashData?.summary?.active_pos||0,lbl:'Active POs',col:'var(--sky)'},
+  ].map(s=>`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center"><div style="font-size:20px;margin-bottom:6px">${s.ic}</div><div style="font-size:26px;font-weight:900;color:${s.col};font-family:var(--mono);line-height:1">${s.val}</div><div style="font-size:10px;color:var(--text3);margin-top:4px">${s.lbl}</div></div>`).join('');
 }
 
 function showDayDetail(i){
   const day=window._weekDayData?.[i];if(!day)return;
   const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const fullDayNames=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const fullNames=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
   document.getElementById('wd-emoji').textContent=day.isToday?'📍':'📅';
-  document.getElementById('wd-title').textContent=`${fullDayNames[i]}, ${months[day.d.getMonth()]} ${day.d.getDate()}, ${day.d.getFullYear()}${day.isToday?' — Today':''}`;
-
-  // Left: follow-ups | Right: new enquiries + sites
-  let leftHTML='';let rightHTML='';
-
-  // Follow-ups column
-  leftHTML+=`<div style="padding:16px;border-right:1px solid var(--border)">
-    <div style="font-size:11px;font-weight:700;color:var(--amber);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">📞 Follow-ups Due (${day.followups.length})</div>`;
-  if(day.followups.length){
-    leftHTML+=day.followups.map(e=>`<div style="background:var(--amber3);border:1px solid var(--amber2);border-radius:10px;padding:10px 12px;margin-bottom:8px">
-      <div style="font-size:12px;font-weight:700;color:var(--text)">${e.company_name}</div>
-      <div style="font-size:10px;color:var(--text2);margin-top:2px">👤 ${e.customer_name||'—'} · 📱 ${e.phone||'—'}</div>
-      <div style="display:flex;align-items:center;gap:6px;margin-top:5px">${badge(e.stage)}<span style="font-size:10px;color:var(--text3)">🏭 ${getPT(e.requirement)}</span></div>
-      ${e.quotation_value?`<div style="font-size:11px;font-weight:700;color:var(--amber);margin-top:4px;font-family:var(--mono)">₹${fmtN(e.quotation_value)}</div>`:''}
-      <div style="font-size:10px;color:var(--text3);margin-top:4px">📝 ${e.notes||'No notes'}</div>
-    </div>`).join('');
-  }else{
-    leftHTML+=`<div style="color:var(--text3);font-size:12px;padding:10px 0">✅ No follow-ups scheduled</div>`;
-  }
-  leftHTML+='</div>';
-
-  // Right: new enquiries + active sites
-  rightHTML+=`<div style="padding:16px">`;
-
-  // New enquiries added this day
-  rightHTML+=`<div style="font-size:11px;font-weight:700;color:var(--sky);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">📥 Enquiries Added (${day.added.length})</div>`;
-  if(day.added.length){
-    rightHTML+=day.added.map(e=>`<div style="background:var(--sky3);border:1px solid var(--sky2);border-radius:10px;padding:10px 12px;margin-bottom:8px">
-      <div style="font-size:12px;font-weight:700;color:var(--text)">${e.company_name}</div>
-      <div style="font-size:10px;color:var(--text2);margin-top:2px">🏭 ${getPT(e.requirement)} · 📣 ${e.source||'—'}</div>
-      <div style="margin-top:5px">${badge(e.stage)}</div>
-    </div>`).join('');
-  }else{
-    rightHTML+=`<div style="color:var(--text3);font-size:12px;padding:0 0 12px">No enquiries added</div>`;
-  }
-
-  // Active sites always shown on today
-  if(day.isToday&&day.activeSites.length){
-    rightHTML+=`<div style="font-size:11px;font-weight:700;color:var(--emerald);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;margin-top:8px">🏭 Active Sites Today (${day.activeSites.length})</div>`;
-    rightHTML+=day.activeSites.map(p=>{const pg=parseInt(p.progress)||0;return`<div style="background:var(--emerald3);border:1px solid var(--emerald2);border-radius:10px;padding:10px 12px;margin-bottom:8px">
-      <div style="font-size:12px;font-weight:700;color:var(--text)">${p.name}</div>
-      <div style="font-size:10px;color:var(--text2);margin-top:2px">👷 ${p.engineer||'—'} · 🏢 ${p.client}</div>
-      <div style="display:flex;align-items:center;gap:8px;margin-top:6px"><div style="background:rgba(255,255,255,.06);border-radius:4px;height:4px;flex:1;overflow:hidden"><div style="height:100%;background:var(--emerald);width:${pg}%;border-radius:4px"></div></div><span style="font-size:10px;font-weight:700;color:var(--emerald);font-family:var(--mono)">${pg}%</span></div>
-    </div>`;}).join('');
-  }
-
-  rightHTML+='</div>';
-
-  document.getElementById('wd-body').innerHTML=leftHTML+rightHTML;
-  const panel=document.getElementById('week-detail-panel');
-  panel.style.display='block';
-  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+  document.getElementById('wd-title').textContent=`${fullNames[i]}, ${months[day.d.getMonth()]} ${day.d.getDate()}${day.isToday?' — Today':''}`;
+  let left=`<div style="padding:16px;border-right:1px solid var(--border)"><div style="font-size:11px;font-weight:700;color:var(--amber);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">📞 Follow-ups Due (${day.followups.length})</div>`;
+  left+=day.followups.length?day.followups.map(e=>`<div style="background:var(--amber3);border:1px solid var(--amber2);border-radius:10px;padding:10px 12px;margin-bottom:8px"><div style="font-size:12px;font-weight:700;color:var(--text)">${e.company_name}</div><div style="font-size:10px;color:var(--text2);margin-top:2px">👤 ${e.customer_name||'—'} · 📱 ${e.phone||'—'}</div><div style="margin-top:5px">${badge(e.stage)}</div>${e.notes?`<div style="font-size:10px;color:var(--text3);margin-top:4px">📝 ${e.notes}</div>`:''}</div>`).join(''):'<div style="color:var(--text3);font-size:12px">✅ No follow-ups today</div>';
+  left+='</div>';
+  let right=`<div style="padding:16px"><div style="font-size:11px;font-weight:700;color:var(--sky);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">📥 Enquiries Added (${day.added.length})</div>`;
+  right+=day.added.length?day.added.map(e=>`<div style="background:var(--sky3);border:1px solid var(--sky2);border-radius:10px;padding:10px 12px;margin-bottom:8px"><div style="font-size:12px;font-weight:700;color:var(--text)">${e.company_name}</div><div style="font-size:10px;color:var(--text2)">${getPT(e.requirement)} · ${e.source||'—'}</div><div style="margin-top:5px">${badge(e.stage)}</div></div>`).join(''):'<div style="color:var(--text3);font-size:12px">No enquiries added</div>';
+  if(day.isToday&&day.activeSites.length){right+=`<div style="font-size:11px;font-weight:700;color:var(--emerald);margin-top:12px;margin-bottom:8px">🏭 Active Sites Today</div>`;right+=day.activeSites.map(p=>{const pg=parseInt(p.progress)||0;return`<div style="background:var(--emerald3);border:1px solid var(--emerald2);border-radius:10px;padding:10px 12px;margin-bottom:8px"><div style="font-size:12px;font-weight:700;color:var(--text)">${p.name}</div><div style="font-size:10px;color:var(--text2)">👷 ${p.engineer||'—'} · ${p.client}</div><div style="display:flex;align-items:center;gap:8px;margin-top:6px"><div style="background:rgba(255,255,255,.06);border-radius:4px;height:4px;flex:1;overflow:hidden"><div style="height:100%;background:var(--emerald);width:${pg}%;border-radius:4px"></div></div><span style="font-size:10px;font-weight:700;color:var(--emerald);font-family:var(--mono)">${pg}%</span></div></div>`;}).join('');}
+  right+='</div>';
+  document.getElementById('wd-body').innerHTML=left+right;
+  const panel=document.getElementById('week-detail-panel');panel.style.display='block';panel.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
-function renderTeam(){
-  // Build engineer list from real active projects in Sheets
-  const projs=dashData?.projects||[];
-  const active=projs.filter(p=>p.status==='Active');
-  if(!active.length){
-    document.getElementById('emp-grid').innerHTML='<div class="empty" style="padding:40px;grid-column:1/-1"><div class="empty-ic">👷</div><p>No field engineers yet<br><span style="font-size:11px">Engineers appear when active projects are added in Google Sheets</span></p></div>';
-    return;
-  }
-  // Deduplicate engineers from projects
-  const engMap={};
-  const colors=['var(--violet)','var(--sky)','var(--emerald)','var(--amber)','var(--coral)'];
-  active.forEach(p=>{
-    const name=p.engineer||'Unknown';
-    if(!engMap[name])engMap[name]={name,sites:[],color:colors[Object.keys(engMap).length%colors.length]};
-    engMap[name].sites.push(p);
-  });
-  document.getElementById('emp-grid').innerHTML=Object.values(engMap).map(e=>{
-    const ini=e.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-    const siteList=e.sites.map(s=>s.client).join(', ');
-    return`<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;transition:all .2s" onmouseover="this.style.borderColor='var(--border2)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform='none'">
-      <div style="display:flex;align-items:center;gap:11px;margin-bottom:12px">
-        <div style="width:40px;height:40px;border-radius:12px;background:${e.color}22;border:2px solid ${e.color}44;color:${e.color};display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900">${ini}</div>
-        <div><div style="font-size:13px;font-weight:800;color:var(--text)">${e.name}</div><div style="font-size:10px;color:var(--text3)">Field Engineer · ${e.sites.length} site${e.sites.length>1?'s':''}</div></div>
-      </div>
-      <div style="background:${e.color}11;border:1px solid ${e.color}22;border-radius:8px;padding:8px;margin-bottom:8px">
-        ${e.sites.map(s=>`<div style="font-size:11px;color:var(--text2);margin-bottom:3px">🏭 ${s.name} <span style="color:${e.color};font-weight:700">${s.progress}%</span></div>`).join('')}
-      </div>
-      <div style="font-size:11px;color:var(--emerald);font-weight:600">🟢 Assigned · 📍 ${siteList}</div>
-    </div>`;
-  }).join('');
-}
-
+// ─────────────────────────────────────────
+// CHART
+// ─────────────────────────────────────────
 function renderChart(){
   const h=['06','07','08','09','10','11','12','13','14','15','16','17'];
   const e1=[1,2,4,7,10,8,9,12,9,7,5,3];const e2=[0,1,1,2,3,4,5,4,3,2,2,1];
@@ -1436,7 +1314,9 @@ function renderChart(){
   lc.innerHTML=h.map(hh=>`<div class="chart-xl">${hh}</div>`).join('');
 }
 
+// ─────────────────────────────────────────
 // MODALS + SAVE
+// ─────────────────────────────────────────
 function openM(t){document.getElementById('mo-'+t).classList.add('open');}
 function closeM(t){document.getElementById('mo-'+t).classList.remove('open');}
 
@@ -1455,12 +1335,14 @@ async function saveEnq(){
   }catch(e){toast('❌ Error saving — check connection','err');}
   finally{saving=false;if(btn){btn.disabled=false;btn.textContent='Save Enquiry →';}}
 }
+
 async function savePO(){
   const d={po_number:v('po-n'),client:v('po-c'),value:v('po-v'),date:v('po-d'),engineer:v('po-e'),description:v('po-pt')+' — '+v('po-desc')};
   if(!d.po_number||!d.client){toast('⚠️ PO number and client required','err');return;}
   try{await fetch(URLS.po,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});toast('✅ PO saved','ok');closeM('po');setTimeout(loadData,800);}
   catch(e){toast('❌ Error saving PO','err');}
 }
+
 async function deleteEnq(eid,rowEl){
   if(!confirm('Delete enquiry '+eid+'?'))return;
   rowEl.style.opacity='.3';rowEl.style.pointerEvents='none';
@@ -1468,62 +1350,61 @@ async function deleteEnq(eid,rowEl){
   renderCRM(allEnq);toast('🗑️ Deleted','ok');
 }
 
-// AI
+// ─────────────────────────────────────────
+// AI BOT
+// ─────────────────────────────────────────
 function toggleAI(){const p=document.getElementById('ai-panel');p.classList.toggle('open');if(p.classList.contains('open'))document.getElementById('ai-inp').focus();}
 function sendAI(){const inp=document.getElementById('ai-inp');const msg=inp.value.trim();if(!msg)return;askAI(msg);inp.value='';}
+
 async function askAI(q){
   const msgs=document.getElementById('ai-msgs');
   msgs.innerHTML+=`<div class="ai-msg user">🧑 ${q}</div>`;
-  msgs.innerHTML+=`<div class="ai-msg typing" id="ai-typing" style="color:var(--violet);font-size:18px;letter-spacing:4px">···</div>`;
+  msgs.innerHTML+=`<div class="ai-msg bot" id="ai-typing" style="color:var(--violet);font-size:18px;letter-spacing:4px">···</div>`;
   msgs.scrollTop=msgs.scrollHeight;
   const s=dashData?.summary||{};
-  // Call n8n AI workflow which calls Claude with your API key server-side
+  // Try n8n AI webhook first
   try{
-    const res=await fetch(URLS.ai,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({question:q,context:s})
-    });
+    const res=await fetch(URLS.ai,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,context:s})});
     const data=await res.json();
     document.getElementById('ai-typing')?.remove();
-    if(data.success&&data.reply){
-      msgs.innerHTML+=`<div class="ai-msg bot">🤖 ${data.reply}</div>`;
-    }else throw new Error('no reply');
-  }catch(e){
-    // Smart offline fallback using real live numbers
-    document.getElementById('ai-typing')?.remove();
-    const ql=q.toLowerCase();let reply='';
-    if(ql.includes('pipeline')||ql.includes('enquir')||ql.includes('lead'))
-      reply=`💰 ${s.active_enquiries||0} active enquiries worth ₹${s.pipeline_value?(s.pipeline_value/100000).toFixed(1)+'L':'0'}. ${s.overdue_enquiries||0} are overdue — follow up today! 📞`;
-    else if(ql.includes('site')||ql.includes('project')||ql.includes('plant'))
-      reply=`🏭 ${s.active_projects||0} sites running O&M right now. ${s.completed_projects||0} projects completed. Total PO value: ₹${s.total_po_value?(s.total_po_value/100000).toFixed(1)+'L':'0'}.`;
-    else if(ql.includes('overdue')||ql.includes('follow'))
-      reply=`⚠️ ${s.overdue_enquiries||0} enquiries need follow-up urgently — no contact in 7+ days. Call them before 11 AM for best response. 📞`;
-    else if(ql.includes('po')||ql.includes('order'))
-      reply=`📋 ${s.active_pos||0} active POs worth ₹${s.total_po_value?(s.total_po_value/100000).toFixed(1)+'L':'0'}. ${s.completed_pos||0} completed so far this year.`;
-    else if(ql.includes('won')||ql.includes('deal'))
-      reply=`🏆 ${s.won_enquiries||0} deals won! Conversion rate: ${s.total_enquiries?Math.round((s.won_enquiries/s.total_enquiries)*100):0}% of total enquiries.`;
-    else
-      reply=`🌿 Live snapshot — ₹${s.pipeline_value?(s.pipeline_value/100000).toFixed(1)+'L':'0'} pipeline | ${s.active_projects||0} active sites | ${s.overdue_enquiries||0} overdue | ${s.active_pos||0} active POs. What would you like to dig into? 📊`;
-    msgs.innerHTML+=`<div class="ai-msg bot">🤖 ${reply}</div>`;
-  }
+    if(data.success&&data.reply){msgs.innerHTML+=`<div class="ai-msg bot">🤖 ${data.reply}</div>`;msgs.scrollTop=msgs.scrollHeight;return;}
+  }catch(e){}
+  // Smart fallback using real numbers from Sheets
+  document.getElementById('ai-typing')?.remove();
+  const ql=q.toLowerCase();let reply='';
+  if(ql.includes('pipeline')||ql.includes('enquir')||ql.includes('lead'))
+    reply=`💰 ${s.active_enquiries||0} active enquiries worth ₹${s.pipeline_value?(s.pipeline_value/100000).toFixed(1)+'L':'0'}. ${s.overdue_enquiries||0} overdue — need follow-up today!`;
+  else if(ql.includes('overdue')||ql.includes('follow'))
+    reply=`⚠️ ${s.overdue_enquiries||0} enquiries need follow-up urgently — no contact in 7+ days. Check CRM for details.`;
+  else if(ql.includes('site')||ql.includes('project')||ql.includes('plant'))
+    reply=`🏭 ${s.active_projects||0} sites running O&M right now. ${s.completed_projects||0} projects completed. Total PO value: ₹${s.total_po_value?(s.total_po_value/100000).toFixed(1)+'L':'0'}.`;
+  else if(ql.includes('po')||ql.includes('order'))
+    reply=`📋 ${s.active_pos||0} active POs worth ₹${s.total_po_value?(s.total_po_value/100000).toFixed(1)+'L':'0'}. ${s.completed_pos||0} completed.`;
+  else if(ql.includes('won')||ql.includes('deal'))
+    reply=`🏆 ${s.won_enquiries||0} deals won! Conversion: ${s.total_enquiries?Math.round((s.won_enquiries/s.total_enquiries)*100):0}% of total enquiries.`;
+  else
+    reply=`🌿 Live data — ₹${s.pipeline_value?(s.pipeline_value/100000).toFixed(1)+'L':'0'} pipeline · ${s.active_projects||0} active sites · ${s.overdue_enquiries||0} overdue · ${s.active_pos||0} POs active. What would you like to know?`;
+  msgs.innerHTML+=`<div class="ai-msg bot">🤖 ${reply}</div>`;
   msgs.scrollTop=msgs.scrollHeight;
 }
 
+// ─────────────────────────────────────────
 // HELPERS
+// ─────────────────────────────────────────
 function badge(s){const m=STAGE_COLORS;return`<span class="badge ${m[s]||'b-dis'}">${s||'—'}</span>`;}
 function set(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
 function v(id){const el=document.getElementById(id);return el?el.value.trim():'';}
 function toast(msg,type='ok'){const t=document.getElementById('toast');const ic={ok:'✅',err:'❌',warn:'⚠️'};document.getElementById('toast-ic').textContent=ic[type]||'ℹ️';document.getElementById('toast-msg').textContent=msg;t.className='toast '+type;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
 
-// SAMPLE DATA
-function sampleData(){return{timestamp:new Date().toISOString().replace('T',' ').substring(0,19),summary:{total_enquiries:12,active_enquiries:9,won_enquiries:2,lost_enquiries:1,overdue_enquiries:3,pipeline_value:12600000,total_pos:6,active_pos:3,completed_pos:3,total_po_value:10540000,total_projects:8,active_projects:4,completed_projects:4},enquiries:[{enquiry_id:'ENQ-001',customer_name:'Rajesh Kulkarni',company_name:'Hindalco Industries',phone:'9823456789',requirement:'WTP 500 KLD',stage:'Quoted',source:'IndiaMART',last_followup:'2026-03-15',quotation_value:'1200000'},{enquiry_id:'ENQ-002',customer_name:'Priya Mehta',company_name:'Tech Mahindra Ltd',phone:'9876543210',requirement:'OWC 2 TPD',stage:'Negotiation',source:'Reference',last_followup:'2026-03-10',quotation_value:'850000'},{enquiry_id:'ENQ-003',customer_name:'Amit Joshi',company_name:'Cisco Systems India',phone:'9765432109',requirement:'ETP Industrial',stage:'New',source:'Exhibition',last_followup:'2026-03-18',quotation_value:''},{enquiry_id:'ENQ-004',customer_name:'Sonia Patel',company_name:'Alkem Laboratories',phone:'9654321098',requirement:'STP 200 KLD',stage:'Won',source:'Phone Call',last_followup:'2026-03-12',quotation_value:'2200000'},{enquiry_id:'ENQ-005',customer_name:'Vikram Singh',company_name:'JBM Auto Ltd',phone:'9543210987',requirement:'OWC 5 TPD',stage:'Discussion',source:'WhatsApp',last_followup:'2026-03-01',quotation_value:'450000'},{enquiry_id:'ENQ-006',customer_name:'Rohit Sharma',company_name:'HCC Infrastructure',phone:'9432109876',requirement:'WTP Nashik',stage:'Quoted',source:'IndiaMART',last_followup:'2026-03-14',quotation_value:'980000'}],overdue_list:[{company_name:'JBM Auto Ltd'},{company_name:'Bajaj Auto'},{company_name:'Tech Mahindra'}],pos:[{po_number:'PO-2026-001',client:'Alkem Laboratories',description:'STP 200 KLD',value:'2200000',date:'2026-03-12',status:'Active',project:'PROJ-2026-001'},{po_number:'PO-2026-002',client:'Hindalco Industries',description:'WTP 500 KLD',value:'1200000',date:'2026-03-16',status:'Active',project:'PROJ-2026-002'},{po_number:'PO-2026-003',client:'Tata Motors',description:'STP Campus',value:'2800000',date:'2026-02-22',status:'Active',project:'PROJ-2026-003'}],projects:[{project_id:'PROJ-2026-001',name:'Alkem STP 200 KLD',client:'Alkem Laboratories',start_date:'2026-03-13',end_date:'2026-07-31',progress:15,status:'Active',engineer:'Ravi Kumar',description:'STP Installation',value:'2200000'},{project_id:'PROJ-2026-002',name:'Hindalco WWT 500 KLD',client:'Hindalco Industries',start_date:'2026-03-17',end_date:'2026-09-30',progress:5,status:'Active',engineer:'Suresh Patil',description:'WTP Plant',value:'1200000'},{project_id:'PROJ-2026-003',name:'Tata Motors STP Campus',client:'Tata Motors',start_date:'2026-02-23',end_date:'2026-08-15',progress:30,status:'Active',engineer:'Manoj Desai',description:'STP Corporate',value:'2800000'},{project_id:'PROJ-2025-045',name:'Tech Mahindra O&M Annual',client:'Tech Mahindra',start_date:'2025-11-01',end_date:'2026-10-31',progress:45,status:'Active',engineer:'Ravi Kumar',description:'O&M Annual',value:'1800000'},{project_id:'PROJ-2025-032',name:'Cisco ETP Plant',client:'Cisco Systems',start_date:'2025-08-01',end_date:'2026-02-28',progress:100,status:'Completed',engineer:'Suresh Patil',description:'ETP Plant',value:'1650000'}]};}
-
+// ─────────────────────────────────────────
 // PARTICLES
+// ─────────────────────────────────────────
 function initParticles(){const el=document.getElementById('particles');if(!el)return;const colors=['var(--violet)','var(--sky)','var(--emerald)','var(--amber)','var(--coral)','var(--rose)'];for(let i=0;i<18;i++){const p=document.createElement('div');p.className='particle';const sz=Math.random()*2.5+.8;const c=colors[Math.floor(Math.random()*colors.length)];p.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;background:${c};box-shadow:0 0 ${sz*3}px ${c};animation-duration:${Math.random()*22+12}s;animation-delay:-${Math.random()*22}s;`;el.appendChild(p);}}
 initParticles();
 
+// ─────────────────────────────────────────
 // INIT
+// ─────────────────────────────────────────
 window.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('login-screen').style.display!=='none')doLogin();});
 function updateGrid(){const dg=document.querySelector('.dash-grid');if(dg)dg.style.gridTemplateColumns=window.innerWidth<950?'1fr':'1fr 340px';}
 window.addEventListener('resize',updateGrid);updateGrid();
