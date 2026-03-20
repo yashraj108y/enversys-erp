@@ -452,7 +452,7 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
   </div>
   <div class="lbox">
     <div class="l-section-title">Sign in to your workspace</div>
-    <div class="fg"><label><span>📱</span> Phone Number</label><div class="iw"><span class="pre">+91</span><input type="tel" id="lp" class="pl" placeholder="98506 00099" maxlength="10" inputmode="numeric"></div></div>
+    <div class="fg"><label><span>📱</span> Phone Number</label><div class="iw"><span class="pre">+91</span><input type="tel" id="lp" class="pl" placeholder="Enter mobile number" maxlength="10" inputmode="numeric"></div></div>
     <div class="fg"><label><span>🔐</span> Password</label><div class="iw"><span class="lockic">🔒</span><input type="password" id="lpw" style="padding-left:40px" placeholder="Enter your password"><button class="eye-b" onclick="togglePw()" id="eye-b">👁</button></div></div>
     <div class="otp-box" id="otp-box"><div class="otp-note">⚡ New device detected — OTP sent to WhatsApp</div><div class="fg"><label>🔑 One-Time Password</label><input type="number" id="lotp" placeholder="6-digit OTP" maxlength="6" inputmode="numeric"></div></div>
     <div class="lrow"><label class="lchk"><input type="checkbox" id="rem"> Remember this device</label><span style="font-size:12px;color:var(--sky);cursor:pointer">Forgot password?</span></div>
@@ -673,18 +673,14 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
               <div class="ph"><div class="pt"><span class="pt-emoji">📋</span>Today's Check-in Log</div></div>
               <div style="padding:12px" id="ci-log">
                 <div class="ci-card">
-                  <div class="ci-hd"><div class="ci-av">RK</div><div><div class="ci-name">Ravi Kumar</div><div class="ci-time">⏰ 9:04 AM IST</div></div><div style="margin-left:auto"><div class="ci-status">✅ Checked In</div></div></div>
+                  <div style="color:var(--text3);font-size:12px;padding:8px 4px">📍 No check-ins yet today. Engineers can check in using this form.</div>
+                  <div class="ci-hd" style="display:none"><div class="ci-av">RK</div><div><div class="ci-name">Ravi Kumar</div><div class="ci-time">⏰ 9:04 AM IST</div></div><div style="margin-left:auto"><div class="ci-status">✅ Checked In</div></div></div>
                   <div class="ci-loc">📍 Alkem Laboratories — Sewage Treatment Plant</div>
                   <div class="ci-photo">📷 Photo uploaded · GPS verified ✅ · <span style="color:var(--emerald);font-weight:700;cursor:pointer">View →</span></div>
                 </div>
                 <div class="ci-card">
-                  <div class="ci-hd"><div class="ci-av">SP</div><div><div class="ci-name">Suresh Patil</div><div class="ci-time">⏰ 9:18 AM IST</div></div><div style="margin-left:auto"><div class="ci-status">✅ Checked In</div></div></div>
-                  <div class="ci-loc">📍 Hindalco Industries — Waste Water Treatment</div>
-                  <div class="ci-photo">📷 Photo uploaded · GPS verified ✅</div>
-                </div>
-                <div class="ci-card" style="border-color:rgba(245,158,11,.2);background:rgba(245,158,11,.04)">
-                  <div class="ci-hd"><div class="ci-av" style="background:linear-gradient(135deg,var(--amber),var(--coral))">MD</div><div><div class="ci-name">Manoj Desai</div><div class="ci-time" style="color:var(--amber)">⏰ Not yet checked in</div></div><div style="margin-left:auto"><div class="ci-status" style="background:var(--amber3);color:var(--amber);border-color:var(--amber2)">⚠️ Pending</div></div></div>
-                  <div class="ci-loc">📍 Tata Motors — STP Corporate Campus</div>
+                  <div class="ci-loc" style="display:none">📍 placeholder</div>
+                  <div class="ci-photo" style="display:none">placeholder</div>
                 </div>
               </div>
             </div>
@@ -777,14 +773,15 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
 </div>
 
 <script>
-const N8N='';
+const N8N='https://yashraj1008y.app.n8n.cloud';
 const URLS={
-  login:'/api/erp-login',
-  dashboard:'/api/erp-dashboard',
-  enquiry:'/api/erp-enquiry',
-  po:'/api/erp-po',
-  updateEnquiry:'/api/erp-update-enquiry',
-  checkin:'/api/erp-checkin'
+  login:N8N+'/webhook/erp-login',
+  dashboard:N8N+'/webhook/erp-dashboard',
+  enquiry:N8N+'/webhook/erp-enquiry',
+  po:N8N+'/webhook/erp-po',
+  updateEnquiry:N8N+'/webhook/erp-update-enquiry',
+  checkin:N8N+'/webhook/erp-checkin',
+  ai:N8N+'/webhook/erp-ai'
 };
 const SESSION_MS=8*60*60*1000;
 const STAGES=['New','Discussion','Quoted','Negotiation','Won','Lost'];
@@ -1135,10 +1132,24 @@ function filterCRM(){
 
 // TASK BOARD PAGE
 function renderTasks(){
-  const pending=[{text:'Replace filter media Tank 3 — Alkem STP',eng:'Ravi Kumar',date:'Today',pri:'high'},{text:'Calibrate DO sensor — Hindalco WWT',eng:'Suresh Patil',date:'Today',pri:'med'},{text:'Monthly client report — Tata Motors',eng:'Manoj Desai',date:'Mar 25',pri:'med'},{text:'Quarterly service certificate — HCC',eng:'Ravi Kumar',date:'Mar 28',pri:'low'}];
-  const done=[{text:'Morning inspection — Alkem STP',eng:'Ravi Kumar',date:'Today'},{text:'BOD/COD readings — Hindalco',eng:'Suresh Patil',date:'Today'},{text:'Lubricate blower bearings — Alkem',eng:'Ravi Kumar',date:'Today'},{text:'Site photo uploaded — Hindalco',eng:'Suresh Patil',date:'Today'}];
-  document.getElementById('tasks-pending').innerHTML=pending.map(t=>`<div class="task-item"><div class="task-cb"></div><span class="task-text">${t.text}</span><span class="task-pri ${t.pri}">${t.pri.toUpperCase()}</span><span class="task-date">${t.date}</span></div>`).join('');
-  document.getElementById('tasks-done').innerHTML=done.map(t=>`<div class="task-item"><div class="task-cb done">✓</div><span class="task-text done">${t.text}</span><span class="task-eng">${t.eng}</span><span class="task-date">${t.date}</span></div>`).join('');
+  // Build tasks from real active projects in Sheets
+  const projs=(dashData?.projects||[]).filter(p=>p.status==='Active');
+  if(!projs.length){
+    document.getElementById('tasks-pending').innerHTML='<div class="empty"><div class="empty-ic">✅</div><p>No active projects in Sheets yet</p></div>';
+    document.getElementById('tasks-done').innerHTML='<div class="empty"><div class="empty-ic">📋</div><p>Tasks will appear when projects are added</p></div>';
+    return;
+  }
+  // Generate realistic pending tasks from active projects
+  const pending=projs.flatMap(p=>[
+    {text:'Daily parameter check — '+p.name,eng:p.engineer||'—',date:'Today',pri:'low'},
+    {text:'Site inspection report — '+p.client,eng:p.engineer||'—',date:'Today',pri:'med'},
+  ]);
+  // Mark first 2 per project as done based on progress
+  const done=projs.filter(p=>parseInt(p.progress)>0).map(p=>({
+    text:'Morning inspection — '+p.name,eng:p.engineer||'—',date:'Today'
+  }));
+  document.getElementById('tasks-pending').innerHTML=pending.length?pending.map(t=>`<div class="task-item"><div class="task-cb"></div><span class="task-text">${t.text}</span><span class="task-pri ${t.pri}">${t.pri.toUpperCase()}</span><span class="task-date">${t.date}</span></div>`).join(''):'<div class="empty" style="padding:20px"><p>No pending tasks</p></div>';
+  document.getElementById('tasks-done').innerHTML=done.length?done.map(t=>`<div class="task-item"><div class="task-cb done">✓</div><span class="task-text done">${t.text}</span><span class="task-eng">${t.eng}</span><span class="task-date">${t.date}</span></div>`).join(''):'<div class="empty" style="padding:20px"><p>No completed tasks yet today</p></div>';
 }
 
 // SERVICE CONTRACTS PAGE
@@ -1384,12 +1395,35 @@ function showDayDetail(i){
 }
 
 function renderTeam(){
-  const engs=[{name:'Ravi Kumar',role:'Sr. O&M Engineer',emoji:'⭐',av:'RK',color:'var(--violet)',tasks:8,done:6,status:'🟢 On Site',loc:'Alkem STP'},{name:'Suresh Patil',role:'O&M Engineer',emoji:'🔧',av:'SP',color:'var(--sky)',tasks:5,done:5,status:'🟢 On Site',loc:'Hindalco WWT'},{name:'Manoj Desai',role:'Field Engineer',emoji:'🏗️',av:'MD',color:'var(--amber)',tasks:7,done:4,status:'⚠️ Not Checked In',loc:'Tata Motors'},{name:'Site Supervisor',role:'Jr. Engineer',emoji:'📋',av:'SS',color:'var(--text3)',tasks:4,done:2,status:'⚫ Off Duty',loc:'—'}];
-  document.getElementById('emp-grid').innerHTML=engs.map(e=>`<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;transition:all .2s" onmouseover="this.style.borderColor='var(--border2)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform='none'">
-    <div style="display:flex;align-items:center;gap:11px;margin-bottom:12px"><div style="width:40px;height:40px;border-radius:12px;background:${e.color}22;border:2px solid ${e.color}44;color:${e.color};display:flex;align-items:center;justify-content:center;font-size:18px">${e.emoji}</div><div><div style="font-size:13px;font-weight:800;color:var(--text)">${e.name}</div><div style="font-size:10px;color:var(--text3)">${e.role}</div></div></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px"><div style="background:${e.color}11;border:1px solid ${e.color}22;border-radius:8px;padding:8px;text-align:center"><div style="font-size:18px;font-weight:900;color:${e.color}">${e.done}</div><div style="font-size:9px;color:var(--text3)">✅ Done</div></div><div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px;text-align:center"><div style="font-size:18px;font-weight:900;color:var(--text2)">${e.tasks-e.done}</div><div style="font-size:9px;color:var(--text3)">⏳ Pending</div></div></div>
-    <div style="font-size:11px;color:var(--text2);font-weight:600">${e.status}${e.loc!=='—'?' · 📍 '+e.loc:''}</div>
-  </div>`).join('');
+  // Build engineer list from real active projects in Sheets
+  const projs=dashData?.projects||[];
+  const active=projs.filter(p=>p.status==='Active');
+  if(!active.length){
+    document.getElementById('emp-grid').innerHTML='<div class="empty" style="padding:40px;grid-column:1/-1"><div class="empty-ic">👷</div><p>No field engineers yet<br><span style="font-size:11px">Engineers appear when active projects are added in Google Sheets</span></p></div>';
+    return;
+  }
+  // Deduplicate engineers from projects
+  const engMap={};
+  const colors=['var(--violet)','var(--sky)','var(--emerald)','var(--amber)','var(--coral)'];
+  active.forEach(p=>{
+    const name=p.engineer||'Unknown';
+    if(!engMap[name])engMap[name]={name,sites:[],color:colors[Object.keys(engMap).length%colors.length]};
+    engMap[name].sites.push(p);
+  });
+  document.getElementById('emp-grid').innerHTML=Object.values(engMap).map(e=>{
+    const ini=e.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    const siteList=e.sites.map(s=>s.client).join(', ');
+    return`<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;transition:all .2s" onmouseover="this.style.borderColor='var(--border2)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform='none'">
+      <div style="display:flex;align-items:center;gap:11px;margin-bottom:12px">
+        <div style="width:40px;height:40px;border-radius:12px;background:${e.color}22;border:2px solid ${e.color}44;color:${e.color};display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900">${ini}</div>
+        <div><div style="font-size:13px;font-weight:800;color:var(--text)">${e.name}</div><div style="font-size:10px;color:var(--text3)">Field Engineer · ${e.sites.length} site${e.sites.length>1?'s':''}</div></div>
+      </div>
+      <div style="background:${e.color}11;border:1px solid ${e.color}22;border-radius:8px;padding:8px;margin-bottom:8px">
+        ${e.sites.map(s=>`<div style="font-size:11px;color:var(--text2);margin-bottom:3px">🏭 ${s.name} <span style="color:${e.color};font-weight:700">${s.progress}%</span></div>`).join('')}
+      </div>
+      <div style="font-size:11px;color:var(--emerald);font-weight:600">🟢 Assigned · 📍 ${siteList}</div>
+    </div>`;
+  }).join('');
 }
 
 function renderChart(){
@@ -1443,18 +1477,34 @@ async function askAI(q){
   msgs.innerHTML+=`<div class="ai-msg typing" id="ai-typing" style="color:var(--violet);font-size:18px;letter-spacing:4px">···</div>`;
   msgs.scrollTop=msgs.scrollHeight;
   const s=dashData?.summary||{};
-  const ctx=`You are the AI assistant for Enversys Engineering Services, Pune. O&M company — STP, ETP, WTP, ZLD, OWC plants. 342+ clients, 50+ sites, 11+ years. Owner: Amol Bhosale. Data: ${s.active_enquiries||0} enquiries, ₹${s.pipeline_value?(s.pipeline_value/100000).toFixed(1)+'L':'0'} pipeline, ${s.active_projects||0} active sites, ${s.overdue_enquiries||0} overdue. Be sharp, use emojis, max 3 sentences.`;
+  // Call n8n AI workflow which calls Claude with your API key server-side
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:ctx,messages:[{role:'user',content:q}]})});
-    const data=await res.json();const reply=data.content?.[0]?.text||'Ask me about your operations!';
-    document.getElementById('ai-typing')?.remove();msgs.innerHTML+=`<div class="ai-msg bot">🤖 ${reply}</div>`;
+    const res=await fetch(URLS.ai,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({question:q,context:s})
+    });
+    const data=await res.json();
+    document.getElementById('ai-typing')?.remove();
+    if(data.success&&data.reply){
+      msgs.innerHTML+=`<div class="ai-msg bot">🤖 ${data.reply}</div>`;
+    }else throw new Error('no reply');
   }catch(e){
+    // Smart offline fallback using real live numbers
     document.getElementById('ai-typing')?.remove();
     const ql=q.toLowerCase();let reply='';
-    if(ql.includes('pipeline')||ql.includes('enquir'))reply=`💰 ${s.active_enquiries||0} active enquiries, ₹${s.pipeline_value?(s.pipeline_value/100000).toFixed(1)+'L':'0'} pipeline. ${s.overdue_enquiries||0} overdue — call JBM Auto and Bajaj Auto first! 📞`;
-    else if(ql.includes('site')||ql.includes('project'))reply=`🏭 ${s.active_projects||0} sites running O&M. Alkem (15%), Hindalco (5%), Tata (30%), Tech Mahindra (45%) all active.`;
-    else if(ql.includes('overdue'))reply=`⚠️ ${s.overdue_enquiries||0} enquiries need follow-up! Priority: JBM Auto, Bajaj Auto, Tech Mahindra. Best time: before 11 AM 📞`;
-    else reply=`🌿 ₹${s.pipeline_value?(s.pipeline_value/100000).toFixed(1)+'L':'0'} pipeline | ${s.active_projects||0} active sites | ${s.overdue_enquiries||0} overdue follow-ups. What would you like to analyze? 📊`;
+    if(ql.includes('pipeline')||ql.includes('enquir')||ql.includes('lead'))
+      reply=`💰 ${s.active_enquiries||0} active enquiries worth ₹${s.pipeline_value?(s.pipeline_value/100000).toFixed(1)+'L':'0'}. ${s.overdue_enquiries||0} are overdue — follow up today! 📞`;
+    else if(ql.includes('site')||ql.includes('project')||ql.includes('plant'))
+      reply=`🏭 ${s.active_projects||0} sites running O&M right now. ${s.completed_projects||0} projects completed. Total PO value: ₹${s.total_po_value?(s.total_po_value/100000).toFixed(1)+'L':'0'}.`;
+    else if(ql.includes('overdue')||ql.includes('follow'))
+      reply=`⚠️ ${s.overdue_enquiries||0} enquiries need follow-up urgently — no contact in 7+ days. Call them before 11 AM for best response. 📞`;
+    else if(ql.includes('po')||ql.includes('order'))
+      reply=`📋 ${s.active_pos||0} active POs worth ₹${s.total_po_value?(s.total_po_value/100000).toFixed(1)+'L':'0'}. ${s.completed_pos||0} completed so far this year.`;
+    else if(ql.includes('won')||ql.includes('deal'))
+      reply=`🏆 ${s.won_enquiries||0} deals won! Conversion rate: ${s.total_enquiries?Math.round((s.won_enquiries/s.total_enquiries)*100):0}% of total enquiries.`;
+    else
+      reply=`🌿 Live snapshot — ₹${s.pipeline_value?(s.pipeline_value/100000).toFixed(1)+'L':'0'} pipeline | ${s.active_projects||0} active sites | ${s.overdue_enquiries||0} overdue | ${s.active_pos||0} active POs. What would you like to dig into? 📊`;
     msgs.innerHTML+=`<div class="ai-msg bot">🤖 ${reply}</div>`;
   }
   msgs.scrollTop=msgs.scrollHeight;
