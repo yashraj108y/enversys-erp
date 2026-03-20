@@ -61,6 +61,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;back
 .l-badge.ok{color:var(--emerald);border-color:rgba(16,185,129,.2)}
 .lerr{background:var(--rose3);border:1px solid var(--rose2);border-radius:10px;padding:11px 14px;font-size:12px;color:var(--rose);margin-top:12px;display:none}
 .lerr.show{display:block}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
 .lbtm{text-align:center;margin-top:20px;font-size:11px;color:var(--text3);z-index:1;position:relative}
 .otp-box{display:none;margin-bottom:16px}
 .otp-box.show{display:block}
@@ -728,7 +729,35 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
       <div class="page" id="page-team"><div class="panel"><div class="ph"><div class="pt"><span class="pt-emoji">👷</span>Field Engineers</div></div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;padding:16px" id="emp-grid"></div></div></div>
 
       <!-- WEEKLY -->
-      <div class="page" id="page-weekly"><div class="panel"><div class="ph"><div class="pt"><span class="pt-emoji">📅</span>Week of March 16–22, 2026</div></div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;padding:14px" id="week-grid"></div></div></div>
+      <div class="page" id="page-weekly">
+        <!-- Week nav + summary strip -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+          <div>
+            <div style="font-size:18px;font-weight:900;color:var(--text);letter-spacing:-.3px" id="week-label">Week of Mar 16 – 22, 2026</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px" id="week-sub">Loading data...</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="pi" onclick="shiftWeek(-1)">← Prev</button>
+            <button class="pi" onclick="shiftWeek(0)" style="color:var(--violet);border-color:var(--violet2)">Today</button>
+            <button class="pi" onclick="shiftWeek(1)">Next →</button>
+          </div>
+        </div>
+        <!-- 7-day grid -->
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:16px" id="week-grid"></div>
+        <!-- Day detail panel — shown on click -->
+        <div class="panel" id="week-detail-panel" style="display:none">
+          <div class="ph">
+            <div class="pt"><span class="pt-emoji" id="wd-emoji">📅</span><span id="wd-title">Friday, March 20</span></div>
+            <button class="pi" onclick="document.getElementById('week-detail-panel').style.display='none'">✕ Close</button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0" id="wd-body"></div>
+        </div>
+        <!-- Weekly summary panel -->
+        <div class="panel">
+          <div class="ph"><div class="pt"><span class="pt-emoji">📊</span>This Week Summary</div></div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px" id="week-summary"></div>
+        </div>
+      </div>
 
     </div>
   </div>
@@ -748,14 +777,14 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
 </div>
 
 <script>
-const N8N='https://yashraj1008y.app.n8n.cloud';
+const N8N='';
 const URLS={
-  login:N8N+'/webhook/erp-login',
-  dashboard:N8N+'/webhook/erp-dashboard',
-  enquiry:N8N+'/webhook/erp-enquiry',
-  po:N8N+'/webhook/erp-po',
-  updateEnquiry:N8N+'/webhook/erp-update-enquiry',
-  checkin:N8N+'/webhook/erp-checkin'
+  login:'/api/erp-login',
+  dashboard:'/api/erp-dashboard',
+  enquiry:'/api/erp-enquiry',
+  po:'/api/erp-po',
+  updateEnquiry:'/api/erp-update-enquiry',
+  checkin:'/api/erp-checkin'
 };
 const SESSION_MS=8*60*60*1000;
 const STAGES=['New','Discussion','Quoted','Negotiation','Won','Lost'];
@@ -787,22 +816,78 @@ async function doLogin(){
   if(!phone||phone.length<10){showErr('⚠️ Enter valid 10-digit number');return;}
   if(!pw){showErr('⚠️ Password required');return;}
   if(otpBox.classList.contains('show')&&!otp){showErr('⚠️ Enter OTP');return;}
-  btn.disabled=true;document.getElementById('l-txt').textContent='Authenticating...';
+
+  // Always unlock button after 10 seconds max — prevents any stuck state
+  btn.disabled=true;
+  document.getElementById('l-txt').textContent='Authenticating...';
+  const safetyTimer=setTimeout(()=>resetBtn()
+
+,10000);
+
   const isKnown=isTrusted(phone);
   try{
-    const res=await fetch(URLS.login,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone,password:pw,fingerprint:fp(),is_known_device:isKnown,otp:otp||null})});
+    const controller=new AbortController();
+    const timeout=setTimeout(()=>controller.abort(),8000);
+    const res=await fetch(URLS.login,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone,password:pw,fingerprint:fp(),is_known_device:isKnown,otp:otp||null}),signal:controller.signal});
+    clearTimeout(timeout);clearTimeout(safetyTimer);
     const data=await res.json();
-    if(data.success){if(data.require_otp){otpBox.classList.add('show');document.getElementById('l-txt').textContent='Verify OTP →';btn.disabled=false;toast('📱 OTP sent','warn');return;}trustDevice(phone);initApp(data.user);}
-    else showErr('❌ '+(data.error||'Authentication failed'));
+    if(data.success===true){
+      // Successful login from n8n
+      trustDevice(phone);
+      initApp(data.user||{name:'Amol Bhosale',phone,role:'Owner',department:'Management'});
+      return;
+    }else{
+      // n8n returned success:false = wrong credentials
+      showErr('❌ '+(data.error||'Wrong phone number or password'));
+    }
   }catch(e){
-    if(!isKnown&&!otp){otpBox.classList.add('show');document.getElementById('l-txt').textContent='Verify OTP →';btn.disabled=false;toast('💡 Demo OTP: 123456','warn');return;}
-    if(otp&&otp!=='123456'&&!isKnown){showErr('❌ Invalid OTP');}
-    else{trustDevice(phone);initApp({name:'Amol Bhosale',phone,role:'Owner',department:'Management'});}
+    clearTimeout(safetyTimer);
+    // Network error or timeout — allow if device is trusted OR OTP matches
+    if(isKnown){
+      // Device already trusted before — let them in with offline fallback
+      initApp({name:'Amol Bhosale',phone,role:'Owner',department:'Management'});
+      return;
+    }
+    // Unknown device + offline — ask for OTP
+    if(!otp){
+      otpBox.classList.add('show');resetBtn('Verify OTP →');
+      toast('⚠️ Slow connection — enter OTP: 123456','warn');return;
+    }
+    if(otp==='123456'){
+      trustDevice(phone);
+      initApp({name:'Amol Bhosale',phone,role:'Owner',department:'Management'});
+      return;
+    }
+    showErr('❌ Invalid OTP — try again');
   }
-  btn.disabled=false;document.getElementById('l-txt').textContent='Access Dashboard';
+  resetBtn();
 }
-function showErr(msg){const e=document.getElementById('lerr');e.textContent=msg;e.classList.add('show');document.getElementById('l-btn').disabled=false;document.getElementById('l-txt').textContent='Access Dashboard';}
-function initApp(user){startSession(user);document.getElementById('un').textContent=user.name;document.getElementById('ur').textContent='👑 '+user.role;document.getElementById('ua').textContent=(user.name||'A').charAt(0).toUpperCase();document.getElementById('login-screen').style.display='none';document.getElementById('app').classList.add('visible');loadData();toast('👋 Welcome, '+user.name.split(' ')[0]+'!','ok');}
+function resetBtn(txt='Access Dashboard'){
+  const btn=document.getElementById('l-btn');
+  if(btn){btn.disabled=false;}
+  const ltxt=document.getElementById('l-txt');
+  if(ltxt)ltxt.textContent=txt;
+}
+function showErr(msg){
+  const e=document.getElementById('lerr');
+  e.textContent=msg;e.classList.add('show');
+  resetBtn();
+  // Shake animation on error
+  const box=document.querySelector('.lbox');
+  if(box){box.style.animation='shake .3s ease';setTimeout(()=>box.style.animation='',400);}
+}
+function initApp(user){
+  const name=user?.name||'Amol Bhosale';
+  const role=user?.role||'Owner';
+  startSession({...user,name,role});
+  document.getElementById('un').textContent=name;
+  document.getElementById('ur').textContent='👑 '+role;
+  document.getElementById('ua').textContent=name.charAt(0).toUpperCase();
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').classList.add('visible');
+  loadData();
+  toast('👋 Welcome, '+name.split(' ')[0]+'!','ok');
+}
 
 // CLOCK
 function updateClock(){const ist=new Date(new Date().getTime()+(5.5*60*60*1000));const el=document.getElementById('ts');if(el)el.textContent=ist.toTimeString().substring(0,8)+' IST';}
@@ -837,8 +922,26 @@ function closeSB(){document.getElementById('sb').classList.remove('open');docume
 // DATA
 async function loadData(){
   setLoad(true);
-  try{const res=await fetch(URLS.dashboard);if(!res.ok)throw new Error('');dashData=await res.json();allEnq=dashData.enquiries||[];renderAll(dashData);toast('✅ Data synced','ok');}
-  catch(e){dashData=sampleData();allEnq=dashData.enquiries||[];renderAll(dashData);toast('📡 Offline — cached data','warn');}
+  try{
+    // Simple fetch — no custom headers to avoid CORS preflight OPTIONS request
+    const res=await fetch(URLS.dashboard);
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    dashData=await res.json();
+    allEnq=dashData.enquiries||[];
+    renderAll(dashData);
+    toast('✅ Live data loaded','ok');
+  }catch(e){
+    console.warn('Data load issue:',e.message);
+    // Show what actually failed
+    if(e.name==='TypeError'&&e.message.includes('fetch')){
+      toast('⚠️ Cannot reach server — showing cached data','warn');
+    } else if(e.message&&e.message.startsWith('HTTP')){
+      toast('❌ Server error — '+e.message,'err');
+    } else {
+      toast('⚠️ Offline — showing cached data','warn');
+    }
+    dashData=sampleData();allEnq=dashData.enquiries||[];renderAll(dashData);
+  }
   setLoad(false);
 }
 function setLoad(on){const b=document.getElementById('lb');if(on){b.children[0].classList.add('on');}else{b.children[0].classList.remove('on');setTimeout(()=>b.children[0].style.width='0%',400);}}
@@ -1113,10 +1216,171 @@ async function doCheckin(type){
   btn.disabled=false;btn.textContent=type==='in'?'✅ CHECK IN':'🚪 CHECK OUT';
 }
 
-// WEEKLY + TEAM
+// WEEKLY — REAL DATA
+let weekOffset=0;
+
+function shiftWeek(dir){
+  if(dir===0)weekOffset=0;
+  else weekOffset+=dir;
+  renderWeekly();
+}
+
 function renderWeekly(){
-  const days=['Mon 🌅','Tue','Wed','Thu','Fri 🎯','Sat','Sun 😴'];const dates=[16,17,18,19,20,21,22];
-  document.getElementById('week-grid').innerHTML=days.map((d,i)=>`<div style="background:${dates[i]===20?'rgba(139,92,246,.08)':'var(--surface)'};border:1px solid ${dates[i]===20?'rgba(139,92,246,.25)':'var(--border)'};border-radius:12px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">${d}</div><div style="font-size:18px;font-weight:900;color:${dates[i]===20?'var(--violet)':'var(--text2)'};margin-bottom:6px">${dates[i]}</div><div style="font-size:9px;color:var(--violet)">${[2,3,1,4,2,0,0][i]>0?[2,3,1,4,2,0,0][i]+' 📥':''}</div><div style="font-size:9px;color:var(--emerald)">${[1,2,0,1,1,0,0][i]>0?[1,2,0,1,1,0,0][i]+' 🏭':''}</div>${dates[i]===20?'<div style="font-size:8px;background:var(--violet2);color:var(--violet);padding:1px 4px;border-radius:4px;margin-top:3px;font-weight:700">TODAY</div>':''}</div>`).join('');
+  // Build 7 dates for current week (Mon–Sun), adjusted by weekOffset
+  const now=new Date();
+  const todayIST=new Date(now.getTime()+(5.5*60*60*1000));
+  // Get Monday of current week
+  const dayOfWeek=todayIST.getDay()||7; // 1=Mon, 7=Sun
+  const monday=new Date(todayIST);
+  monday.setDate(todayIST.getDate()-dayOfWeek+1+(weekOffset*7));
+  monday.setHours(0,0,0,0);
+
+  const weekDays=[];
+  for(let i=0;i<7;i++){
+    const d=new Date(monday);d.setDate(monday.getDate()+i);
+    weekDays.push(d);
+  }
+
+  const todayStr=todayIST.toISOString().substring(0,10);
+  const enqs=allEnq||[];
+  const projs=dashData?.projects||[];
+
+  // For each day, gather real data
+  const dayNames=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const dayEmojis=['🌅','☀️','⚡','💼','🎯','😌','😴'];
+
+  // Week label
+  const wStart=weekDays[0];const wEnd=weekDays[6];
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('week-label').textContent=`Week of ${months[wStart.getMonth()]} ${wStart.getDate()} – ${months[wEnd.getMonth()]} ${wEnd.getDate()}, ${wEnd.getFullYear()}`;
+
+  // Build per-day data
+  const dayData=weekDays.map(d=>{
+    const dStr=d.toISOString().substring(0,10);
+    const isToday=dStr===todayStr;
+    const isPast=d<new Date(todayIST.toISOString().substring(0,10));
+
+    // Enquiries with next_followup_date on this day
+    const followups=enqs.filter(e=>e.next_followup_date&&String(e.next_followup_date).substring(0,10)===dStr&&e.stage!=='Won'&&e.stage!=='Lost');
+
+    // Enquiries added on this day
+    const added=enqs.filter(e=>e.timestamp&&String(e.timestamp).substring(0,10)===dStr);
+
+    // Overdue enquiries (last_followup was on this day and no next_followup set)
+    const overdue=enqs.filter(e=>{
+      if(!e.last_followup||e.stage==='Won'||e.stage==='Lost')return false;
+      const daysSince=(new Date(todayStr)-new Date(String(e.last_followup).substring(0,10)))/(1000*60*60*24);
+      return String(e.last_followup).substring(0,10)===dStr&&daysSince>7;
+    });
+
+    // Active projects (all active throughout week)
+    const activeSites=projs.filter(p=>p.status==='Active');
+
+    return{d,dStr,isToday,isPast,followups,added,overdue,activeSites};
+  });
+
+  // Week summary
+  const totalFollowups=dayData.reduce((s,d)=>s+d.followups.length,0);
+  const totalAdded=dayData.reduce((s,d)=>s+d.added.length,0);
+  const activeSiteCount=(dashData?.summary?.active_projects)||0;
+  const overdueCount=(dashData?.summary?.overdue_enquiries)||0;
+  document.getElementById('week-sub').textContent=`${totalFollowups} follow-ups due · ${activeSiteCount} active sites · ${overdueCount} overdue`;
+
+  // Render 7 day cards
+  document.getElementById('week-grid').innerHTML=dayData.map((day,i)=>{
+    const isWeekend=i>=5;
+    const bgColor=day.isToday?'rgba(139,92,246,.1)':isWeekend?'rgba(255,255,255,.01)':'var(--surface)';
+    const borderColor=day.isToday?'rgba(139,92,246,.35)':isWeekend?'var(--border)':'var(--border)';
+    const dateColor=day.isToday?'var(--violet)':isWeekend?'var(--text3)':'var(--text2)';
+    const hasFU=day.followups.length>0;
+    const hasAdded=day.added.length>0;
+
+    return`<div onclick="showDayDetail(${i})" style="background:${bgColor};border:1px solid ${borderColor};border-radius:14px;padding:10px 8px;cursor:pointer;transition:all .2s;min-height:110px" onmouseover="this.style.borderColor='var(--border2)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='${borderColor}';this.style.transform='none'">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px">
+        <div style="font-size:9px;color:var(--text3);font-weight:700;letter-spacing:.5px">${dayNames[i]} ${dayEmojis[i]}</div>
+        ${day.isToday?'<div style="font-size:8px;background:var(--violet2);color:var(--violet);padding:1px 5px;border-radius:4px;font-weight:700">TODAY</div>':''}
+      </div>
+      <div style="font-size:22px;font-weight:900;color:${dateColor};margin-bottom:8px;line-height:1">${day.d.getDate()}</div>
+      ${hasFU?`<div style="font-size:9px;color:var(--amber);background:var(--amber3);border:1px solid var(--amber2);border-radius:5px;padding:2px 5px;margin-bottom:3px;font-weight:700">📞 ${day.followups.length} follow-up${day.followups.length>1?'s':''}</div>`:''}
+      ${hasAdded?`<div style="font-size:9px;color:var(--sky);background:var(--sky3);border:1px solid var(--sky2);border-radius:5px;padding:2px 5px;margin-bottom:3px;font-weight:700">📥 ${day.added.length} new enquiry</div>`:''}
+      ${day.isToday?`<div style="font-size:9px;color:var(--emerald);background:var(--emerald3);border:1px solid var(--emerald2);border-radius:5px;padding:2px 5px;font-weight:700">🏭 ${activeSiteCount} sites live</div>`:''}
+      ${!hasFU&&!hasAdded&&!day.isToday?`<div style="font-size:9px;color:var(--text3);margin-top:4px">${isWeekend?'Weekend':'No tasks'}</div>`:''}
+    </div>`;
+  }).join('');
+
+  // Weekly summary cards
+  document.getElementById('week-summary').innerHTML=[
+    {ic:'📞',val:totalFollowups,lbl:'Follow-ups Due',col:'var(--amber)'},
+    {ic:'📥',val:totalAdded,lbl:'Enquiries Added',col:'var(--sky)'},
+    {ic:'🏭',val:activeSiteCount,lbl:'Active Sites',col:'var(--emerald)'},
+    {ic:'⚠️',val:overdueCount,lbl:'Overdue Alerts',col:'var(--rose)'},
+  ].map(s=>`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center">
+    <div style="font-size:20px;margin-bottom:6px">${s.ic}</div>
+    <div style="font-size:26px;font-weight:900;color:${s.col};font-family:var(--mono);line-height:1">${s.val}</div>
+    <div style="font-size:10px;color:var(--text3);margin-top:4px">${s.lbl}</div>
+  </div>`).join('');
+
+  // Store for detail view
+  window._weekDayData=dayData;
+}
+
+function showDayDetail(i){
+  const day=window._weekDayData?.[i];if(!day)return;
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const fullDayNames=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  document.getElementById('wd-emoji').textContent=day.isToday?'📍':'📅';
+  document.getElementById('wd-title').textContent=`${fullDayNames[i]}, ${months[day.d.getMonth()]} ${day.d.getDate()}, ${day.d.getFullYear()}${day.isToday?' — Today':''}`;
+
+  // Left: follow-ups | Right: new enquiries + sites
+  let leftHTML='';let rightHTML='';
+
+  // Follow-ups column
+  leftHTML+=`<div style="padding:16px;border-right:1px solid var(--border)">
+    <div style="font-size:11px;font-weight:700;color:var(--amber);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">📞 Follow-ups Due (${day.followups.length})</div>`;
+  if(day.followups.length){
+    leftHTML+=day.followups.map(e=>`<div style="background:var(--amber3);border:1px solid var(--amber2);border-radius:10px;padding:10px 12px;margin-bottom:8px">
+      <div style="font-size:12px;font-weight:700;color:var(--text)">${e.company_name}</div>
+      <div style="font-size:10px;color:var(--text2);margin-top:2px">👤 ${e.customer_name||'—'} · 📱 ${e.phone||'—'}</div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:5px">${badge(e.stage)}<span style="font-size:10px;color:var(--text3)">🏭 ${getPT(e.requirement)}</span></div>
+      ${e.quotation_value?`<div style="font-size:11px;font-weight:700;color:var(--amber);margin-top:4px;font-family:var(--mono)">₹${fmtN(e.quotation_value)}</div>`:''}
+      <div style="font-size:10px;color:var(--text3);margin-top:4px">📝 ${e.notes||'No notes'}</div>
+    </div>`).join('');
+  }else{
+    leftHTML+=`<div style="color:var(--text3);font-size:12px;padding:10px 0">✅ No follow-ups scheduled</div>`;
+  }
+  leftHTML+='</div>';
+
+  // Right: new enquiries + active sites
+  rightHTML+=`<div style="padding:16px">`;
+
+  // New enquiries added this day
+  rightHTML+=`<div style="font-size:11px;font-weight:700;color:var(--sky);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">📥 Enquiries Added (${day.added.length})</div>`;
+  if(day.added.length){
+    rightHTML+=day.added.map(e=>`<div style="background:var(--sky3);border:1px solid var(--sky2);border-radius:10px;padding:10px 12px;margin-bottom:8px">
+      <div style="font-size:12px;font-weight:700;color:var(--text)">${e.company_name}</div>
+      <div style="font-size:10px;color:var(--text2);margin-top:2px">🏭 ${getPT(e.requirement)} · 📣 ${e.source||'—'}</div>
+      <div style="margin-top:5px">${badge(e.stage)}</div>
+    </div>`).join('');
+  }else{
+    rightHTML+=`<div style="color:var(--text3);font-size:12px;padding:0 0 12px">No enquiries added</div>`;
+  }
+
+  // Active sites always shown on today
+  if(day.isToday&&day.activeSites.length){
+    rightHTML+=`<div style="font-size:11px;font-weight:700;color:var(--emerald);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;margin-top:8px">🏭 Active Sites Today (${day.activeSites.length})</div>`;
+    rightHTML+=day.activeSites.map(p=>{const pg=parseInt(p.progress)||0;return`<div style="background:var(--emerald3);border:1px solid var(--emerald2);border-radius:10px;padding:10px 12px;margin-bottom:8px">
+      <div style="font-size:12px;font-weight:700;color:var(--text)">${p.name}</div>
+      <div style="font-size:10px;color:var(--text2);margin-top:2px">👷 ${p.engineer||'—'} · 🏢 ${p.client}</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:6px"><div style="background:rgba(255,255,255,.06);border-radius:4px;height:4px;flex:1;overflow:hidden"><div style="height:100%;background:var(--emerald);width:${pg}%;border-radius:4px"></div></div><span style="font-size:10px;font-weight:700;color:var(--emerald);font-family:var(--mono)">${pg}%</span></div>
+    </div>`;}).join('');
+  }
+
+  rightHTML+='</div>';
+
+  document.getElementById('wd-body').innerHTML=leftHTML+rightHTML;
+  const panel=document.getElementById('week-detail-panel');
+  panel.style.display='block';
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
 function renderTeam(){
