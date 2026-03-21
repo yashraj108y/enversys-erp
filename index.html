@@ -420,6 +420,14 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
 .info-box h4{color:var(--violet);font-size:13px;font-weight:700;margin-bottom:6px}
 .code-block{background:rgba(0,0,0,.4);border:1px solid var(--border2);border-radius:8px;padding:10px 13px;font-family:var(--mono);font-size:11px;color:var(--emerald);margin:8px 0;word-break:break-all}
 
+/* TABLE SCROLL */
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:0 0 16px 16px}
+.tw table{min-width:600px}
+@media(max-width:768px){
+  .tw table{min-width:500px;font-size:11px}
+  .tw td,.tw th{padding:8px 10px;white-space:nowrap}
+}
+
 /* ROLE-BASED VISIBILITY */
 body.role-manager td.am{color:transparent!important;position:relative;}
 body.role-manager td.am::after{content:'₹ ••••';color:var(--text3);position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:700;letter-spacing:2px;}
@@ -428,6 +436,10 @@ body.role-manager #d-pv{color:transparent!important;position:relative;}
 body.role-manager #d-pv::after{content:'₹ ••••';color:var(--text3);font-size:16px;font-weight:700;letter-spacing:2px;position:absolute;left:0;top:0;}
 body.role-manager #po-val,body.role-manager #svc-value{color:transparent!important;position:relative;}
 body.role-manager #po-val::after,body.role-manager #svc-value::after{content:'₹ ••••';color:var(--text3);font-size:16px;font-weight:700;letter-spacing:2px;position:absolute;left:0;top:0;}
+body.role-employee #alerts,body.role-employee .al-list,body.role-employee [id="alerts-panel"]{display:none!important;}
+body.role-employee .sc.violet,body.role-employee .sc.rose{display:none!important;}
+body.role-employee #notif-btn{display:none!important;}
+body.role-employee #tb-search{display:none!important;}
 /* Employee restrictions */
 body.role-employee .al-list,body.role-employee #alerts,body.role-employee .al{display:none!important;}
 body.role-employee #notif-btn{display:none!important;}
@@ -447,7 +459,7 @@ body.role-employee #d-enq-tb tr td:last-child{display:none!important;}
   input,select,textarea{font-size:16px!important;}
   button{-webkit-tap-highlight-color:transparent;}
   .sb{position:fixed;top:0;bottom:0;left:0;width:260px;transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);z-index:300;box-shadow:4px 0 24px rgba(0,0,0,.5)}
-  .sb.open{transform:translateX(0)}
+  .sb.open{transform:translateX(0);-webkit-overflow-scrolling:touch}
   .sb-overlay{z-index:299}.sb-overlay.open{display:block}
   .main{width:100vw;position:relative}
   .sg{grid-template-columns:repeat(2,1fr)}
@@ -954,7 +966,7 @@ function initApp(user){
   const name=user?.name||'User';const role=user?.role||'Staff';
   startSession({...user,name,role});
   document.getElementById('un').textContent=name;
-  const roleIcon={'owner':'👑','manager':'🔑','engineer':'👷'};document.getElementById('ur').textContent=(roleIcon[role.toLowerCase()]||'👤')+' '+role;
+  const roleIcon={'owner':'👑','manager':'🔑','engineer':'👷','employee':'👷'};document.getElementById('ur').textContent=(roleIcon[role.toLowerCase()]||'👤')+' '+role;
   document.getElementById('ua').textContent=name.charAt(0).toUpperCase();
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').classList.add('visible');
@@ -984,7 +996,10 @@ function applyRoleView(role){
   const alertsPanel=document.getElementById('alerts-panel');
   if(isEmp){
     document.body.classList.add('role-employee');
-    document.querySelectorAll('.sb-item[onclick*="crm"],.sb-item[onclick*="po"],.sb-item[onclick*="team"],.sb-item[onclick*="service"],.sb-item[onclick*="weekly"],.sb-item[onclick*="attendance"]').forEach(el=>el.style.display='none');
+    document.querySelectorAll('.sb-item[onclick*="crm"],.sb-item[onclick*="po"],.sb-item[onclick*="team"],.sb-item[onclick*="service"],.sb-item[onclick*="weekly"],.sb-item[onclick*="attendance"],.sb-item[onclick*="projects"]').forEach(el=>el.style.display='none');
+    // Also hide search and notification bell for employee
+    const tbSearch=document.getElementById('tb-search');if(tbSearch)tbSearch.style.display='none';
+    const notifBtn=document.getElementById('notif-btn');if(notifBtn)notifBtn.style.display='none';
     document.getElementById('add-btn').style.display='none';
     document.getElementById('ur').textContent='👷 '+(role||'Employee');
     // Show employee dashboard, hide business dashboard
@@ -1033,7 +1048,7 @@ const PAGE_TITLES={dashboard:'🏠 Dashboard','client-detail':'🏢 Client Detai
 function goP(name,el){
   // Block engineers from restricted pages
   const rg=getRole();
-  const engineerBlocked=['crm','po','team','service','weekly','client-detail','attendance'];
+  const engineerBlocked=['crm','po','team','service','weekly','client-detail','attendance','projects','project-detail'];
   if((rg.toLowerCase()==='engineer'||rg.toLowerCase()==='employee')&&engineerBlocked.includes(name)){toast('🚫 Access restricted. Contact your manager.','warn');return;}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
@@ -1068,8 +1083,8 @@ function goBack(){
     goP('dashboard',document.querySelector('[onclick*=dashboard]'));
   }
 }
-function openSB(){document.getElementById('sb').classList.add('open');document.getElementById('sb-overlay').classList.add('open');document.body.style.overflow='hidden';}
-function closeSB(){document.getElementById('sb').classList.remove('open');document.getElementById('sb-overlay').classList.remove('open');document.body.style.overflow='';}
+function openSB(){document.getElementById('sb').classList.add('open');document.getElementById('sb-overlay').classList.add('open');document.body.style.overflow='hidden';document.body.style.position='fixed';document.body.style.width='100%';}
+function closeSB(){document.getElementById('sb').classList.remove('open');document.getElementById('sb-overlay').classList.remove('open');document.body.style.overflow='';document.body.style.position='';document.body.style.width='';}
 
 // ─────────────────────────────────────────
 // DATA — same as old working HTML, no custom headers
