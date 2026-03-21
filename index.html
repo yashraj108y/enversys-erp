@@ -401,10 +401,11 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
 
 /* CHART */
 .chart-wrap{padding:16px 18px 0}
-.chart-bars{display:flex;align-items:flex-end;gap:6px;height:120px;position:relative;padding:0 4px}
+.chart-bars{display:flex;align-items:flex-end;gap:6px;height:120px;padding:0 4px;position:relative}
 .chart-grp{display:flex;gap:2px;align-items:flex-end;flex:1;min-width:0;flex-direction:column;justify-content:flex-end}
 .cbar{border-radius:4px 4px 0 0;cursor:default;transform-origin:bottom;animation:barGrow .6s cubic-bezier(.22,1,.36,1) both;position:relative}.cbar-val{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:700;color:var(--text2);white-space:nowrap;font-family:var(--mono)}
 @keyframes barGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes barRise{from{height:0;opacity:0}to{opacity:1}}
 .cbar.c1{background:linear-gradient(180deg,var(--violet),rgba(139,92,246,.1))}
 .cbar.c2{background:linear-gradient(180deg,var(--sky),rgba(39,174,96,.1))}
 .chart-xl{flex:1;text-align:center;font-size:9px;color:var(--text3);margin-top:5px;font-family:var(--mono)}
@@ -1108,18 +1109,20 @@ function goBack(){
   }
 }
 function openSB(){
-  const sb=document.getElementById('sb');
-  const ov=document.getElementById('sb-overlay');
-  sb.classList.add('open');
-  ov.classList.add('open');
-  document.body.style.overflow='hidden';
+  document.getElementById('sb').classList.add('open');
+  document.getElementById('sb-overlay').classList.add('open');
+  if(window.innerWidth<=768){
+    document.body.style.overflow='hidden';
+    document.body.style.position='fixed';
+    document.body.style.width='100%';
+  }
 }
 function closeSB(){
-  const sb=document.getElementById('sb');
-  const ov=document.getElementById('sb-overlay');
-  sb.classList.remove('open');
-  ov.classList.remove('open');
+  document.getElementById('sb').classList.remove('open');
+  document.getElementById('sb-overlay').classList.remove('open');
   document.body.style.overflow='';
+  document.body.style.position='';
+  document.body.style.width='';
 }
 
 // ─────────────────────────────────────────
@@ -1823,16 +1826,16 @@ function renderChart(d,role){
   const mx=Math.max(...vals,1);
   const total=vals.reduce((a,b)=>a+b,0)||1;
 
-  // Build bars — each bar is a simple div with explicit height
+  // Build bars — simple inline-block style, no flex-column conflict
   bc.innerHTML=labels.map((lbl,i)=>{
-    const barH=vals[i]>0?Math.max(Math.round((vals[i]/mx)*90),8):4;
+    const barH=vals[i]>0?Math.max(Math.round((vals[i]/mx)*90),6):3;
     const pct=Math.round((vals[i]/total)*100);
-    const col=colors[i]||'var(--text3)';
-    const topLabel=vals[i]>0?(isEmp||isMgr?vals[i]:pct+'%'):'';
-    return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;position:relative">
-      <div style="font-size:9px;font-weight:800;color:${col};font-family:var(--mono);height:14px;display:flex;align-items:center;justify-content:center">${topLabel}</div>
-      <div style="width:80%;height:${barH}px;background:${col};border-radius:5px 5px 0 0;position:relative;overflow:hidden;box-shadow:0 -2px 8px ${col}44;animation:barGrow .7s cubic-bezier(.22,1,.36,1) ${i*0.08}s both">
-        <div style="position:absolute;top:0;left:0;right:0;height:40%;background:rgba(255,255,255,.2);border-radius:5px 5px 0 0"></div>
+    const col=colors[i]||'var(--border2)';
+    const topLabel=vals[i]>0?(isEmp||isMgr?String(vals[i]):(pct+'%')):'';
+    return`<div style="flex:1;min-width:0;display:flex;align-items:flex-end;justify-content:center;position:relative">
+      <div style="width:min(100%,40px);display:flex;flex-direction:column;align-items:center;gap:3px">
+        <div style="font-size:9px;font-weight:800;color:${col};font-family:var(--mono);text-align:center;line-height:1">${topLabel}</div>
+        <div style="width:100%;height:${barH}px;background:linear-gradient(to top,${col}cc,${col});border-radius:4px 4px 0 0;box-shadow:0 0 10px ${col}66;transform-origin:bottom;animation:barGrow .6s cubic-bezier(.22,1,.36,1) ${i*0.1}s both"></div>
       </div>
     </div>`;
   }).join('');
