@@ -459,7 +459,7 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
     <div class="fg"><label><span>📱</span> Phone Number</label><div class="iw"><span class="pre">+91</span><input type="tel" id="lp" class="pl" placeholder="Enter mobile number" maxlength="10" inputmode="numeric"></div></div>
     <div class="fg"><label><span>🔐</span> Password</label><div class="iw"><span class="lockic">🔒</span><input type="password" id="lpw" style="padding-left:40px" placeholder="Enter your password"><button class="eye-b" onclick="togglePw()" id="eye-b">👁</button></div></div>
     <div class="otp-box" id="otp-box"><div class="otp-note">⚡ New device detected — OTP sent to WhatsApp</div><div class="fg"><label>🔑 One-Time Password</label><input type="number" id="lotp" placeholder="6-digit OTP" maxlength="6" inputmode="numeric"></div></div>
-    <div class="lrow"><label class="lchk"><input type="checkbox" id="rem"> Remember this device</label><span style="font-size:12px;color:var(--sky);cursor:pointer">Forgot password?</span></div>
+    <div class="lrow"><label class="lchk"><input type="checkbox" id="rem"> Remember this device</label><span style="font-size:12px;color:var(--sky);cursor:pointer;text-decoration:underline" onclick="forgotPass()">Forgot password?</span></div>
     <button class="l-btn" id="l-btn" onclick="doLogin()"><span id="l-txt">Access Dashboard</span><span>→</span></button>
     <div class="lerr" id="lerr"></div>
     <div class="l-divider"><span>🔒 Secured by</span></div>
@@ -816,6 +816,12 @@ function logout(){if(!confirm('Sign out?'))return;clearInterval(sessionInterval)
 let pwVis=false;
 function togglePw(){const i=document.getElementById('lpw');pwVis=!pwVis;i.type=pwVis?'text':'password';document.getElementById('eye-b').textContent=pwVis?'🙈':'👁';}
 
+function forgotPass(){
+  const err=document.getElementById('lerr');
+  err.innerHTML='🔑 Contact your manager to reset your password:<br><strong style="color:var(--text)">Amol Bhosale — 📱 98506 00099</strong>';
+  err.classList.add('show');
+}
+
 function resetBtn(txt='Access Dashboard'){const btn=document.getElementById('l-btn');if(btn)btn.disabled=false;const ltxt=document.getElementById('l-txt');if(ltxt)ltxt.textContent=txt;}
 
 function showErr(msg){const e=document.getElementById('lerr');e.textContent=msg;e.classList.add('show');resetBtn();const box=document.querySelector('.lbox');if(box){box.style.animation='shake .3s ease';setTimeout(()=>box.style.animation='',400);}}
@@ -834,7 +840,7 @@ async function doLogin(){
     const res=await fetch(URLS.login,{method:'POST',body:JSON.stringify({phone,password:pw})});
     const data=await res.json();
     if(data.success){initApp(data.user);return;}
-    err.textContent='❌ '+(data.error||'Wrong phone or password');
+    err.textContent='❌ Access denied. Contact your manager for help.';
     err.classList.add('show');
   }catch(e){
     if(isTrusted(phone)){initApp({name:'User',phone,role:'Owner'});return;}
