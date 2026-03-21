@@ -70,12 +70,12 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;back
 /* APP LAYOUT */
 #app{display:none;height:100vh;flex-direction:row;position:relative;z-index:1}
 #app.visible{display:flex}
-.sb{width:240px;min-width:240px;height:100vh;background:rgba(9,9,15,.96);backdrop-filter:blur(20px);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;position:relative;z-index:50;flex-shrink:0}
-.sb-logo{padding:16px 16px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sb{width:240px;min-width:240px;height:100vh;background:rgba(9,9,15,.98);backdrop-filter:blur(20px);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;position:relative;z-index:50;flex-shrink:0}
+.sb-logo{padding:16px 16px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;position:relative;z-index:301}
 .sb-icon{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--violet),var(--sky));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;box-shadow:0 0 16px rgba(139,92,246,.3)}
 .sb-brand h2{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.3px}
 .sb-brand p{font-size:9px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
-.sb-nav{flex:1;padding:10px 8px;overflow-y:auto}
+.sb-nav{flex:1;padding:10px 8px;overflow-y:auto;position:relative;z-index:301}
 .sb-nav::-webkit-scrollbar{width:0}
 .sb-sec{font-size:9px;font-weight:700;color:var(--text3);letter-spacing:2.5px;text-transform:uppercase;padding:12px 10px 5px}
 .sb-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;font-size:12px;font-weight:500;color:var(--text2);transition:all .15s;margin-bottom:1px;position:relative;border:1px solid transparent}
@@ -400,7 +400,7 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
 .toast-ic{font-size:16px}
 
 /* CHART */
-.chart-wrap{padding:16px 18px 0}
+.chart-wrap{padding:14px 18px 4px}
 .chart-bars{display:flex;align-items:flex-end;gap:4px;height:120px;padding:0 4px}
 .chart-grp{display:flex;gap:2px;align-items:flex-end;flex:1;min-width:0;flex-direction:column;justify-content:flex-end}
 .cbar{border-radius:4px 4px 0 0;cursor:default;transform-origin:bottom;animation:barGrow .6s cubic-bezier(.22,1,.36,1) both;position:relative}.cbar-val{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:700;color:var(--text2);white-space:nowrap;font-family:var(--mono)}
@@ -1786,7 +1786,6 @@ function weekSummaryClick(i){
 // CHART
 // ─────────────────────────────────────────
 function renderChart(d,role){
-  if(!d)d=dashData;
   const bc=document.getElementById('chart-bars');
   const lc=document.getElementById('chart-labels');
   if(!bc||!lc)return;
@@ -1794,70 +1793,79 @@ function renderChart(d,role){
   const isEmp=r==='employee'||r==='engineer';
   const isMgr=r==='manager';
 
-  let labels=[],vals=[],colors=[];
+  let labels=[],vals=[],colors=[],titleTxt='',subtitle='';
 
   if(isEmp){
     labels=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
     vals=[0,0,0,0,0,0,0];
     colors=['#10b981','#10b981','#10b981','#10b981','#10b981','#475569','#475569'];
-    const ph=bc.closest('.panel')?.querySelector('#chart-title');
-    if(ph)ph.textContent='My Check-ins This Week';
+    titleTxt='My Check-ins This Week';
+    subtitle='Daily work log';
   } else if(isMgr){
     const projs=(d?.projects||[]).filter(p=>p.status==='Active');
     const engMap={};
-    projs.forEach(p=>{const n=(p.engineer||'Unknown').split(' ')[0];engMap[n]=(engMap[n]||0)+1;});
-    labels=Object.keys(engMap).slice(0,6);
+    projs.forEach(p=>{
+      const n=(p.engineer||'Unknown').split(' ')[0];
+      engMap[n]=(engMap[n]||0)+1;
+    });
+    labels=Object.keys(engMap);
     vals=labels.map(n=>engMap[n]);
     colors=['#27ae60','#8b5cf6','#10b981','#f59e0b','#f97316','#f43f5e'];
-    const ph=bc.closest('.panel')?.querySelector('#chart-title');
-    if(ph)ph.textContent='Team Site Load';
-    const leg=document.getElementById('chart-legend');
-    if(leg)leg.textContent='Sites per engineer';
+    titleTxt='Team Site Load';
+    subtitle=labels.length+' engineers · '+vals.reduce((a,b)=>a+b,0)+' sites';
   } else {
+    // Owner: real stage data from enquiries
+    const stages=['New','Discussion','Quoted','Negotiation','Won','Lost'];
+    const stageColors=['#27ae60','#94a3b8','#8b5cf6','#f59e0b','#10b981','#f43f5e'];
     const enqs=d?.enquiries||[];
-    labels=['New','Disc','Quoted','Nego','Won','Lost'];
-    const stageNames=['New','Discussion','Quoted','Negotiation','Won','Lost'];
-    vals=stageNames.map(s=>enqs.filter(e=>e.stage===s).length);
-    colors=['#27ae60','#94a3b8','#8b5cf6','#f59e0b','#10b981','#f43f5e'];
-    const ph=bc.closest('.panel')?.querySelector('#chart-title');
-    if(ph)ph.textContent='Pipeline by Stage';
+    labels=stages;
+    vals=stages.map(s=>enqs.filter(e=>e.stage===s).length);
+    colors=stageColors;
     const total=vals.reduce((a,b)=>a+b,0);
-    const leg=document.getElementById('chart-legend');
-    if(leg)leg.textContent=total+' total enquiries';
+    titleTxt='Pipeline by Stage';
+    subtitle=total+' total · Click bar for details';
   }
 
   const mx=Math.max(...vals,1);
   const total=vals.reduce((a,b)=>a+b,0)||1;
-  const H=90; // max bar height in px
+  const maxH=90; // max bar height in px
 
-  // SIMPLE: just use inline-block divs, no flexbox tricks
-  let barsHTML='';
-  let labelsHTML='';
-  for(let i=0;i<labels.length;i++){
-    const h=vals[i]>0?Math.max(Math.round((vals[i]/mx)*H),8):3;
-    const pct=Math.round((vals[i]/total)*100);
-    const col=colors[i]||'#94a3b8';
-    const label=isEmp||isMgr?String(vals[i]):(vals[i]>0?pct+'%':'');
-    barsHTML+=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end">
-      <div style="font-size:9px;font-weight:800;color:${col};font-family:monospace;margin-bottom:3px;min-height:12px">${vals[i]>0?label:''}</div>
-      <div style="width:min(36px,85%);height:${h}px;background:${col};border-radius:4px 4px 0 0;box-shadow:0 -3px 12px ${col}66;transform:scaleY(1);transition:height .6s ease ${i*80}ms"></div>
+  // Render bars using simple divs — guaranteed to work
+  bc.innerHTML=vals.map((v,i)=>{
+    const h=v>0?Math.max(Math.round((v/mx)*maxH),8):3;
+    const pct=Math.round((v/total)*100);
+    const col=colors[i]||'#475569';
+    const label=v>0?(isEmp||isMgr?v:pct+'%'):'';
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px">
+      <span style="font-size:9px;font-weight:700;color:${col};font-family:monospace;min-height:12px;line-height:1">${label}</span>
+      <div style="width:min(36px,90%);height:${h}px;background:${col};border-radius:3px 3px 0 0;opacity:${v>0?1:0.2};transition:height 0.6s ease ${i*0.08}s"></div>
     </div>`;
-    labelsHTML+=`<div style="flex:1;text-align:center;font-size:9px;color:${vals[i]>0?col:'#475569'};font-weight:${vals[i]>0?700:400};padding-top:5px">${labels[i]}</div>`;
-  }
-  bc.innerHTML=barsHTML;
-  lc.innerHTML=labelsHTML;
+  }).join('');
+
+  // Labels
+  lc.innerHTML=labels.map((lbl,i)=>{
+    const col=vals[i]>0?(colors[i]||'#475569'):'#475569';
+    const short=lbl.substring(0,4);
+    return `<div style="flex:1;text-align:center;font-size:9px;font-weight:${vals[i]>0?700:400};color:${col};padding-top:4px">${short}</div>`;
+  }).join('');
+
+  // Title
+  const titleEl=bc.closest('.panel')?.querySelector('#chart-title');
+  if(titleEl)titleEl.textContent=titleTxt;
+  const legEl=document.getElementById('chart-legend');
+  if(legEl)legEl.textContent=subtitle;
 
   // Stats
   const s=d?.summary||{};
   if(isEmp){
-    set('cs1','0 today');set('cs1-lbl','✅ My Check-ins');
-    set('cs2',(s.active_projects||0)+' sites');set('cs2-lbl','🏭 Active Sites');
+    set('cs1','—');set('cs1-lbl','✅ My Check-ins');
+    set('cs2',(s.active_projects||0)+'');set('cs2-lbl','🏭 Active Sites');
   } else if(isMgr){
-    set('cs1',labels.length+' engineers');set('cs1-lbl','👷 Field Team');
-    set('cs2',(s.active_projects||0)+' active');set('cs2-lbl','🏭 Sites Running');
+    set('cs1',labels.length+'');set('cs1-lbl','👷 Engineers');
+    set('cs2',(s.active_projects||0)+'');set('cs2-lbl','🏭 Sites Active');
   } else {
-    set('cs1',(s.total_enquiries||0)+' total');set('cs1-lbl','📊 All Enquiries');
-    set('cs2',(s.won_enquiries||0)+' won');set('cs2-lbl','🏆 Deals Won');
+    set('cs1',(s.total_enquiries||0)+'');set('cs1-lbl','📊 Total Enquiries');
+    set('cs2',(s.won_enquiries||0)+'');set('cs2-lbl','🏆 Won Deals');
   }
 }
 
