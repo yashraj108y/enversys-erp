@@ -102,7 +102,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;back
 .topbar::after{content:'';position:absolute;bottom:0;left:-40%;width:35%;height:1px;background:linear-gradient(90deg,transparent,var(--violet),transparent);animation:tbSweep 6s ease-in-out infinite;pointer-events:none}
 @keyframes tbSweep{0%{left:-35%}100%{left:135%}}
 .tl{display:flex;align-items:center;gap:12px}
-.menu-btn{display:none;background:none;border:1px solid var(--border2);color:var(--text2);padding:6px 9px;cursor:pointer;border-radius:8px;font-size:14px}
+.menu-btn{display:none;background:none;border:1px solid var(--border2);color:var(--text2);padding:8px 10px;cursor:pointer;border-radius:8px;font-size:16px;flex-shrink:0;z-index:10;position:relative}
 .tb-crumb{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:6px}
 .tb-crumb span{color:var(--text);font-weight:600}
 .tb-crumb::before{content:'◆';font-size:7px;color:var(--violet)}
@@ -203,13 +203,13 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:7px;font-size:10px;font-weight:700;border:1px solid;letter-spacing:.3px}
 .badge::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0}
 .b-new{background:rgba(39,174,96,.1);color:var(--sky);border-color:rgba(39,174,96,.2)}.b-new::before{background:var(--sky)}
-.b-act,.b-won{background:rgba(16,185,129,.1);color:var(--emerald);border-color:rgba(16,185,129,.2)}.b-act::before,.b-won::before{background:var(--emerald)}
+.b-act,.b-won{background:rgba(16,185,129,.15);color:#059669;border-color:rgba(16,185,129,.35);font-weight:800}.b-act::before,.b-won::before{background:#059669}
 .b-comp{background:rgba(16,185,129,.08);color:var(--emerald);border-color:rgba(16,185,129,.15)}.b-comp::before{background:var(--emerald)}
-.b-lost{background:var(--rose3);color:var(--rose);border-color:var(--rose2)}.b-lost::before{background:var(--rose)}
+.b-lost{background:rgba(244,63,94,.15);color:#e11d48;border-color:rgba(244,63,94,.35);font-weight:800}.b-lost::before{background:#e11d48}
 .b-neg{background:var(--amber3);color:var(--amber);border-color:var(--amber2)}.b-neg::before{background:var(--amber)}
 .b-quo{background:var(--violet3);color:var(--violet);border-color:var(--violet2)}.b-quo::before{background:var(--violet)}
 .b-dis{background:var(--surface2);color:var(--text2);border-color:var(--border)}.b-dis::before{background:var(--text3)}
-.b-ov{background:var(--rose3);color:var(--rose);border-color:var(--rose2);animation:blink 1.2s infinite}.b-ov::before{background:var(--rose)}
+.b-ov{background:rgba(244,63,94,.2);color:#e11d48;border-color:rgba(244,63,94,.5);animation:blink 1.2s infinite;font-weight:800}.b-ov::before{background:#e11d48}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
 /* STAGE DROPDOWN - NEW */
@@ -253,11 +253,11 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
 .ph-client{font-size:13px;color:var(--text2)}
 .ph-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
 .circ-prog{position:relative;width:80px;height:80px;flex-shrink:0}
-.circ-prog svg{width:100%;height:100%;filter:drop-shadow(0 4px 12px rgba(139,92,246,.3))}
+.circ-prog svg{width:100%;height:100%;}
 .circ-prog circle{fill:none;stroke-width:5}
 .circ-bg{stroke:rgba(255,255,255,.05)}
-.circ-fill{stroke:url(#circGrad);stroke-linecap:round;transition:stroke-dashoffset 1.5s;transform:rotate(-90deg);transform-origin:50% 50%}
-.circ-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:var(--violet);font-family:var(--mono)}
+.circ-fill{stroke:#8b5cf6;stroke-linecap:round;transition:stroke-dashoffset 1.5s,stroke .5s;transform:rotate(-90deg);transform-origin:50% 50%}
+.circ-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;color:var(--violet);font-family:var(--mono);text-shadow:0 0 12px rgba(139,92,246,.5)}
 .ph-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .ph-metric{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:10px 14px;text-align:center}
 .ph-mv{font-size:18px;font-weight:900;color:var(--text);font-family:var(--mono)}
@@ -401,9 +401,9 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
 
 /* CHART */
 .chart-wrap{padding:16px 18px}
-.chart-bars{display:flex;align-items:flex-end;gap:4px;height:80px}
+.chart-bars{display:flex;align-items:flex-end;gap:4px;height:100px;padding-top:20px;position:relative}
 .chart-grp{display:flex;gap:2px;align-items:flex-end;flex:1}
-.cbar{border-radius:4px 4px 0 0;cursor:default;transform-origin:bottom;animation:barGrow .6s cubic-bezier(.22,1,.36,1) both}
+.cbar{border-radius:4px 4px 0 0;cursor:default;transform-origin:bottom;animation:barGrow .6s cubic-bezier(.22,1,.36,1) both;position:relative}.cbar-val{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:700;color:var(--text2);white-space:nowrap;font-family:var(--mono)}
 @keyframes barGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
 .cbar.c1{background:linear-gradient(180deg,var(--violet),rgba(139,92,246,.1))}
 .cbar.c2{background:linear-gradient(180deg,var(--sky),rgba(39,174,96,.1))}
@@ -865,6 +865,17 @@ body.role-employee #d-enq-tb tr td:last-child{display:none!important;}
 <div class="mo" id="mo-enq"><div class="mb"><div class="mb-head"><div class="mb-title">➕ Add New Enquiry</div><button class="xb" onclick="closeM('enq')">✕</button></div><div class="mb-body"><div class="mg"><div class="fg-m"><label>👤 Customer Name</label><input type="text" id="e-cn" placeholder="Full name"></div><div class="fg-m"><label>🏢 Company</label><input type="text" id="e-co" placeholder="Company name"></div><div class="fg-m"><label>📱 Phone</label><input type="tel" id="e-ph" placeholder="Mobile" inputmode="numeric"></div><div class="fg-m"><label>📧 Email</label><input type="email" id="e-em" placeholder="email@company.com"></div><div class="fg-m"><label>📍 City</label><input type="text" id="e-ci" placeholder="City"></div><div class="fg-m"><label>📣 Source</label><select id="e-so"><option>IndiaMART</option><option>Phone Call</option><option>WhatsApp</option><option>Reference</option><option>Exhibition</option></select></div><div class="fg-m"><label>🏭 Plant Type</label><select id="e-pt"><option>STP</option><option>ETP</option><option>WTP</option><option>ZLD</option><option>OWC</option><option>MEE</option><option>Other</option></select></div><div class="fg-m"><label>🏗️ Industry</label><select id="e-ind"><option>Pharma</option><option>Automobile</option><option>Chemical</option><option>Food &amp; Beverage</option><option>Steel &amp; Power</option><option>Textile</option><option>Other</option></select></div><div class="fg-m full"><label>📝 Requirement</label><input type="text" id="e-rq" placeholder="Capacity, specifications..."></div><div class="fg-m full"><label>💬 Notes</label><input type="text" id="e-nt" placeholder="Additional notes"></div></div><div class="ma"><button class="cb3" onclick="closeM('enq')">Cancel</button><button class="sb4" onclick="saveEnq()">Save Enquiry →</button></div></div></div></div>
 <div class="mo" id="mo-po"><div class="mb"><div class="mb-head"><div class="mb-title">📋 Add Purchase Order</div><button class="xb" onclick="closeM('po')">✕</button></div><div class="mb-body"><div class="mg"><div class="fg-m"><label>📌 PO Number</label><input type="text" id="po-n" placeholder="PO-2026-001"></div><div class="fg-m"><label>🏢 Client</label><input type="text" id="po-c" placeholder="Client company"></div><div class="fg-m"><label>🏭 Plant Type</label><select id="po-pt"><option>STP</option><option>ETP</option><option>WTP</option><option>ZLD</option><option>OWC</option><option>O&amp;M Annual</option></select></div><div class="fg-m"><label>💰 Value (₹)</label><input type="number" id="po-v" placeholder="Amount"></div><div class="fg-m"><label>📅 Start Date</label><input type="date" id="po-d"></div><div class="fg-m"><label>👷 Lead Engineer</label><input type="text" id="po-e" placeholder="Engineer name"></div><div class="fg-m full"><label>📝 Description</label><input type="text" id="po-desc" placeholder="Scope of work"></div></div><div class="ma"><button class="cb3" onclick="closeM('po')">Cancel</button><button class="sb4" onclick="savePO()">Save PO →</button></div></div></div></div>
 
+<!-- PO DETAIL MODAL -->
+<div class="mo" id="mo-po-detail">
+  <div class="mb" style="max-width:480px">
+    <div class="mb-head">
+      <div class="mb-title" id="po-detail-title">📋 Purchase Order</div>
+      <button class="xb" onclick="closeM('po-detail')">✕</button>
+    </div>
+    <div class="mb-body" id="po-detail-body"></div>
+  </div>
+</div>
+
 <!-- ENGINEER DETAIL MODAL -->
 <div class="mo" id="mo-eng">
   <div class="mb" style="max-width:480px">
@@ -873,6 +884,17 @@ body.role-employee #d-enq-tb tr td:last-child{display:none!important;}
       <button class="xb" onclick="closeM('eng')">✕</button>
     </div>
     <div class="mb-body" id="eng-modal-body"></div>
+  </div>
+</div>
+
+<!-- PO DETAIL MODAL -->
+<div class="mo" id="mo-po-detail">
+  <div class="mb" style="max-width:500px">
+    <div class="mb-head">
+      <div class="mb-title" id="po-detail-title">📋 PO Detail</div>
+      <button class="xb" onclick="closeM('po-detail')">✕</button>
+    </div>
+    <div class="mb-body" id="po-detail-body"></div>
   </div>
 </div>
 
@@ -972,7 +994,12 @@ function initApp(user){
   document.getElementById('app').classList.add('visible');
   applyRoleView(role);
   loadData();
-  toast('👋 Welcome, '+name.split(' ')[0]+'!','ok');
+  const g2=getGreeting();
+  const wRole=String(role).toLowerCase();
+  const wMsg=wRole==='owner'?`👑 ${g2.greeting}, ${g2.name}! Your dashboard is ready.`:
+             wRole==='manager'?`🔑 ${g2.greeting}, ${g2.name}! Team overview is ready.`:
+             `👷 ${g2.greeting}, ${g2.name}! Check in when you reach site.`;
+  toast(wMsg,'ok');
 }
 
 // ROLE-BASED VIEW
@@ -1194,7 +1221,13 @@ function renderDashEnq(enqs){
   const tb=document.getElementById('d-enq-tb');
   if(!enqs.length){tb.innerHTML='<tr><td colspan="5" class="empty">No enquiries yet — click + Add 🚀</td></tr>';return;}
   const now=new Date();
-  tb.innerHTML=enqs.map(e=>`<tr><td class="gr">${e.enquiry_id||'—'}</td><td class="b em">${e.company_name||'—'}</td><td><span class="badge b-quo">${getPT(e.requirement)}</span></td><td>${badge(isOv(e,now)?'Overdue':e.stage)}</td><td class="am">${e.quotation_value?'₹'+fmtN(e.quotation_value):'—'}</td></tr>`).join('');
+  tb.innerHTML=enqs.map(e=>`<tr onclick="openClientDetail('${e.enquiry_id}')" style="cursor:pointer" title="Click to view details">
+    <td class="gr">${e.enquiry_id||'—'}</td>
+    <td class="b" style="color:var(--sky)">${e.company_name||'—'} →</td>
+    <td><span class="badge b-quo">${getPT(e.requirement)}</span></td>
+    <td>${badge(isOv(e,now)?'Overdue':e.stage)}</td>
+    <td class="am">${e.quotation_value?'₹'+fmtN(e.quotation_value):'—'}</td>
+  </tr>`).join('');
 }
 
 // ─────────────────────────────────────────
@@ -1247,7 +1280,15 @@ function filterCRM(){
 function renderPO(pos){
   const tb=document.getElementById('po-tb');const valid=pos.filter(p=>p.po_number);
   if(!valid.length){tb.innerHTML='<tr><td colspan="7" class="empty">No POs yet — click + Add PO</td></tr>';return;}
-  tb.innerHTML=valid.map(p=>`<tr><td class="gr">${p.po_number}</td><td class="b em">${p.client||'—'}</td><td><span class="badge b-quo">${getPT(p.description)}</span></td><td class="am">${p.value?'₹'+fmtN(p.value):'—'}</td><td style="color:var(--text3);font-family:var(--mono)">${(p.date||'—').substring(0,10)}</td><td>${badge(p.status)}</td><td style="color:var(--text3)">${p.project||'—'}</td></tr>`).join('');
+  tb.innerHTML=valid.map(p=>`<tr onclick="openPODetail('${p.po_number}')" style="cursor:pointer" title="Click to view PO details">
+    <td class="gr">${p.po_number}</td>
+    <td class="b" style="color:var(--sky)">${p.client||'—'} →</td>
+    <td><span class="badge b-quo">${getPT(p.description)}</span></td>
+    <td class="am">${p.value?'₹'+fmtN(p.value):'—'}</td>
+    <td style="color:var(--text3);font-family:var(--mono)">${(p.date||'—').substring(0,10)}</td>
+    <td>${badge(p.status)}</td>
+    <td style="color:var(--text3)">${p.project||'—'}</td>
+  </tr>`).join('');
 }
 
 // ─────────────────────────────────────────
@@ -1485,7 +1526,20 @@ function openProjectDetail(pid){
   set('pm-days',proj.status==='Completed'?'✅ Done':days+' days');
   set('pm-tasks',Math.floor(pg/10)+'/'+Math.round(pg/10+3));
   const circ=document.getElementById('circ-fill');
-  if(circ)setTimeout(()=>{circ.style.strokeDashoffset=213.6-(213.6*pg/100);},100);
+  const circVal=document.getElementById('circ-val');
+  // Color based on progress
+  const circColor=pg>=81?'#10b981':pg>=61?'#27ae60':pg>=31?'#f59e0b':'#f43f5e';
+  const circShadow=pg>=81?'rgba(16,185,129,.5)':pg>=61?'rgba(39,174,96,.5)':pg>=31?'rgba(245,158,11,.5)':'rgba(244,63,94,.5)';
+  if(circ){
+    circ.style.stroke=circColor;
+    circ.style.filter='drop-shadow(0 0 6px '+circShadow+')';
+    setTimeout(()=>{circ.style.strokeDashoffset=213.6-(213.6*pg/100);},100);
+  }
+  if(circVal){
+    circVal.style.color=circColor;
+    circVal.style.textShadow='0 0 14px '+circShadow;
+    circVal.style.fontSize=pg===100?'14px':'17px';
+  }
   set('circ-val',pg+'%');
   document.getElementById('proj-info').innerHTML=[['📌 Project ID',proj.project_id||'—'],['🏭 Type',getPT(proj.description)],['📅 Start',proj.start_date||'—'],['📅 End',proj.end_date||'—'],['🔄 Status',proj.status||'—'],['👷 Engineer',proj.engineer||'—']].map(r=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)"><span style="font-size:11px;color:var(--text3)">${r[0]}</span><span style="font-size:12px;font-weight:700;color:var(--text2)">${r[1]}</span></div>`).join('');
   renderTimeline(proj);renderProjTasks(proj);renderCheckins(proj);renderIssues(proj);renderExpenses(proj);
@@ -1541,13 +1595,24 @@ function initCheckin(){
       });
     }
   }
-  // Get GPS
+  // Get GPS with address
+  const gpsEl=document.getElementById('ci-gps-status');
+  if(gpsEl)gpsEl.innerHTML='📡 Detecting your location... <span style="color:var(--text3)">Please allow location access</span>';
   if(navigator.geolocation){
-    navigator.geolocation.getCurrentPosition(pos=>{
+    navigator.geolocation.getCurrentPosition(async pos=>{
       ciLat=pos.coords.latitude;ciLng=pos.coords.longitude;
-      const el=document.getElementById('ci-gps-status');
-      if(el)el.innerHTML='📍 GPS: '+ciLat.toFixed(4)+', '+ciLng.toFixed(4)+' ✅';
-    },()=>{const el=document.getElementById('ci-gps-status');if(el)el.innerHTML='⚠️ GPS: Permission denied. Location not captured.';});
+      if(gpsEl)gpsEl.innerHTML='📍 Location captured ✅ · <span style="color:var(--emerald);font-family:var(--mono)">'+ciLat.toFixed(4)+', '+ciLng.toFixed(4)+'</span>';
+      // Try to get address
+      try{
+        const r=await fetch('https://nominatim.openstreetmap.org/reverse?lat='+ciLat+'&lon='+ciLng+'&format=json');
+        const d=await r.json();
+        const addr=d.address;
+        const readable=(addr.road||addr.suburb||'')+', '+(addr.city||addr.town||addr.village||'')+', '+(addr.state||'');
+        if(gpsEl)gpsEl.innerHTML='📍 '+readable.replace(/^,\s*/,'').replace(/,\s*,/g,',')+' ✅';
+      }catch(e){}
+    },()=>{
+      if(gpsEl)gpsEl.innerHTML='⚠️ Location access denied — <button onclick="initCheckin()" style="background:var(--violet2);border:1px solid var(--violet);color:var(--violet);padding:2px 8px;border-radius:6px;cursor:pointer;font-size:10px;font-weight:700">Try Again</button>';
+    },{enableHighAccuracy:true,timeout:10000});
   }
 }
 
@@ -1631,7 +1696,7 @@ function renderWeekly(){
     {ic:'🏭',val:activeSiteCount,lbl:'Active Sites',col:'var(--emerald)'},
     {ic:'⚠️',val:overdueCount,lbl:'Overdue Alerts',col:'var(--rose)'},
     {ic:'📋',val:dashData?.summary?.active_pos||0,lbl:'Active POs',col:'var(--sky)'},
-  ].map(s=>`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center"><div style="font-size:20px;margin-bottom:6px">${s.ic}</div><div style="font-size:26px;font-weight:900;color:${s.col};font-family:var(--mono);line-height:1">${s.val}</div><div style="font-size:10px;color:var(--text3);margin-top:4px">${s.lbl}</div></div>`).join('');
+  ].map((s,i)=>`<div onclick="weekSummaryClick(${i})" style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='${s.col}';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform='none'"><div style="font-size:20px;margin-bottom:6px">${s.ic}</div><div style="font-size:26px;font-weight:900;color:${s.col};font-family:var(--mono);line-height:1">${s.val}</div><div style="font-size:10px;color:var(--text3);margin-top:4px">${s.lbl}</div><div style="font-size:9px;color:${s.col};margin-top:4px;font-weight:600">Tap for details →</div></div>`).join('');
 }
 
 function showDayDetail(i){
@@ -1649,6 +1714,26 @@ function showDayDetail(i){
   right+='</div>';
   document.getElementById('wd-body').innerHTML=left+right;
   const panel=document.getElementById('week-detail-panel');panel.style.display='block';panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function weekSummaryClick(i){
+  const s=dashData?.summary||{};
+  const ol=dashData?.overdue_list||[];
+  const projs=dashData?.projects||[];
+  const labels=['📞 Follow-ups','🏭 Active Sites','⚠️ Overdue','📋 Active POs'];
+  const details=[
+    ol.length?ol.map(e=>`<div style="background:var(--amber3);border:1px solid var(--amber2);border-radius:10px;padding:10px 12px;margin-bottom:6px"><div style="font-size:12px;font-weight:700;color:var(--text)">${e.company_name}</div><div style="font-size:10px;color:var(--text2)">👤 ${e.customer_name||'—'} · 📅 Last: ${(e.last_followup||'—').substring(0,10)}</div></div>`).join(''):'<div style="color:var(--text3);font-size:12px">✅ No overdue follow-ups</div>',
+    projs.filter(p=>p.status==='Active').map(p=>`<div style="background:var(--emerald3);border:1px solid var(--emerald2);border-radius:10px;padding:10px 12px;margin-bottom:6px"><div style="font-size:12px;font-weight:700;color:var(--text)">${p.name}</div><div style="font-size:10px;color:var(--text2)">🏢 ${p.client} · 👷 ${p.engineer||'—'} · ${p.progress}%</div></div>`).join('')||'<div style="color:var(--text3);font-size:12px">No active sites</div>',
+    ol.length?ol.map(e=>`<div style="background:var(--rose3);border:1px solid var(--rose2);border-radius:10px;padding:10px 12px;margin-bottom:6px"><div style="font-size:12px;font-weight:700;color:var(--text)">${e.company_name}</div><div style="font-size:10px;color:var(--rose)">⚠️ No contact in 7+ days · Stage: ${e.stage}</div></div>`).join(''):'<div style="color:var(--text3);font-size:12px">✅ No overdue alerts</div>',
+    (dashData?.pos||[]).filter(p=>p.status==='Active').map(p=>`<div style="background:var(--sky3);border:1px solid var(--sky2);border-radius:10px;padding:10px 12px;margin-bottom:6px"><div style="font-size:12px;font-weight:700;color:var(--text)">${p.po_number}</div><div style="font-size:10px;color:var(--text2)">🏢 ${p.client} · 📅 ${(p.date||'—').substring(0,10)}</div></div>`).join('')||'<div style="color:var(--text3);font-size:12px">No active POs</div>'
+  ];
+  const panel=document.getElementById('week-detail-panel');
+  const emoji=['📞','🏭','⚠️','📋'];
+  document.getElementById('wd-emoji').textContent=emoji[i];
+  document.getElementById('wd-title').textContent=labels[i];
+  document.getElementById('wd-body').innerHTML=`<div style="padding:16px;grid-column:1/-1">${details[i]}</div>`;
+  panel.style.display='block';
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
 // ─────────────────────────────────────────
@@ -1679,7 +1764,7 @@ function renderChart(d,role){
     const names=Object.keys(engMap).slice(0,6);
     const vals=names.map(n=>engMap[n]);
     const mx=Math.max(...vals,1);
-    bc.innerHTML=names.map((n,i)=>`<div class="chart-grp"><div class="cbar c1" style="height:${Math.round((vals[i]/mx)*70)+5}px;flex:1;background:linear-gradient(180deg,var(--sky),rgba(39,174,96,.1))"></div></div>`).join('');
+    bc.innerHTML=names.map((n,i)=>`<div class="chart-grp" style="position:relative"><div class="cbar c1" style="height:${Math.round((vals[i]/mx)*70)+5}px;flex:1;background:linear-gradient(180deg,var(--sky),rgba(39,174,96,.1))"><span class="cbar-val" style="color:var(--sky)">${vals[i]}</span></div></div>`).join('');
     lc.innerHTML=names.map(n=>`<div class="chart-xl">${n}</div>`).join('');
     const ph=bc.closest('.panel')?.querySelector('.pt');
     if(ph)ph.innerHTML='<span class="pt-emoji">📈</span>Team Site Load';
@@ -1690,7 +1775,8 @@ function renderChart(d,role){
     const vals=stages.map(s=>enqs.filter(e=>e.stage===s||(s==='Disc'&&e.stage==='Discussion')).length);
     const mx=Math.max(...vals,1);
     const colors=['var(--sky)','var(--violet)','var(--amber)','var(--coral)','var(--emerald)','var(--rose)'];
-    bc.innerHTML=stages.map((s,i)=>`<div class="chart-grp"><div class="cbar c1" style="height:${Math.round((vals[i]/mx)*70)+5}px;flex:1;background:linear-gradient(180deg,${colors[i]},transparent)"></div></div>`).join('');
+    const total=vals.reduce((a,b)=>a+b,0)||1;
+    bc.innerHTML=stages.map((s,i)=>`<div class="chart-grp" style="position:relative"><div class="cbar c1" style="height:${Math.round((vals[i]/mx)*70)+5}px;flex:1;background:linear-gradient(180deg,${colors[i]},transparent)"><span class="cbar-val" style="color:${colors[i]}">${vals[i]>0?Math.round((vals[i]/total)*100)+'%':''}</span></div></div>`).join('');
     lc.innerHTML=stages.map(s=>`<div class="chart-xl">${s}</div>`).join('');
     const ph=bc.closest('.panel')?.querySelector('.pt');
     if(ph)ph.innerHTML='<span class="pt-emoji">📈</span>Pipeline by Stage';
@@ -1846,6 +1932,22 @@ function renderManagerChart(engineers){
 // ─────────────────────────────────────────
 // EMPLOYEE DASHBOARD
 // ─────────────────────────────────────────
+function getGreeting(){
+  const ist=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Kolkata'}));
+  const h=ist.getHours();
+  const name=(currentUser?.name||'').split(' ')[0];
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const day=days[ist.getDay()];
+  const date=`${day}, ${ist.getDate()} ${months[ist.getMonth()]} ${ist.getFullYear()}`;
+  let greeting='Good Evening';
+  if(h>=5&&h<12)greeting='Good Morning';
+  else if(h>=12&&h<17)greeting='Good Afternoon';
+  else if(h>=17&&h<21)greeting='Good Evening';
+  else greeting='Good Night';
+  return{greeting,date,name,h};
+}
+
 function renderEmployeeDashboard(){
   const name=currentUser?.name||'';
   const projs=dashData?.projects||[];
@@ -1862,6 +1964,9 @@ function renderEmployeeDashboard(){
   if(dateEl)dateEl.textContent=days[ist.getDay()]+', '+ist.getDate()+' '+months[ist.getMonth()]+' '+ist.getFullYear();
   set('emp-sites',mySites.length||'—');
   set('emp-pending',mySites.length||'—');
+  const empG=getGreeting();
+  const egreet=document.getElementById('emp-greeting');if(egreet)egreet.textContent=empG.greeting+', '+empG.name+'! 👋';
+  const edate=document.getElementById('emp-date');if(edate)edate.textContent=empG.date;
 
   // My assigned sites
   const sitesList=document.getElementById('emp-sites-list');
@@ -1988,6 +2093,115 @@ function filterAttendance(){
   tb.innerHTML=rows.join('');
   set('att-today',active.length);
   set('att-month',active.length*22);
+}
+
+// ─────────────────────────────────────────
+// PO DETAIL
+// ─────────────────────────────────────────
+function openPODetail(poNum){
+  const pos=dashData?.pos||[];
+  const p=pos.find(x=>x.po_number===poNum);
+  if(!p)return;
+  // Find linked project
+  const proj=dashData?.projects?.find(x=>x.project_id===p.project)||null;
+  document.getElementById('po-detail-title').textContent='📋 '+p.po_number;
+  const statusColor=p.status==='Active'?'var(--emerald)':p.status==='Completed'?'var(--sky)':'var(--amber)';
+  document.getElementById('po-detail-body').innerHTML=`
+    <div style="background:linear-gradient(135deg,rgba(245,158,11,.08),rgba(249,115,22,.05));border:1px solid rgba(245,158,11,.2);border-radius:14px;padding:18px;margin-bottom:16px">
+      <div style="font-size:11px;color:var(--amber);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">📋 PO Details</div>
+      <div style="font-size:22px;font-weight:900;color:var(--text);margin-bottom:4px">${p.po_number}</div>
+      <div style="font-size:13px;color:var(--text2)">${p.description||'—'}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <div style="background:var(--amber3);border:1px solid var(--amber2);border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:20px;font-weight:900;color:var(--amber);font-family:var(--mono)">${p.value?'₹'+fmtN(p.value):'—'}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px">💰 PO Value</div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:14px;font-weight:900;color:${statusColor}">${badge(p.status)}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:6px">📊 Status</div>
+      </div>
+    </div>
+    <div style="margin-bottom:16px">
+      ${[['🏢 Client',p.client||'—'],['📅 Date',(p.date||'—').substring(0,10)],['🔗 Project',p.project||'—'],['🏭 Type',getPT(p.description)]].map(r=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:11px;color:var(--text3)">${r[0]}</span>
+          <span style="font-size:12px;font-weight:700;color:var(--text2)">${r[1]}</span>
+        </div>`).join('')}
+    </div>
+    ${proj?`
+    <div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">🏗️ Linked Project</div>
+    <div onclick="closeM('po-detail');openProjectDetail('${proj.project_id}')" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--violet)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="font-size:12px;font-weight:700;color:var(--text)">${proj.name} →</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:4px">👷 ${proj.engineer||'—'} · 📊 ${proj.progress}% complete · ${badge(proj.status)}</div>
+    </div>`:''}
+  `;
+  openM('po-detail');
+}
+
+// ─────────────────────────────────────────
+// PO DETAIL
+// ─────────────────────────────────────────
+function openPODetail(poNum){
+  const pos=dashData?.pos||[];
+  const p=pos.find(x=>x.po_number===poNum);
+  if(!p)return;
+  // Find linked project
+  const proj=dashData?.projects?.find(x=>x.project_id===p.project);
+  document.getElementById('po-detail-title').textContent='📋 '+p.po_number;
+  const statusColor=p.status==='Active'?'var(--emerald)':p.status==='Completed'?'var(--sky)':'var(--amber)';
+  document.getElementById('po-detail-body').innerHTML=`
+    <div style="background:linear-gradient(135deg,rgba(139,92,246,.08),rgba(39,174,96,.05));border:1px solid rgba(139,92,246,.2);border-radius:14px;padding:20px;margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+        <div>
+          <div style="font-size:18px;font-weight:900;color:var(--text);margin-bottom:4px">${p.client||'—'}</div>
+          <div style="font-size:12px;color:var(--text2)">${p.description||'—'}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:22px;font-weight:900;color:var(--amber);font-family:var(--mono)">${p.value?'₹'+fmtN(p.value):'—'}</div>
+          <div>${badge(p.status)}</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:10px">
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">📌 PO Number</div>
+          <div style="font-size:13px;font-weight:700;color:var(--violet);font-family:var(--mono)">${p.po_number}</div>
+        </div>
+        <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:10px">
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">📅 Date</div>
+          <div style="font-size:13px;font-weight:700;color:var(--text)">${p.date||'—'}</div>
+        </div>
+        <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:10px">
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">🏭 Plant Type</div>
+          <div style="font-size:13px;font-weight:700;color:var(--sky)">${getPT(p.description)}</div>
+        </div>
+        <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:10px">
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">🔄 Status</div>
+          <div style="font-size:13px;font-weight:700;color:${statusColor}">${p.status||'—'}</div>
+        </div>
+      </div>
+    </div>
+    ${proj?`
+    <div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">🔗 Linked Project</div>
+    <div onclick="closeM('po-detail');openProjectDetail('${proj.project_id}')" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--violet)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--text)">${proj.name}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">👷 ${proj.engineer||'—'} · 📅 Ends: ${proj.end_date||'—'}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:14px;font-weight:900;color:${parseInt(proj.progress)>=80?'var(--emerald)':parseInt(proj.progress)>=40?'var(--amber)':'var(--sky)'};font-family:var(--mono)">${proj.progress}%</div>
+          <div style="font-size:10px;color:var(--text3)">progress</div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,.05);border-radius:4px;height:5px;margin-top:8px;overflow:hidden">
+        <div style="height:100%;background:${parseInt(proj.progress)>=80?'var(--emerald)':parseInt(proj.progress)>=40?'var(--amber)':'var(--sky)'};width:${proj.progress}%;transition:width 1s;border-radius:4px"></div>
+      </div>
+      <div style="font-size:10px;color:var(--violet);margin-top:6px;font-weight:600">Tap to open project detail →</div>
+    </div>
+    `:'<div style="color:var(--text3);font-size:12px;padding:10px 0">No linked project found.</div>'}
+  `;
+  openM('po-detail');
 }
 
 // ─────────────────────────────────────────
