@@ -205,11 +205,11 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
 .b-new{background:rgba(39,174,96,.1);color:var(--sky);border-color:rgba(39,174,96,.2)}.b-new::before{background:var(--sky)}
 .b-act,.b-won{background:rgba(16,185,129,.15);color:#059669;border-color:rgba(16,185,129,.35);font-weight:800}.b-act::before,.b-won::before{background:#059669}
 .b-comp{background:rgba(16,185,129,.08);color:var(--emerald);border-color:rgba(16,185,129,.15)}.b-comp::before{background:var(--emerald)}
-.b-lost{background:rgba(244,63,94,.15);color:#e11d48;border-color:rgba(244,63,94,.35);font-weight:800}.b-lost::before{background:#e11d48}
+.b-lost{background:rgba(244,63,94,.12);color:#e11d48;border-color:rgba(244,63,94,.3);font-weight:800;opacity:.8}.b-lost::before{background:#e11d48}
 .b-neg{background:var(--amber3);color:var(--amber);border-color:var(--amber2)}.b-neg::before{background:var(--amber)}
 .b-quo{background:var(--violet3);color:var(--violet);border-color:var(--violet2)}.b-quo::before{background:var(--violet)}
 .b-dis{background:var(--surface2);color:var(--text2);border-color:var(--border)}.b-dis::before{background:var(--text3)}
-.b-ov{background:rgba(244,63,94,.2);color:#e11d48;border-color:rgba(244,63,94,.5);animation:blink 1.2s infinite;font-weight:800}.b-ov::before{background:#e11d48}
+.b-ov{background:rgba(244,63,94,.15);color:#fff;border-color:rgba(244,63,94,.8);animation:blink 1.2s infinite;font-weight:800;box-shadow:0 0 8px rgba(244,63,94,.4)}.b-ov::before{background:#f43f5e}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
 /* STAGE DROPDOWN - NEW */
@@ -222,7 +222,7 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
 
 /* ALERTS */
 .al-list{padding:10px 14px;display:flex;flex-direction:column;gap:8px}
-.al{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border-radius:12px;border:1px solid;font-size:12px;line-height:1.6;position:relative;overflow:hidden}
+.al{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border-radius:12px;border:1px solid;font-size:12px;line-height:1.6;position:relative;overflow:hidden;transition:all .2s}
 .al::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
 .al.r{background:var(--rose3);border-color:var(--rose2);color:#fda4af}.al.r::before{background:var(--rose)}
 .al.a{background:var(--amber3);border-color:var(--amber2);color:#fcd34d}.al.a::before{background:var(--amber)}
@@ -400,15 +400,15 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
 .toast-ic{font-size:16px}
 
 /* CHART */
-.chart-wrap{padding:16px 18px}
-.chart-bars{display:flex;align-items:flex-end;gap:4px;height:100px;padding-top:20px;position:relative}
-.chart-grp{display:flex;gap:2px;align-items:flex-end;flex:1}
+.chart-wrap{padding:16px 18px 0}
+.chart-bars{display:flex;align-items:flex-end;gap:6px;height:120px;position:relative;padding:0 4px}
+.chart-grp{display:flex;gap:2px;align-items:flex-end;flex:1;min-width:0;flex-direction:column;justify-content:flex-end}
 .cbar{border-radius:4px 4px 0 0;cursor:default;transform-origin:bottom;animation:barGrow .6s cubic-bezier(.22,1,.36,1) both;position:relative}.cbar-val{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:700;color:var(--text2);white-space:nowrap;font-family:var(--mono)}
 @keyframes barGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
 .cbar.c1{background:linear-gradient(180deg,var(--violet),rgba(139,92,246,.1))}
 .cbar.c2{background:linear-gradient(180deg,var(--sky),rgba(39,174,96,.1))}
 .chart-xl{flex:1;text-align:center;font-size:9px;color:var(--text3);margin-top:5px;font-family:var(--mono)}
-.chart-xlabels{display:flex}
+.chart-xlabels{display:flex;padding:6px 4px 0;border-top:1px solid var(--border)}
 .chart-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 18px 16px}
 .cstat{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:10px 14px}
 .cstat-val{font-size:20px;font-weight:900;color:var(--violet);font-family:var(--mono)}
@@ -753,15 +753,10 @@ body.role-employee #d-enq-tb tr td:last-child{display:none!important;}
             <div class="panel">
               <div class="ph"><div class="pt"><span class="pt-emoji">📋</span>Today's Check-in Log</div></div>
               <div style="padding:12px" id="ci-log">
-                <div class="ci-card">
-                  <div style="color:var(--text3);font-size:12px;padding:8px 4px">📍 No check-ins yet today. Engineers can check in using this form.</div>
-
-                  <div class="ci-loc">📍 Alkem Laboratories — Sewage Treatment Plant</div>
-                  <div class="ci-photo">📷 Photo uploaded · GPS verified ✅ · <span style="color:var(--emerald);font-weight:700;cursor:pointer">View →</span></div>
-                </div>
-                <div class="ci-card">
-                  <div class="ci-loc" style="display:none">📍 placeholder</div>
-                  <div class="ci-photo" style="display:none">placeholder</div>
+                <div style="text-align:center;padding:32px 16px;color:var(--text3)">
+                  <div style="font-size:32px;margin-bottom:8px">📍</div>
+                  <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:4px">No check-ins yet today</div>
+                  <div style="font-size:11px">Engineers can check in using the form</div>
                 </div>
               </div>
             </div>
@@ -1096,7 +1091,8 @@ function goP(name,el){
   if(name==='service'&&dashData)renderService();
   if(name==='checkin')initCheckin();
   if(name==='attendance')loadAttendance();
-  closeSB();
+  // Only close sidebar on mobile
+  if(window.innerWidth<=768)closeSB();
 }
 function openAdd(){if(currentPage==='crm')openM('enq');else if(currentPage==='po')openM('po');}
 function goBack(){
@@ -1204,10 +1200,45 @@ function renderEmployeeDash(myProjs){
 }
 
 function renderAlerts(d){
-  const s=d.summary||{};const ol=d.overdue_list||[];let h='';
-  if(s.overdue_enquiries>0)h+=alf('r','🔴 CRITICAL','⚠️',s.overdue_enquiries+' enquiries overdue — 7+ days no contact');
-  ol.slice(0,2).forEach(e=>h+=alf('a','🟡 WARNING','⚡',e.company_name+' — follow-up required today'));
-  if(s.active_projects>0)h+=alf('g','🟢 INFO','✅',s.active_projects+' sites active — all systems operational');
+  const s=d.summary||{};const ol=d.overdue_list||[];const projs=d.projects||[];let h='';
+  if(s.overdue_enquiries>0){
+    const now=new Date();
+    const overdueDetails=ol.map(e=>{
+      const days=e.last_followup?Math.floor((now-new Date(e.last_followup))/(1000*60*60*24)):999;
+      return`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(244,63,94,.15)">
+        <div><div style="font-size:11px;font-weight:700;color:#fda4af">${e.company_name}</div><div style="font-size:10px;color:rgba(253,164,175,.7)">👤 ${e.customer_name||'—'} · 📱 ${e.phone||'—'}</div></div>
+        <div style="text-align:right"><div style="font-size:11px;font-weight:800;color:#f43f5e">${days}d</div><div style="font-size:9px;color:rgba(253,164,175,.6)">overdue</div></div>
+      </div>`;
+    }).join('');
+    h+=`<div class="al r" style="flex-direction:column;align-items:flex-start;cursor:pointer" onclick="this.querySelector('.al-detail').style.display=this.querySelector('.al-detail').style.display==='none'?'block':'none'">
+      <div style="display:flex;align-items:center;gap:10px;width:100%"><span class="al-ic">⚠️</span><div class="al-body" style="flex:1"><span class="al-tag">🔴 CRITICAL</span>${s.overdue_enquiries} enquiries overdue — 7+ days no contact</div><span style="font-size:10px;color:rgba(253,164,175,.6)">▼ Details</span></div>
+      <div class="al-detail" style="display:none;width:100%;margin-top:10px;padding-top:8px;border-top:1px solid rgba(244,63,94,.2)">${overdueDetails}</div>
+    </div>`;
+  }
+  ol.slice(0,3).forEach(e=>{
+    const lastDate=(e.last_followup||'—').substring(0,10);
+    const stage=e.stage||'—';
+    h+=`<div class="al a" style="flex-direction:column;align-items:flex-start;cursor:pointer" onclick="this.querySelector('.al-detail').style.display=this.querySelector('.al-detail').style.display==='none'?'block':'none'">
+      <div style="display:flex;align-items:center;gap:10px;width:100%"><span class="al-ic">⚡</span><div class="al-body" style="flex:1"><span class="al-tag">🟡 WARNING</span>${e.company_name} — follow-up required today</div><span style="font-size:10px;color:rgba(252,211,77,.6)">▼ Details</span></div>
+      <div class="al-detail" style="display:none;width:100%;margin-top:10px;padding-top:8px;border-top:1px solid rgba(245,158,11,.2)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          ${[['👤 Contact',e.customer_name||'—'],['📱 Phone',e.phone||'—'],['📊 Stage',stage],['📅 Last Contact',lastDate],['🏭 Requirement',e.requirement?e.requirement.substring(0,30)+'...':'—'],['💰 Value',e.quotation_value?'₹'+(Number(e.quotation_value)/100000).toFixed(1)+'L':'—']].map(r=>`<div style="background:rgba(245,158,11,.08);border-radius:6px;padding:6px 8px"><div style="font-size:9px;color:rgba(252,211,77,.6)">${r[0]}</div><div style="font-size:11px;font-weight:700;color:#fcd34d;margin-top:2px">${r[1]}</div></div>`).join('')}
+        </div>
+        ${e.notes?`<div style="margin-top:8px;font-size:10px;color:rgba(252,211,77,.7)">📝 ${e.notes}</div>`:''}
+      </div>
+    </div>`;
+  });
+  if(s.active_projects>0){
+    const activeSites=projs.filter(p=>p.status==='Active');
+    const siteDetails=activeSites.map(p=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(16,185,129,.1)">
+      <div><div style="font-size:11px;font-weight:700;color:#6ee7b7">${p.name}</div><div style="font-size:10px;color:rgba(110,231,183,.6)">👷 ${p.engineer||'—'} · 🏢 ${p.client||'—'}</div></div>
+      <div style="text-align:right"><div style="font-size:11px;font-weight:800;color:${parseInt(p.progress)>=80?'#10b981':parseInt(p.progress)>=40?'#f59e0b':'#f43f5e'}">${p.progress||0}%</div></div>
+    </div>`).join('');
+    h+=`<div class="al g" style="flex-direction:column;align-items:flex-start;cursor:pointer" onclick="this.querySelector('.al-detail').style.display=this.querySelector('.al-detail').style.display==='none'?'block':'none'">
+      <div style="display:flex;align-items:center;gap:10px;width:100%"><span class="al-ic">✅</span><div class="al-body" style="flex:1"><span class="al-tag">🟢 INFO</span>${s.active_projects} sites active — all systems operational</div><span style="font-size:10px;color:rgba(110,231,183,.6)">▼ Details</span></div>
+      <div class="al-detail" style="display:none;width:100%;margin-top:10px;padding-top:8px;border-top:1px solid rgba(16,185,129,.2)">${siteDetails}</div>
+    </div>`;
+  }
   if(!h)h='<div class="empty" style="padding:20px"><p>✅ All clear — no alerts</p></div>';
   document.getElementById('alerts').innerHTML=h;
 }
@@ -1215,7 +1246,7 @@ function alf(t,tag,ic,msg){const cl=t.includes('🔴')?'r':t.includes('🟡')?'a
 
 function getPT(r){const m=(r||'').match(/STP|ETP|WTP|ZLD|OWC|MEE|O&M|Composting/i);return m?m[0].toUpperCase():'General';}
 function isOv(e,now){return e.last_followup&&e.stage!=='Won'&&e.stage!=='Lost'&&((now-new Date(e.last_followup))/(1000*60*60*24))>7;}
-function fmtN(v){return Number(v).toLocaleString('en-IN');}
+function fmtN(v){const n=Number(v)||0;if(n>=10000000)return (n/10000000).toFixed(1)+'Cr';if(n>=100000)return (n/100000).toFixed(1)+'L';if(n>=1000)return (n/1000).toFixed(0)+'K';return n.toString();}
 
 function renderDashEnq(enqs){
   const tb=document.getElementById('d-enq-tb');
@@ -1740,46 +1771,78 @@ function weekSummaryClick(i){
 // CHART
 // ─────────────────────────────────────────
 function renderChart(d,role){
-  const bc=document.getElementById('chart-bars');const lc=document.getElementById('chart-labels');
-  if(!bc)return;
+  const bc=document.getElementById('chart-bars');
+  const lc=document.getElementById('chart-labels');
+  if(!bc||!lc)return;
   const r=String(role||currentUser?.role||'owner').trim().toLowerCase();
   const isEmp=r==='employee'||r==='engineer';
   const isMgr=r==='manager';
+  const chartH=80;
+
+  let labels=[],vals=[],colors=[],subtitle='',titleTxt='';
 
   if(isEmp){
-    // Employee: show their check-ins this week (Mon-Sun)
-    const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-    const vals=[1,1,1,0,1,0,0]; // placeholder — would come from CheckIns sheet
-    const mx=Math.max(...vals,1);
-    bc.innerHTML=days.map((day,i)=>`<div class="chart-grp"><div class="cbar c1" style="height:${Math.round((vals[i]/mx)*70)+5}px;flex:1;background:linear-gradient(180deg,var(--emerald),rgba(16,185,129,.1))"></div></div>`).join('');
-    lc.innerHTML=days.map(day=>`<div class="chart-xl">${day}</div>`).join('');
-    // Update chart title
-    const ph=bc.closest('.panel')?.querySelector('.pt');
-    if(ph)ph.innerHTML='<span class="pt-emoji">📈</span>My Check-ins This Week';
+    labels=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    vals=[0,0,0,0,0,0,0];
+    colors=labels.map(()=>'var(--emerald)');
+    titleTxt='My Check-ins This Week';subtitle='Days worked';
   } else if(isMgr){
-    // Manager: show team activity per engineer
     const projs=(d?.projects||[]).filter(p=>p.status==='Active');
     const engMap={};
-    projs.forEach(p=>{const n=(p.engineer||'?').split(' ')[0];engMap[n]=(engMap[n]||0)+1;});
-    const names=Object.keys(engMap).slice(0,6);
-    const vals=names.map(n=>engMap[n]);
-    const mx=Math.max(...vals,1);
-    bc.innerHTML=names.map((n,i)=>`<div class="chart-grp" style="position:relative"><div class="cbar c1" style="height:${Math.round((vals[i]/mx)*70)+5}px;flex:1;background:linear-gradient(180deg,var(--sky),rgba(39,174,96,.1))"><span class="cbar-val" style="color:var(--sky)">${vals[i]}</span></div></div>`).join('');
-    lc.innerHTML=names.map(n=>`<div class="chart-xl">${n}</div>`).join('');
-    const ph=bc.closest('.panel')?.querySelector('.pt');
-    if(ph)ph.innerHTML='<span class="pt-emoji">📈</span>Team Site Load';
+    projs.forEach(p=>{const n=(p.engineer||'Unknown').split(' ')[0];engMap[n]=(engMap[n]||0)+1;});
+    labels=Object.keys(engMap).slice(0,6);
+    vals=labels.map(n=>engMap[n]);
+    colors=['var(--sky)','var(--violet)','var(--emerald)','var(--amber)','var(--coral)','var(--rose)'];
+    titleTxt='Team Site Load';
+    subtitle=vals.length?'Sites assigned per engineer':'No active projects';
   } else {
-    // Owner: show pipeline by stage
-    const stages=['New','Disc','Quoted','Nego','Won','Lost'];
+    const stageMap={New:'var(--sky)',Discussion:'var(--text2)',Quoted:'var(--violet)',Negotiation:'var(--amber)',Won:'var(--emerald)',Lost:'var(--rose)'};
+    const stageLabels={New:'New',Discussion:'Disc',Quoted:'Quoted',Negotiation:'Nego',Won:'Won',Lost:'Lost'};
     const enqs=d?.enquiries||[];
-    const vals=stages.map(s=>enqs.filter(e=>e.stage===s||(s==='Disc'&&e.stage==='Discussion')).length);
-    const mx=Math.max(...vals,1);
-    const colors=['var(--sky)','var(--violet)','var(--amber)','var(--coral)','var(--emerald)','var(--rose)'];
+    labels=Object.keys(stageMap).map(s=>stageLabels[s]);
+    vals=Object.keys(stageMap).map(s=>enqs.filter(e=>e.stage===s).length);
+    colors=Object.values(stageMap);
     const total=vals.reduce((a,b)=>a+b,0)||1;
-    bc.innerHTML=stages.map((s,i)=>`<div class="chart-grp" style="position:relative"><div class="cbar c1" style="height:${Math.round((vals[i]/mx)*70)+5}px;flex:1;background:linear-gradient(180deg,${colors[i]},transparent)"><span class="cbar-val" style="color:${colors[i]}">${vals[i]>0?Math.round((vals[i]/total)*100)+'%':''}</span></div></div>`).join('');
-    lc.innerHTML=stages.map(s=>`<div class="chart-xl">${s}</div>`).join('');
-    const ph=bc.closest('.panel')?.querySelector('.pt');
-    if(ph)ph.innerHTML='<span class="pt-emoji">📈</span>Pipeline by Stage';
+    titleTxt='Pipeline by Stage';
+    subtitle=total+' total enquiries';
+  }
+
+  const mx=Math.max(...vals,1);
+  const total=vals.reduce((a,b)=>a+b,0)||1;
+
+  // Build bars — each bar is a simple div with explicit height
+  bc.innerHTML=labels.map((lbl,i)=>{
+    const barH=vals[i]>0?Math.max(Math.round((vals[i]/mx)*90),8):4;
+    const pct=Math.round((vals[i]/total)*100);
+    const col=colors[i]||'var(--text3)';
+    const topLabel=vals[i]>0?(isEmp||isMgr?vals[i]:pct+'%'):'';
+    return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;position:relative">
+      <div style="font-size:9px;font-weight:800;color:${col};font-family:var(--mono);height:14px;display:flex;align-items:center;justify-content:center">${topLabel}</div>
+      <div style="width:80%;height:${barH}px;background:${col};border-radius:5px 5px 0 0;position:relative;overflow:hidden;box-shadow:0 -2px 8px ${col}44;animation:barGrow .7s cubic-bezier(.22,1,.36,1) ${i*0.08}s both">
+        <div style="position:absolute;top:0;left:0;right:0;height:40%;background:rgba(255,255,255,.2);border-radius:5px 5px 0 0"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  lc.innerHTML=labels.map((lbl,i)=>`<div class="chart-xl" style="color:${vals[i]>0?(colors[i]||'var(--text3)'):'var(--text3)'};font-weight:${vals[i]>0?700:400}">${lbl}</div>`).join('');
+
+  // Update title
+  const ph=bc.closest('.panel')?.querySelector('#chart-title');
+  if(ph)ph.textContent=titleTxt;
+  const leg=document.getElementById('chart-legend');
+  if(leg)leg.textContent=subtitle;
+
+  // Stats below chart
+  const s=d?.summary||{};
+  if(isEmp){
+    set('cs1','0 today');set('cs1-lbl','✅ My Check-ins');
+    set('cs2',(s.active_projects||0)+' sites');set('cs2-lbl','🏭 Active Sites');
+  } else if(isMgr){
+    set('cs1',labels.length+' engineers');set('cs1-lbl','👷 Field Team');
+    set('cs2',(s.active_projects||0)+' active');set('cs2-lbl','🏭 Sites Running');
+  } else {
+    set('cs1',(s.total_enquiries||0)+' total');set('cs1-lbl','📊 All Enquiries');
+    set('cs2',(s.won_enquiries||0)+' won');set('cs2-lbl','🏆 Deals Won');
   }
 }
 
