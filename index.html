@@ -837,7 +837,7 @@ async function doLogin(){
   btn.disabled=true;
   document.getElementById('l-txt').textContent='Signing in...';
   try{
-    const res=await fetch(URLS.login,{method:'POST',body:JSON.stringify({phone,password:pw})});
+    const res=await fetch(URLS.login,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone,password:pw})});
     const data=await res.json();
     if(data.success){initApp(data.user);return;}
     err.textContent='❌ Access denied. Contact your manager for help.';
