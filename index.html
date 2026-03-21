@@ -421,26 +421,35 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
 .code-block{background:rgba(0,0,0,.4);border:1px solid var(--border2);border-radius:8px;padding:10px 13px;font-family:var(--mono);font-size:11px;color:var(--emerald);margin:8px 0;word-break:break-all}
 
 /* MOBILE */
-.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);z-index:49}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:149}
 .empty{text-align:center;padding:50px;color:var(--text3);font-size:12px}
 .empty-ic{font-size:32px;margin-bottom:10px;opacity:.4}
 @media(max-width:950px){.dash-grid{grid-template-columns:1fr}.proj-grid{grid-template-columns:1fr}}
 @media(max-width:768px){
-  .menu-btn{display:flex!important;align-items:center;justify-content:center;min-width:36px;min-height:36px;}
-  .sb-item{min-height:44px;padding:10px 12px;}
+  .menu-btn{display:flex!important;align-items:center;justify-content:center;min-width:40px;min-height:40px;font-size:18px;}
+  .sb-item{min-height:48px;padding:10px 14px;}
   input,select,textarea{font-size:16px!important;}
-  button,[onclick]{-webkit-tap-highlight-color:transparent;}
-  .sb{position:fixed;top:0;bottom:0;left:0;transform:translateX(-100%);transition:transform .25s;z-index:200}
+  button{-webkit-tap-highlight-color:transparent;}
+  .sb{position:fixed;top:0;bottom:0;left:0;width:260px;transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);z-index:300;box-shadow:4px 0 24px rgba(0,0,0,.5)}
   .sb.open{transform:translateX(0)}
-  .sb-overlay{z-index:199}.sb-overlay.open{display:block}
-  .main{width:100vw}
-  .menu-btn{display:flex!important}
+  .sb-overlay{z-index:299}.sb-overlay.open{display:block}
+  .main{width:100vw;position:relative}
   .sg{grid-template-columns:repeat(2,1fr)}
   .tb-ts,.tb-search{display:none}
   .content{padding:12px}
   #app .content::before{left:0}
   .mg{grid-template-columns:1fr}.mg .full{grid-column:1}
   .ph-metrics{grid-template-columns:repeat(2,1fr)}
+  .dash-grid{grid-template-columns:1fr}
+  .proj-grid{grid-template-columns:1fr}
+  .ai-panel{bottom:80px;right:12px;width:calc(100vw - 24px)}
+  .ai-fab{bottom:16px;right:16px}
+  .toast{right:12px;left:12px;max-width:100%}
+  div[style*="grid-template-columns:1fr 1fr"]{display:block!important}
+  div[style*="grid-template-columns:1fr 290px"]{display:block!important}
+  div[style*="grid-template-columns:1fr 300px"]{display:block!important}
+  div[style*="grid-template-columns:repeat(7"]{gap:4px}
+  .tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
 }
 </style>
 </head>
@@ -488,6 +497,7 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
       <div class="sb-item" onclick="goP('tasks',this)"><span class="sb-ic">✅</span>Task Board</div>
       <div class="sb-item" onclick="goP('service',this)"><span class="sb-ic">🔧</span>Service Contracts</div>
       <div class="sb-item" onclick="goP('team',this)"><span class="sb-ic">👷</span>Field Engineers</div>
+      <div class="sb-item" onclick="goP('attendance',this)"><span class="sb-ic">📅</span>Attendance</div>
     </nav>
     <div class="sb-session"><div class="sess-hd">Session <span id="sess-txt">8:00:00</span></div><div class="sess-bar"><div class="sess-fill" id="sess-fill" style="width:100%"></div></div></div>
     <div class="sb-foot"><div class="sb-user"><div class="sb-av" id="ua">A</div><div style="overflow:hidden;flex:1;min-width:0"><div class="sb-uname" id="un">Amol Bhosale</div><div class="sb-urole" id="ur">👑 Owner</div></div><button class="sb-out" onclick="logout()" title="Sign out">⏻</button></div></div>
@@ -495,7 +505,7 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
 
   <div class="main">
     <div class="topbar">
-      <div class="tl"><button class="menu-btn" style="display:none" onclick="openSB()">☰</button><div class="tb-crumb">Enversys &rsaquo; <span id="page-title">Dashboard</span></div></div>
+      <div class="tl"><button class="menu-btn" onclick="openSB()">☰</button><div class="tb-crumb">Enversys &rsaquo; <span id="page-title">Dashboard</span></div></div>
       <div class="tr">
         <input class="tb-search" id="tb-search" placeholder="🔍 Search enquiries, companies..." oninput="globalSearch(this.value)">
         <div class="live-chip"><div class="live-dot"></div><div class="live-txt">LIVE</div></div>
@@ -521,7 +531,7 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
         <div class="dash-grid">
           <div>
             <div class="panel">
-              <div class="ph"><div class="pt"><span class="pt-emoji">🤝</span>Recent Enquiries <span class="pt-num" id="enq-cnt">0</span></div><div class="va" onclick="goP('crm',document.querySelector('[onclick*=crm]'))">View all →</div></div>
+              <div class="ph"><div class="pt"><span class="pt-emoji">🤝</span>Recent Enquiries <span class="pt-num" id="enq-cnt">0</span></div><div class="va" onclick="goBack()">View all →</div></div>
               <div class="tw"><table><thead><tr><th>📌 ID</th><th>🏢 Company</th><th>🏭 Plant Type</th><th>📊 Stage</th><th>💰 Value</th></tr></thead><tbody id="d-enq-tb"><tr><td colspan="5" class="empty">⏳ Loading...</td></tr></tbody></table></div>
             </div>
             <div class="panel">
@@ -554,7 +564,7 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
 
       <!-- CLIENT DETAIL -->
       <div class="page" id="page-client-detail">
-        <div class="back-btn" onclick="goP('crm',document.querySelector('[onclick*=crm]'))">← 🤝 Back to CRM</div>
+        <div class="back-btn" onclick="goBack()">← 🤝 Back to CRM</div>
         <div class="proj-hero">
           <div class="ph-top">
             <div><div class="ph-type" id="cd-type">🏢 Client</div><div class="ph-name" id="cd-name">Company</div><div class="ph-client" id="cd-contact">Contact · Phone</div></div>
@@ -615,7 +625,7 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
 
       <!-- PROJECT DETAIL -->
       <div class="page" id="page-project-detail">
-        <div class="back-btn" onclick="goP('projects',document.querySelector('[onclick*=projects]'))">← 🏗️ Back to Sites</div>
+        <div class="back-btn" onclick="goBack()">← 🏗️ Back to Sites</div>
         <div class="proj-hero">
           <div class="ph-top"><div><div class="ph-type" id="ph-type">🏭 STP</div><div class="ph-name" id="ph-name">Project</div><div class="ph-client" id="ph-client">Client</div></div><div class="ph-right"><div class="circ-prog"><svg viewBox="0 0 80 80"><circle class="circ-bg" cx="40" cy="40" r="34"/><circle class="circ-fill" id="circ-fill" cx="40" cy="40" r="34" stroke-dasharray="213.6" stroke-dashoffset="213.6"/></svg><div class="circ-val" id="circ-val">0%</div></div><span id="ph-status-badge"></span></div></div>
           <div class="ph-metrics"><div class="ph-metric"><div class="ph-mv" id="pm-val" style="color:var(--amber)">—</div><div class="ph-ml">💰 Value</div></div><div class="ph-metric"><div class="ph-mv" id="pm-days" style="color:var(--sky)">—</div><div class="ph-ml">⏳ Days Left</div></div><div class="ph-metric"><div class="ph-mv" id="pm-tasks" style="color:var(--emerald)">—</div><div class="ph-ml">✅ Tasks</div></div><div class="ph-metric"><div class="ph-mv" id="pm-eng" style="font-size:13px;font-weight:700;color:var(--coral)">—</div><div class="ph-ml">👷 Engineer</div></div></div>
@@ -729,6 +739,25 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
       <!-- TEAM -->
       <div class="page" id="page-team"><div class="panel"><div class="ph"><div class="pt"><span class="pt-emoji">👷</span>Field Engineers</div></div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;padding:16px" id="emp-grid"></div></div></div>
 
+      <!-- ATTENDANCE -->
+      <div class="page" id="page-attendance">
+        <div class="sg">
+          <div class="sc emerald"><div class="sc-head"><span class="sc-emoji">✅</span></div><span class="sc-val" id="att-today">—</span><span class="sc-lbl">Present Today</span></div>
+          <div class="sc amber"><div class="sc-head"><span class="sc-emoji">⏰</span></div><span class="sc-val" id="att-month">—</span><span class="sc-lbl">This Month</span></div>
+          <div class="sc sky"><div class="sc-head"><span class="sc-emoji">🏭</span></div><span class="sc-val" id="att-sites">—</span><span class="sc-lbl">Sites Active</span></div>
+        </div>
+        <div class="panel">
+          <div class="ph">
+            <div class="pt"><span class="pt-emoji">📅</span>Daily Attendance Log</div>
+            <div class="pa">
+              <input type="date" class="pi" id="att-date" onchange="filterAttendance()">
+              <button class="pi" onclick="loadAttendance()">↺ Refresh</button>
+            </div>
+          </div>
+          <div class="tw"><table><thead><tr><th>👷 Engineer</th><th>🏭 Site</th><th>⏰ Check-in</th><th>🚪 Check-out</th><th>⏳ Hours</th><th>📊 Status</th></tr></thead><tbody id="att-tb"><tr><td colspan="6" class="empty">⏳ Loading attendance...</td></tr></tbody></table></div>
+        </div>
+      </div>
+
       <!-- WEEKLY -->
       <div class="page" id="page-weekly">
         <!-- Week nav + summary strip -->
@@ -769,6 +798,17 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
 <div class="mo" id="mo-enq"><div class="mb"><div class="mb-head"><div class="mb-title">➕ Add New Enquiry</div><button class="xb" onclick="closeM('enq')">✕</button></div><div class="mb-body"><div class="mg"><div class="fg-m"><label>👤 Customer Name</label><input type="text" id="e-cn" placeholder="Full name"></div><div class="fg-m"><label>🏢 Company</label><input type="text" id="e-co" placeholder="Company name"></div><div class="fg-m"><label>📱 Phone</label><input type="tel" id="e-ph" placeholder="Mobile" inputmode="numeric"></div><div class="fg-m"><label>📧 Email</label><input type="email" id="e-em" placeholder="email@company.com"></div><div class="fg-m"><label>📍 City</label><input type="text" id="e-ci" placeholder="City"></div><div class="fg-m"><label>📣 Source</label><select id="e-so"><option>IndiaMART</option><option>Phone Call</option><option>WhatsApp</option><option>Reference</option><option>Exhibition</option></select></div><div class="fg-m"><label>🏭 Plant Type</label><select id="e-pt"><option>STP</option><option>ETP</option><option>WTP</option><option>ZLD</option><option>OWC</option><option>MEE</option><option>Other</option></select></div><div class="fg-m"><label>🏗️ Industry</label><select id="e-ind"><option>Pharma</option><option>Automobile</option><option>Chemical</option><option>Food &amp; Beverage</option><option>Steel &amp; Power</option><option>Textile</option><option>Other</option></select></div><div class="fg-m full"><label>📝 Requirement</label><input type="text" id="e-rq" placeholder="Capacity, specifications..."></div><div class="fg-m full"><label>💬 Notes</label><input type="text" id="e-nt" placeholder="Additional notes"></div></div><div class="ma"><button class="cb3" onclick="closeM('enq')">Cancel</button><button class="sb4" onclick="saveEnq()">Save Enquiry →</button></div></div></div></div>
 <div class="mo" id="mo-po"><div class="mb"><div class="mb-head"><div class="mb-title">📋 Add Purchase Order</div><button class="xb" onclick="closeM('po')">✕</button></div><div class="mb-body"><div class="mg"><div class="fg-m"><label>📌 PO Number</label><input type="text" id="po-n" placeholder="PO-2026-001"></div><div class="fg-m"><label>🏢 Client</label><input type="text" id="po-c" placeholder="Client company"></div><div class="fg-m"><label>🏭 Plant Type</label><select id="po-pt"><option>STP</option><option>ETP</option><option>WTP</option><option>ZLD</option><option>OWC</option><option>O&amp;M Annual</option></select></div><div class="fg-m"><label>💰 Value (₹)</label><input type="number" id="po-v" placeholder="Amount"></div><div class="fg-m"><label>📅 Start Date</label><input type="date" id="po-d"></div><div class="fg-m"><label>👷 Lead Engineer</label><input type="text" id="po-e" placeholder="Engineer name"></div><div class="fg-m full"><label>📝 Description</label><input type="text" id="po-desc" placeholder="Scope of work"></div></div><div class="ma"><button class="cb3" onclick="closeM('po')">Cancel</button><button class="sb4" onclick="savePO()">Save PO →</button></div></div></div></div>
 
+<!-- ENGINEER DETAIL MODAL -->
+<div class="mo" id="mo-eng">
+  <div class="mb" style="max-width:480px">
+    <div class="mb-head">
+      <div class="mb-title" id="eng-modal-title">👷 Engineer Detail</div>
+      <button class="xb" onclick="closeM('eng')">✕</button>
+    </div>
+    <div class="mb-body" id="eng-modal-body"></div>
+  </div>
+</div>
+
 <!-- AI -->
 <button class="ai-fab" onclick="toggleAI()" title="Enversys AI">🤖</button>
 <div class="ai-panel" id="ai-panel">
@@ -796,7 +836,7 @@ const URLS={
 const SESSION_MS=8*60*60*1000;
 const STAGES=['New','Discussion','Quoted','Negotiation','Won','Lost'];
 const STAGE_COLORS={New:'b-new',Discussion:'b-dis',Quoted:'b-quo',Negotiation:'b-neg',Won:'b-won',Lost:'b-lost',Overdue:'b-ov',Active:'b-act',Completed:'b-comp',Approved:'b-act',Pending:'b-neg',Resolved:'b-comp'};
-let currentUser=null,dashData=null,allEnq=[],currentPage='dashboard',sessionExpiry=null,sessionInterval=null,currentProject=null,currentClient=null,saving=false,ciLat=null,ciLng=null;
+let currentUser=null,dashData=null,allEnq=[],currentPage='dashboard',pageHistory=[],sessionExpiry=null,sessionInterval=null,currentProject=null,currentClient=null,saving=false,ciLat=null,ciLng=null;
 
 // ─────────────────────────────────────────
 // FINGERPRINT + SESSION
@@ -843,12 +883,11 @@ async function doLogin(){
     err.textContent='❌ Access denied. Contact your manager for help.';
     err.classList.add('show');
   }catch(e){
-    // Network/CORS error — login with fallback like old HTML
-    // This handles Vercel→n8n CORS issues gracefully
-    const name=phone==='9850600099'?'Amol Bhosale':phone==='8766823848'?'Yashraj':'User';
-    const role=phone==='9850600099'?'Owner':phone==='8766823848'?'Owner':'Engineer';
-    trustDevice(phone);
-    initApp({name,phone,role});
+    // Network error — show message, don't hardcode roles
+    if(!navigator.onLine){err.textContent='❌ No internet. Check your connection.';err.classList.add('show');}
+    else{err.textContent='❌ Server unreachable. Try again or call: 98506 00099';err.classList.add('show');}
+    btn.disabled=false;
+    document.getElementById('l-txt').textContent='Access Dashboard';
     return;
   }
   btn.disabled=false;
@@ -877,14 +916,16 @@ function isOwner(){return getRole().toLowerCase()==='owner';}
 function isManager(){return getRole().toLowerCase()==='manager'||isOwner();}
 
 function applyRoleView(role){
-  const r=(role||'Engineer').trim().toLowerCase();
-  if(r==='engineer'){
-    // Hide nav items not needed for engineer
-    document.querySelectorAll('.sb-item[onclick*="crm"],.sb-item[onclick*="po"],.sb-item[onclick*="team"],.sb-item[onclick*="service"],.sb-item[onclick*="weekly"]').forEach(el=>el.style.display='none');
+  const r=(role||'employee').trim().toLowerCase();
+  const isEmp=r==='engineer'||r==='employee';
+  const isMgr=r==='manager';
+  const isOwn=r==='owner';
+  if(isEmp){
+    document.querySelectorAll('.sb-item[onclick*="crm"],.sb-item[onclick*="po"],.sb-item[onclick*="team"],.sb-item[onclick*="service"],.sb-item[onclick*="weekly"],.sb-item[onclick*="attendance"]').forEach(el=>el.style.display='none');
     document.getElementById('add-btn').style.display='none';
-    document.getElementById('ur').textContent='👷 Engineer';
+    document.getElementById('ur').textContent='👷 '+(role||'Employee');
     setTimeout(()=>goP('checkin',null),400);
-  } else if(r==='manager'){
+  } else if(isMgr){
     document.getElementById('ur').textContent='🔑 Manager';
     applyManagerStyle();
   } else {
@@ -893,14 +934,14 @@ function applyRoleView(role){
 }
 
 function applyManagerStyle(){
-  // Managers can see pages but not financial values or delete
   const s=document.createElement('style');
   s.textContent=`
-    td.am{color:var(--text3)!important;}
-    td.am::after{content:' (hidden)';}
-    td.am span,td.am *{display:none!important;}
+    td.am{color:transparent!important;position:relative;}
+    td.am::after{content:'₹ ••••';color:var(--text3);position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:700;letter-spacing:2px;}
     button[onclick*="deleteEnq"],button[onclick*="deleteClient"]{display:none!important;}
-    #d-pv,#po-val,#svc-value{visibility:hidden;}
+    #d-pv{visibility:hidden;position:relative;}
+    #d-pv::after{content:'₹ ••••';visibility:visible;position:absolute;left:0;color:var(--text3);font-size:18px;letter-spacing:2px;}
+    #po-val,#svc-value{visibility:hidden;}
   `;
   document.head.appendChild(s);
 }
@@ -915,18 +956,20 @@ setInterval(updateClock,1000);updateClock();
 // NAV
 // ─────────────────────────────────────────
 const ADD_LABELS={crm:'➕ Add Enquiry',po:'➕ Add PO'};
-const PAGE_TITLES={dashboard:'🏠 Dashboard','client-detail':'🏢 Client Detail','project-detail':'🏗️ Site Detail',crm:'🤝 CRM',po:'📋 Purchase Orders',projects:'🏗️ Sites & Projects',team:'👷 Field Engineers',weekly:'📅 Weekly View',service:'🔧 Service Contracts',tasks:'✅ Task Board',checkin:'📍 Engineer Check-in'};
+const PAGE_TITLES={dashboard:'🏠 Dashboard','client-detail':'🏢 Client Detail','project-detail':'🏗️ Site Detail',crm:'🤝 CRM',po:'📋 Purchase Orders',projects:'🏗️ Sites & Projects',team:'👷 Field Engineers',attendance:'📅 Attendance',attendance:'📅 Attendance',weekly:'📅 Weekly View',service:'🔧 Service Contracts',tasks:'✅ Task Board',checkin:'📍 Engineer Check-in'};
 
 function goP(name,el){
   // Block engineers from restricted pages
   const r=getRole();
-  const engineerBlocked=['crm','po','team','service','weekly','client-detail'];
-  if(r.toLowerCase()==='engineer'&&engineerBlocked.includes(name)){toast('🚫 Access restricted. Contact your manager.','warn');return;}
+  const engineerBlocked=['crm','po','team','service','weekly','client-detail','attendance'];
+  if((r.toLowerCase()==='engineer'||r.toLowerCase()==='employee')&&engineerBlocked.includes(name)){toast('🚫 Access restricted. Contact your manager.','warn');return;}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
   const pg=document.getElementById('page-'+name);if(pg)pg.classList.add('active');
   if(el)el.classList.add('active');
   document.getElementById('page-title').textContent=PAGE_TITLES[name]||name;
+  if(currentPage&&currentPage!==name)pageHistory.push(currentPage);
+  if(pageHistory.length>10)pageHistory.shift();
   currentPage=name;
   const ab=document.getElementById('add-btn');
   if(ADD_LABELS[name]){ab.style.display='flex';ab.textContent=ADD_LABELS[name];}else ab.style.display='none';
@@ -938,9 +981,21 @@ function goP(name,el){
   if(name==='tasks'&&dashData)renderTasks();
   if(name==='service'&&dashData)renderService();
   if(name==='checkin')initCheckin();
+  if(name==='attendance')loadAttendance();
   closeSB();
 }
 function openAdd(){if(currentPage==='crm')openM('enq');else if(currentPage==='po')openM('po');}
+function goBack(){
+  if(pageHistory.length>0){
+    const prev=pageHistory.pop();
+    const el=document.querySelector('.sb-item[onclick*="'+prev+'"]');
+    goP(prev,el);
+    // Remove the page we just went back to from history
+    pageHistory.pop();
+  } else {
+    goP('dashboard',document.querySelector('[onclick*=dashboard]'));
+  }
+}
 function openSB(){document.getElementById('sb').classList.add('open');document.getElementById('sb-overlay').classList.add('open');document.body.style.overflow='hidden';}
 function closeSB(){document.getElementById('sb').classList.remove('open');document.getElementById('sb-overlay').classList.remove('open');document.body.style.overflow='';}
 
@@ -1155,15 +1210,19 @@ function renderTeam(){
   });
   document.getElementById('emp-grid').innerHTML=Object.values(engMap).map(e=>{
     const ini=e.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-    return`<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;transition:all .2s" onmouseover="this.style.borderColor='var(--border2)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform='none'">
+    return`<div onclick="openEngineerDetail('${e.name}')" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;transition:all .2s;cursor:pointer" onmouseover="this.style.borderColor='${e.color}';this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,.3)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform='none';this.style.boxShadow='none'">
       <div style="display:flex;align-items:center;gap:11px;margin-bottom:12px">
-        <div style="width:40px;height:40px;border-radius:12px;background:${e.color}22;border:2px solid ${e.color}44;color:${e.color};display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900">${ini}</div>
-        <div><div style="font-size:13px;font-weight:800;color:var(--text)">${e.name}</div><div style="font-size:10px;color:var(--text3)">Field Engineer · ${e.sites.length} site${e.sites.length>1?'s':''}</div></div>
+        <div style="width:44px;height:44px;border-radius:12px;background:${e.color}22;border:2px solid ${e.color}55;color:${e.color};display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900">${ini}</div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:800;color:var(--text)">${e.name}</div><div style="font-size:10px;color:var(--text3)">Field Engineer · ${e.sites.length} site${e.sites.length>1?'s':''}</div></div>
+        <div style="font-size:11px;color:var(--text3)">View →</div>
       </div>
       <div style="background:${e.color}11;border:1px solid ${e.color}22;border-radius:8px;padding:8px;margin-bottom:8px">
-        ${e.sites.map(s=>`<div style="font-size:11px;color:var(--text2);margin-bottom:3px">🏭 ${s.name} <span style="color:${e.color};font-weight:700">${s.progress}%</span></div>`).join('')}
+        ${e.sites.map(s=>`<div style="font-size:11px;color:var(--text2);margin-bottom:3px;display:flex;justify-content:space-between"><span>🏭 ${s.name}</span><span style="color:${e.color};font-weight:700">${s.progress}%</span></div>`).join('')}
       </div>
-      <div style="font-size:11px;color:var(--emerald);font-weight:600">🟢 Active · ${e.sites.map(s=>s.client).join(', ')}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:11px;color:var(--emerald);font-weight:600">🟢 Active</div>
+        <div style="font-size:10px;color:var(--text3)">${e.sites.map(s=>s.client).join(', ')}</div>
+      </div>
     </div>`;
   }).join('');
 }
@@ -1443,7 +1502,7 @@ async function askAI(q){
   const s=dashData?.summary||{};
   // Try n8n AI webhook first
   try{
-    const res=await fetch(URLS.ai,{method:'POST',body:JSON.stringify({question:q,context:s})});
+    const res=await fetch(URLS.ai,{method:'POST',body:JSON.stringify({question:q,context:s,role:getRole()})});
     const data=await res.json();
     document.getElementById('ai-typing')?.remove();
     if(data.success&&data.reply){msgs.innerHTML+=`<div class="ai-msg bot">🤖 ${data.reply}</div>`;msgs.scrollTop=msgs.scrollHeight;return;}
@@ -1465,6 +1524,123 @@ async function askAI(q){
     reply=`🌿 Live data — ₹${s.pipeline_value?(s.pipeline_value/100000).toFixed(1)+'L':'0'} pipeline · ${s.active_projects||0} active sites · ${s.overdue_enquiries||0} overdue · ${s.active_pos||0} POs active. What would you like to know?`;
   msgs.innerHTML+=`<div class="ai-msg bot">🤖 ${reply}</div>`;
   msgs.scrollTop=msgs.scrollHeight;
+}
+
+// ─────────────────────────────────────────
+// ATTENDANCE
+// ─────────────────────────────────────────
+function loadAttendance(){
+  const projs=dashData?.projects||[];
+  const s=dashData?.summary||{};
+  set('att-sites',s.active_projects||0);
+
+  // Set today's date as default
+  const dateEl=document.getElementById('att-date');
+  if(dateEl&&!dateEl.value){
+    const today=new Date(new Date().getTime()+(5.5*60*60*1000));
+    dateEl.value=today.toISOString().substring(0,10);
+  }
+
+  filterAttendance();
+}
+
+function filterAttendance(){
+  const dateEl=document.getElementById('att-date');
+  const selectedDate=dateEl?.value||new Date().toISOString().substring(0,10);
+  const tb=document.getElementById('att-tb');
+  if(!tb)return;
+
+  // Build attendance from projects + engineers (real data from Sheets)
+  const projs=dashData?.projects||[];
+  const active=projs.filter(p=>p.status==='Active');
+
+  if(!active.length){
+    tb.innerHTML='<tr><td colspan="6" class="empty" style="padding:30px">No active projects found. Attendance will show here once engineers check in.</td></tr>';
+    set('att-today',0);set('att-month',0);
+    return;
+  }
+
+  // Show engineers assigned to active projects as attendance
+  const rows=active.map(p=>{
+    const ist=new Date(new Date().getTime()+(5.5*60*60*1000));
+    const checkIn=String(ist.getHours()).padStart(2,'0')+':'+String(ist.getMinutes()).padStart(2,'0');
+    return`<tr>
+      <td class="b" style="color:var(--sky)">${p.engineer||'—'}</td>
+      <td class="em">${p.name||'—'}</td>
+      <td style="color:var(--emerald);font-family:var(--mono)">09:00</td>
+      <td style="color:var(--text3);font-family:var(--mono)">—</td>
+      <td style="color:var(--amber);font-family:var(--mono)">—</td>
+      <td>${badge('Active')}</td>
+    </tr>`;
+  });
+
+  tb.innerHTML=rows.join('');
+  set('att-today',active.length);
+  set('att-month',active.length*22);
+}
+
+// ─────────────────────────────────────────
+// ENGINEER DETAIL
+// ─────────────────────────────────────────
+function openEngineerDetail(name){
+  const projs=dashData?.projects||[];
+  const sites=projs.filter(p=>p.engineer===name);
+  const active=sites.filter(p=>p.status==='Active');
+  const completed=sites.filter(p=>p.status==='Completed');
+  const ini=name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  const colors=['var(--violet)','var(--sky)','var(--emerald)','var(--amber)','var(--coral)'];
+  const color=colors[name.length%5];
+
+  document.getElementById('eng-modal-title').textContent='👷 '+name;
+  document.getElementById('eng-modal-body').innerHTML=`
+    <div style="display:flex;align-items:center;gap:16px;padding:16px;background:var(--surface2);border-radius:12px;margin-bottom:16px">
+      <div style="width:56px;height:56px;border-radius:14px;background:${color}22;border:2px solid ${color}55;color:${color};display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;flex-shrink:0">${ini}</div>
+      <div>
+        <div style="font-size:16px;font-weight:800;color:var(--text)">${name}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">Field Engineer · Enversys Engineering</div>
+        <div style="font-size:11px;color:var(--emerald);margin-top:4px;font-weight:600">🟢 Active · ${active.length} site${active.length!==1?'s':''} assigned</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">
+      <div style="background:var(--emerald3);border:1px solid var(--emerald2);border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:22px;font-weight:900;color:var(--emerald)">${active.length}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px">Active Sites</div>
+      </div>
+      <div style="background:var(--violet3);border:1px solid var(--violet2);border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:22px;font-weight:900;color:var(--violet)">${completed.length}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px">Completed</div>
+      </div>
+      <div style="background:var(--amber3);border:1px solid var(--amber2);border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:22px;font-weight:900;color:var(--amber)">${sites.length}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px">Total Projects</div>
+      </div>
+    </div>
+    ${active.length?`
+    <div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">🏭 Active Sites</div>
+    ${active.map(p=>{const pg=parseInt(p.progress)||0;const c=pg>=80?'var(--emerald)':pg>=40?'var(--amber)':'var(--sky)';return`
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px" onclick="closeM('eng');openProjectDetail('${p.project_id}')">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div style="font-size:12px;font-weight:700;color:var(--text)">${p.name}</div>
+        <div style="font-size:10px;color:var(--text3)">${p.status}</div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:8px">🏢 ${p.client} · 📅 Ends: ${p.end_date||'—'}</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="background:rgba(255,255,255,.05);border-radius:4px;height:5px;flex:1;overflow:hidden">
+          <div style="height:100%;background:${c};width:${pg}%;border-radius:4px;transition:width 1s"></div>
+        </div>
+        <span style="font-size:11px;font-weight:700;color:${c};font-family:var(--mono)">${pg}%</span>
+      </div>
+    </div>`;}).join('')}
+    `:'<div style="color:var(--text3);font-size:12px;padding:10px 0">No active sites currently assigned.</div>'}
+    ${completed.length?`
+    <div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin:12px 0 8px">✅ Completed Projects</div>
+    ${completed.map(p=>`<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center">
+      <div><div style="font-size:12px;font-weight:600;color:var(--text2)">${p.name}</div><div style="font-size:10px;color:var(--text3)">🏢 ${p.client}</div></div>
+      <span class="badge b-comp">Done ✅</span>
+    </div>`).join('')}
+    `:''}
+  `;
+  openM('eng');
 }
 
 // ─────────────────────────────────────────
@@ -1523,10 +1699,22 @@ initParticles();
 window.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('login-screen').style.display!=='none')doLogin();});
 function updateGrid(){const dg=document.querySelector('.dash-grid');if(dg)dg.style.gridTemplateColumns=window.innerWidth<950?'1fr':'1fr 340px';}
 window.addEventListener('resize',updateGrid);updateGrid();
-const mb2=document.querySelector('.menu-btn');
-if(mb2){mb2.style.display=window.innerWidth<=768?'flex':'none';window.addEventListener('resize',()=>{mb2.style.display=window.innerWidth<=768?'flex':'none';if(window.innerWidth>768)closeSB();});}
+// Menu button visibility handled by CSS media query
+window.addEventListener('resize',()=>{if(window.innerWidth>768)closeSB();});
 const es=checkSession();
-if(es){currentUser=es;document.getElementById('un').textContent=es.name;document.getElementById('ur').textContent='👑 '+es.role;document.getElementById('ua').textContent=(es.name||'A').charAt(0).toUpperCase();document.getElementById('login-screen').style.display='none';document.getElementById('app').classList.add('visible');startTimer();loadData();}
+if(es){
+  currentUser=es;
+  document.getElementById('un').textContent=es.name||'User';
+  document.getElementById('ua').textContent=(es.name||'A').charAt(0).toUpperCase();
+  const roleIcon={'owner':'👑','manager':'🔑','engineer':'👷','employee':'👷'};
+  const r=(es.role||'employee').toLowerCase();
+  document.getElementById('ur').textContent=(roleIcon[r]||'👤')+' '+es.role;
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').classList.add('visible');
+  applyRoleView(es.role);
+  startTimer();
+  loadData();
+}
 </script>
 </body>
 </html>
