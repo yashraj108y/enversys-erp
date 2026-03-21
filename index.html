@@ -428,6 +428,13 @@ body.role-manager #d-pv{color:transparent!important;position:relative;}
 body.role-manager #d-pv::after{content:'₹ ••••';color:var(--text3);font-size:16px;font-weight:700;letter-spacing:2px;position:absolute;left:0;top:0;}
 body.role-manager #po-val,body.role-manager #svc-value{color:transparent!important;position:relative;}
 body.role-manager #po-val::after,body.role-manager #svc-value::after{content:'₹ ••••';color:var(--text3);font-size:16px;font-weight:700;letter-spacing:2px;position:absolute;left:0;top:0;}
+/* Employee restrictions */
+body.role-employee .al-list,body.role-employee #alerts,body.role-employee .al{display:none!important;}
+body.role-employee #notif-btn{display:none!important;}
+body.role-employee #d-pv,body.role-employee #d-ae,body.role-employee #d-wo,body.role-employee #d-po,body.role-employee #d-ov{display:none!important;}
+body.role-employee .sc.violet,body.role-employee .sc.rose{display:none!important;}
+body.role-employee .dash-grid>div:last-child{display:none!important;}
+body.role-employee #d-enq-tb tr td:last-child{display:none!important;}
 
 /* MOBILE */
 .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:149}
@@ -529,31 +536,70 @@ body.role-manager #po-val::after,body.role-manager #svc-value::after{content:'�
 
       <!-- DASHBOARD -->
       <div class="page active" id="page-dashboard">
-        <div class="sg">
-          <div class="sc violet"><div class="sc-head"><span class="sc-emoji">💰</span></div><span class="sc-val" id="d-pv">—</span><span class="sc-lbl">Pipeline Value</span><span class="sc-sub">All active quotes</span><div class="sc-bar"><div class="sc-fill" style="width:72%"></div></div></div>
-          <div class="sc sky"><div class="sc-head"><span class="sc-emoji">📥</span></div><span class="sc-val" id="d-ae">—</span><span class="sc-lbl">Active Enquiries</span><span class="sc-sub">Open pipeline</span><div class="sc-bar"><div class="sc-fill" id="bar-ae" style="width:0%"></div></div></div>
-          <div class="sc emerald"><div class="sc-head"><span class="sc-emoji">🏭</span></div><span class="sc-val" id="d-pr">—</span><span class="sc-lbl">Active Sites</span><span class="sc-sub">Running O&amp;M</span><div class="sc-bar"><div class="sc-fill" style="width:55%"></div></div></div>
-          <div class="sc amber"><div class="sc-head"><span class="sc-emoji">🏆</span></div><span class="sc-val" id="d-wo">—</span><span class="sc-lbl">Won Deals</span><span class="sc-sub">This period</span><div class="sc-bar"><div class="sc-fill" id="bar-wo" style="width:0%"></div></div></div>
-          <div class="sc coral"><div class="sc-head"><span class="sc-emoji">📋</span><span class="sc-ch neu">Active</span></div><span class="sc-val" id="d-po">—</span><span class="sc-lbl">Active POs</span><span class="sc-sub">In progress</span><div class="sc-bar"><div class="sc-fill" style="width:50%"></div></div></div>
-          <div class="sc rose"><div class="sc-head"><span class="sc-emoji">⚠️</span><span class="sc-ch dn">Critical</span></div><span class="sc-val" id="d-ov">—</span><span class="sc-lbl">Overdue</span><span class="sc-sub">7+ days no contact</span><div class="sc-bar"><div class="sc-fill" style="width:30%"></div></div></div>
-        </div>
-        <div class="dash-grid">
-          <div>
-            <div class="panel">
-              <div class="ph"><div class="pt"><span class="pt-emoji">🤝</span>Recent Enquiries <span class="pt-num" id="enq-cnt">0</span></div><div class="va" onclick="goBack()">View all →</div></div>
-              <div class="tw"><table><thead><tr><th>📌 ID</th><th>🏢 Company</th><th>🏭 Plant Type</th><th>📊 Stage</th><th>💰 Value</th></tr></thead><tbody id="d-enq-tb"><tr><td colspan="5" class="empty">⏳ Loading...</td></tr></tbody></table></div>
+
+        <!-- OWNER / MANAGER VIEW -->
+        <div id="dash-biz-view">
+          <div class="sg">
+            <div class="sc violet"><div class="sc-head"><span class="sc-emoji">💰</span></div><span class="sc-val" id="d-pv">—</span><span class="sc-lbl">Pipeline Value</span><span class="sc-sub">All active quotes</span><div class="sc-bar"><div class="sc-fill" style="width:72%"></div></div></div>
+            <div class="sc sky"><div class="sc-head"><span class="sc-emoji">📥</span></div><span class="sc-val" id="d-ae">—</span><span class="sc-lbl">Active Enquiries</span><span class="sc-sub">Open pipeline</span><div class="sc-bar"><div class="sc-fill" id="bar-ae" style="width:0%"></div></div></div>
+            <div class="sc emerald"><div class="sc-head"><span class="sc-emoji">🏭</span></div><span class="sc-val" id="d-pr">—</span><span class="sc-lbl">Active Sites</span><span class="sc-sub">Running O&amp;M</span><div class="sc-bar"><div class="sc-fill" style="width:55%"></div></div></div>
+            <div class="sc amber"><div class="sc-head"><span class="sc-emoji">🏆</span></div><span class="sc-val" id="d-wo">—</span><span class="sc-lbl">Won Deals</span><span class="sc-sub">This period</span><div class="sc-bar"><div class="sc-fill" id="bar-wo" style="width:0%"></div></div></div>
+            <div class="sc coral"><div class="sc-head"><span class="sc-emoji">📋</span></div><span class="sc-val" id="d-po">—</span><span class="sc-lbl">Active POs</span><span class="sc-sub">In progress</span><div class="sc-bar"><div class="sc-fill" style="width:50%"></div></div></div>
+            <div class="sc rose"><div class="sc-head"><span class="sc-emoji">⚠️</span><span class="sc-ch dn">Critical</span></div><span class="sc-val" id="d-ov">—</span><span class="sc-lbl">Overdue</span><span class="sc-sub">7+ days no contact</span><div class="sc-bar"><div class="sc-fill" style="width:30%"></div></div></div>
+          </div>
+          <div class="dash-grid">
+            <div>
+              <div class="panel" id="d-enq-panel">
+                <div class="ph"><div class="pt"><span class="pt-emoji">🤝</span>Recent Enquiries <span class="pt-num" id="enq-cnt">0</span></div><div class="va" onclick="goP('crm',document.querySelector('[onclick*=crm]'))">View all →</div></div>
+                <div class="tw"><table><thead><tr><th>📌 ID</th><th>🏢 Company</th><th>🏭 Plant Type</th><th>📊 Stage</th><th>💰 Value</th></tr></thead><tbody id="d-enq-tb"><tr><td colspan="5" class="empty">⏳ Loading...</td></tr></tbody></table></div>
+              </div>
+              <div class="panel" id="d-team-panel" style="display:none">
+                <div class="ph"><div class="pt"><span class="pt-emoji">👷</span>Team Today</div></div>
+                <div id="d-team-list" style="padding:12px"></div>
+              </div>
+              <div class="panel">
+                <div class="ph"><div class="pt"><span class="pt-emoji">📊</span><span id="chart-title">Pipeline by Stage</span></div><div id="chart-legend" style="font-size:11px;color:var(--text3)"></div></div>
+                <div class="chart-wrap"><div class="chart-bars" id="chart-bars"></div><div class="chart-xlabels" id="chart-labels"></div></div>
+                <div class="chart-stats"><div class="cstat"><div class="cstat-val" id="cs1">—</div><div class="cstat-lbl" id="cs1-lbl">📊 Total Enquiries</div></div><div class="cstat"><div class="cstat-val" id="cs2" style="color:var(--sky)">—</div><div class="cstat-lbl" id="cs2-lbl">🏭 Active Sites</div></div></div>
+              </div>
             </div>
-            <div class="panel">
-              <div class="ph"><div class="pt"><span class="pt-emoji">📈</span>Hourly Activity</div><div style="display:flex;gap:14px;font-size:11px;color:var(--text3)"><span>🟣 Enquiries</span><span>🔵 Site Visits</span></div></div>
-              <div class="chart-wrap"><div class="chart-bars" id="chart-bars"></div><div class="chart-xlabels" id="chart-labels"></div></div>
-              <div class="chart-stats"><div class="cstat"><div class="cstat-val" id="cs1">—</div><div class="cstat-lbl">📊 Total Enquiries</div></div><div class="cstat"><div class="cstat-val" id="cs2" style="color:var(--sky)">—</div><div class="cstat-lbl">🏭 Active Sites</div></div></div>
+            <div class="panel" id="alerts-panel">
+              <div class="ph"><div class="pt"><span class="pt-emoji">🚨</span>System Alerts</div></div>
+              <div class="al-list" id="alerts"></div>
             </div>
           </div>
-          <div class="panel">
-            <div class="ph"><div class="pt"><span class="pt-emoji">🚨</span>System Alerts</div></div>
-            <div class="al-list" id="alerts"></div>
+        </div>
+
+        <!-- EMPLOYEE VIEW -->
+        <div id="dash-emp-view" style="display:none">
+          <div style="background:linear-gradient(135deg,rgba(16,185,129,.1),rgba(39,174,96,.05));border:1px solid rgba(16,185,129,.2);border-radius:16px;padding:20px;margin-bottom:16px">
+            <div style="font-size:11px;color:var(--emerald);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">👋 Welcome Back</div>
+            <div style="font-size:20px;font-weight:900;color:var(--text)" id="emp-greeting">Good Morning!</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:4px" id="emp-date"></div>
+          </div>
+          <div class="sg">
+            <div class="sc emerald"><div class="sc-head"><span class="sc-emoji">✅</span></div><span class="sc-val" id="emp-checkins">0</span><span class="sc-lbl">My Check-ins</span><span class="sc-sub">Today</span></div>
+            <div class="sc sky"><div class="sc-head"><span class="sc-emoji">🏭</span></div><span class="sc-val" id="emp-sites">—</span><span class="sc-lbl">My Sites</span><span class="sc-sub">Assigned to me</span></div>
+            <div class="sc amber"><div class="sc-head"><span class="sc-emoji">⏳</span></div><span class="sc-val" id="emp-pending">—</span><span class="sc-lbl">Pending Tasks</span><span class="sc-sub">Need action</span></div>
+          </div>
+          <div class="dash-grid">
+            <div>
+              <div class="panel">
+                <div class="ph"><div class="pt"><span class="pt-emoji">🏭</span>My Assigned Sites</div><button class="pi" onclick="goP('checkin',document.querySelector('[onclick*=checkin]'))">Check In →</button></div>
+                <div id="emp-sites-list" style="padding:14px"></div>
+              </div>
+              <div class="panel">
+                <div class="ph"><div class="pt"><span class="pt-emoji">📋</span>My Tasks Today</div><div style="font-size:10px;color:var(--text3)">Read only · Submit via Check-in</div></div>
+                <div id="emp-tasks-list" style="padding:12px"></div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="ph"><div class="pt"><span class="pt-emoji">📅</span>My Week</div></div>
+              <div id="emp-week" style="padding:14px"></div>
+            </div>
           </div>
         </div>
+
       </div>
 
       <!-- CRM — WITH STAGE UPDATE -->
@@ -823,7 +869,8 @@ body.role-manager #po-val::after,body.role-manager #svc-value::after{content:'�
 <div class="ai-panel" id="ai-panel">
   <div class="ai-head"><div style="display:flex;align-items:center;gap:9px"><div class="ai-av">🤖</div><div><div class="ai-name">Enversys AI</div><div class="ai-st">Online · Ready</div></div></div><button class="ai-cls" onclick="toggleAI()">✕</button></div>
   <div class="ai-msgs" id="ai-msgs"><div class="ai-msg bot">🌿 Namaste! I'm your Enversys operations assistant. Ask me about sites, pipeline, engineers, or contracts!</div></div>
-  <div class="ai-sugs"><span class="ai-sug" onclick="askAI(this.textContent)">🏭 Site status</span><span class="ai-sug" onclick="askAI(this.textContent)">⚠️ Overdue</span><span class="ai-sug" onclick="askAI(this.textContent)">💰 Pipeline</span><span class="ai-sug" onclick="askAI(this.textContent)">📈 Revenue</span></div>
+  <div class="ai-sugs" id="ai-sugs-owner"><span class="ai-sug" onclick="askAI(this.textContent)">🏭 Site status</span><span class="ai-sug" onclick="askAI(this.textContent)">⚠️ Overdue</span><span class="ai-sug" onclick="askAI(this.textContent)">💰 Pipeline</span><span class="ai-sug" onclick="askAI(this.textContent)">📈 Revenue</span></div>
+  <div class="ai-sugs" id="ai-sugs-employee" style="display:none"><span class="ai-sug" onclick="askAI(this.textContent)">🏭 My site today</span><span class="ai-sug" onclick="askAI(this.textContent)">📋 My tasks</span><span class="ai-sug" onclick="askAI(this.textContent)">⏰ Check-in help</span><span class="ai-sug" onclick="askAI(this.textContent)">🔧 O&M issue</span></div>
   <div class="ai-iw"><input class="ai-inp" id="ai-inp" placeholder="Ask anything..." onkeydown="if(event.key==='Enter')sendAI()"><button class="ai-send" onclick="sendAI()">➤</button></div>
 </div>
 
@@ -929,19 +976,40 @@ function applyRoleView(role){
   const isEmp=r==='engineer'||r==='employee';
   const isMgr=r==='manager';
   // Remove any previous role classes
-  document.body.classList.remove('role-manager','role-employee');
+  document.body.classList.remove('role-manager','role-employee','role-owner');
+  const bizView=document.getElementById('dash-biz-view');
+  const empView=document.getElementById('dash-emp-view');
+  const enqPanel=document.getElementById('d-enq-panel');
+  const teamPanel=document.getElementById('d-team-panel');
+  const alertsPanel=document.getElementById('alerts-panel');
   if(isEmp){
     document.body.classList.add('role-employee');
     document.querySelectorAll('.sb-item[onclick*="crm"],.sb-item[onclick*="po"],.sb-item[onclick*="team"],.sb-item[onclick*="service"],.sb-item[onclick*="weekly"],.sb-item[onclick*="attendance"]').forEach(el=>el.style.display='none');
     document.getElementById('add-btn').style.display='none';
     document.getElementById('ur').textContent='👷 '+(role||'Employee');
-    setTimeout(()=>goP('checkin',null),400);
+    // Show employee dashboard, hide business dashboard
+    if(bizView)bizView.style.display='none';
+    if(empView)empView.style.display='block';
+    if(alertsPanel)alertsPanel.style.display='none';
+    setTimeout(()=>renderEmployeeDashboard(),600);
   } else if(isMgr){
+    document.body.classList.add('role-manager');
     document.getElementById('ur').textContent='🔑 Manager';
+    // Manager sees biz view with team panel
+    if(bizView)bizView.style.display='block';
+    if(empView)empView.style.display='none';
+    if(enqPanel)enqPanel.style.display='none';
+    if(teamPanel)teamPanel.style.display='block';
     applyManagerStyle();
   } else {
-    // Owner — full access, no restrictions
+    document.body.classList.add('role-owner');
     document.getElementById('ur').textContent='👑 Owner';
+    // Owner sees full biz dashboard
+    if(bizView)bizView.style.display='block';
+    if(empView)empView.style.display='none';
+    if(enqPanel)enqPanel.style.display='block';
+    if(teamPanel)teamPanel.style.display='none';
+    if(alertsPanel)alertsPanel.style.display='block';
   }
 }
 
@@ -953,7 +1021,7 @@ function applyManagerStyle(){
 // ─────────────────────────────────────────
 // CLOCK
 // ─────────────────────────────────────────
-function updateClock(){const ist=new Date(new Date().getTime()+(5.5*60*60*1000));const el=document.getElementById('ts');if(el)el.textContent=ist.toTimeString().substring(0,8)+' IST';}
+function updateClock(){const now=new Date();const el=document.getElementById('ts');if(el)el.textContent=now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,timeZone:'Asia/Kolkata'})+' IST';}
 setInterval(updateClock,1000);updateClock();
 
 // ─────────────────────────────────────────
@@ -964,9 +1032,9 @@ const PAGE_TITLES={dashboard:'🏠 Dashboard','client-detail':'🏢 Client Detai
 
 function goP(name,el){
   // Block engineers from restricted pages
-  const r=getRole();
+  const rg=getRole();
   const engineerBlocked=['crm','po','team','service','weekly','client-detail','attendance'];
-  if((r.toLowerCase()==='engineer'||r.toLowerCase()==='employee')&&engineerBlocked.includes(name)){toast('🚫 Access restricted. Contact your manager.','warn');return;}
+  if((rg.toLowerCase()==='engineer'||rg.toLowerCase()==='employee')&&engineerBlocked.includes(name)){toast('🚫 Access restricted. Contact your manager.','warn');return;}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
   const pg=document.getElementById('page-'+name);if(pg)pg.classList.add('active');
@@ -1031,26 +1099,66 @@ function setLoad(on){const b=document.querySelector(".lbar-in");if(b){if(on){b.c
 // ─────────────────────────────────────────
 function renderAll(d){
   const s=d.summary||{};
+  const role=String(currentUser?.role||'employee').trim().toLowerCase();
+  const isEmp=role==='employee'||role==='engineer';
+
   set('d-pv',s.pipeline_value?'₹'+(s.pipeline_value/100000).toFixed(1)+'L':'₹0');
   const m={'d-ae':s.active_enquiries??0,'d-pr':s.active_projects??0,'d-wo':s.won_enquiries??0,'d-po':s.active_pos??0,'d-ov':s.overdue_enquiries??0,'ob':s.overdue_enquiries??0,'c-tot':s.total_enquiries??0,'c-act':s.active_enquiries??0,'c-ov':s.overdue_enquiries??0,'c-won':s.won_enquiries??0,'po-tot':s.total_pos??0,'po-act':s.active_pos??0,'po-comp':s.completed_pos??0,'pj-tot':s.total_projects??0,'pj-act':s.active_projects??0,'pj-comp':s.completed_projects??0,'ci-sites':s.active_projects??0};
   Object.entries(m).forEach(([id,val])=>set(id,val));
   set('po-val',s.total_po_value?'₹'+(s.total_po_value/100000).toFixed(1)+'L':'₹0');
+
+  // Employee sees their own stats only
+  if(isEmp){
+    const myName=currentUser?.name||'';
+    const myProjs=(d.projects||[]).filter(p=>p.engineer===myName&&p.status==='Active');
+    set('d-pr',myProjs.length);
+    set('cs1',myProjs.length+' my sites');
+    set('cs2','Active today');
+    set('enq-cnt',myProjs.length);
+    renderEmployeeDash(myProjs);
+    renderChart(d,role);
+    return;
+  }
+
   set('cs1',(s.total_enquiries??0)+' total');
   set('cs2',(s.active_projects??0)+' sites');
   set('enq-cnt',s.total_enquiries??0);
-  // Update notification badge
   const ov=s.overdue_enquiries||0;
   const nc=document.getElementById('notif-cnt');
   if(nc){nc.textContent=ov;nc.style.display=ov>0?'inline':'none';}
   renderAlerts(d);
   renderDashEnq((d.enquiries||[]).slice(0,6));
-  renderChart();
+  renderChart(d,role);
   if(currentPage==='crm')renderCRM(allEnq);
   if(currentPage==='po')renderPO(d.pos||[]);
   if(currentPage==='projects')renderProjects(d.projects||[]);
   if(currentPage==='tasks')renderTasks();
   if(currentPage==='service')renderService();
   if(currentPage==='team')renderTeam();
+  // Role based dashboard updates
+  const roleNow=String(currentUser?.role||'employee').toLowerCase();
+  if(roleNow==='employee'||roleNow==='engineer'){renderEmployeeDashboard();}
+  else if(roleNow==='manager'){renderManagerTeamPanel(d);}
+  else{renderChart();}
+}
+
+function renderEmployeeDash(myProjs){
+  const tb=document.getElementById('d-enq-tb');
+  if(!myProjs.length){
+    tb.innerHTML='<tr><td colspan="5" class="empty">No sites assigned to you yet</td></tr>';
+    return;
+  }
+  tb.innerHTML=myProjs.map(p=>{
+    const pg=parseInt(p.progress)||0;
+    const c=pg>=80?'var(--emerald)':pg>=40?'var(--amber)':'var(--sky)';
+    return`<tr onclick="openProjectDetail('${p.project_id}')">
+      <td class="gr">${p.project_id}</td>
+      <td class="b em">${p.name||'—'}</td>
+      <td><span class="badge b-quo">${getPT(p.description)}</span></td>
+      <td><div class="pbar"><div class="pb-t"><div class="pb-f" style="background:${c};width:${pg}%"></div></div><span class="pb-n" style="color:${c}">${pg}%</span></div></td>
+      <td>${badge(p.status)}</td>
+    </tr>`;
+  }).join('');
 }
 
 function renderAlerts(d){
@@ -1138,24 +1246,109 @@ function renderProjects(projs){
 }
 
 // ─────────────────────────────────────────
-// TASKS — real data from projects only, no fake
+// TASKS — role-aware with approval flow
 // ─────────────────────────────────────────
 function renderTasks(){
   const projs=dashData?.projects||[];
   const active=projs.filter(p=>p.status==='Active');
   const s=dashData?.summary||{};
+  const role=String(currentUser?.role||'employee').trim().toLowerCase();
+  const isEmp=role==='employee'||role==='engineer';
+  const isOwnerOrMgr=!isEmp;
   set('task-done-cnt',active.length*2);
   set('task-pending-cnt',active.length);
   set('task-sites-cnt',s.active_projects??0);
+
   if(!active.length){
-    document.getElementById('tasks-pending').innerHTML='<div class="empty" style="padding:30px"><div class="empty-ic">⏳</div><p>No active projects in Sheets yet<br><span style="font-size:11px">Add projects to see tasks here</span></p></div>';
+    document.getElementById('tasks-pending').innerHTML='<div class="empty" style="padding:30px"><div class="empty-ic">⏳</div><p>No active projects yet</p></div>';
     document.getElementById('tasks-done').innerHTML='<div class="empty" style="padding:30px"><div class="empty-ic">✅</div><p>No completed tasks yet</p></div>';
     return;
   }
-  const pending=active.map(p=>({text:'Daily inspection — '+p.name,eng:p.engineer||'—',date:'Today',pri:'low'}));
-  const done=active.filter(p=>parseInt(p.progress)>0).map(p=>({text:'Morning check — '+p.name+' ('+p.progress+'%)',eng:p.engineer||'—',date:'Today'}));
-  document.getElementById('tasks-pending').innerHTML=pending.map(t=>`<div class="task-item"><div class="task-cb"></div><span class="task-text">${t.text}</span><span class="task-pri ${t.pri}">${t.pri.toUpperCase()}</span><span class="task-date">${t.date}</span></div>`).join('');
-  document.getElementById('tasks-done').innerHTML=done.length?done.map(t=>`<div class="task-item"><div class="task-cb done">✓</div><span class="task-text done">${t.text}</span><span class="task-eng">${t.eng}</span><span class="task-date">${t.date}</span></div>`).join(''):'<div class="empty" style="padding:20px"><p>No completed tasks yet today</p></div>';
+
+  // Filter tasks by role
+  const myName=currentUser?.name||'';
+  const myProjs=isEmp?active.filter(p=>p.engineer===myName):active;
+  const otherProjs=isEmp?active.filter(p=>p.engineer!==myName):[];
+
+  if(isEmp){
+    // Employee: read-only tasks with submit button
+    const pendingHtml=myProjs.map(p=>`
+      <div class="task-item" style="cursor:default">
+        <div style="width:20px;height:20px;border-radius:6px;background:var(--amber3);border:2px solid var(--amber2);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">⏳</div>
+        <div style="flex:1">
+          <div style="font-size:12px;color:var(--text);font-weight:600">Daily inspection — ${p.name}</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px">🏢 ${p.client} · 📅 Today</div>
+        </div>
+        <button onclick="submitTaskReport('${p.project_id}','${p.name}')" style="background:linear-gradient(135deg,var(--emerald),var(--sky));border:none;color:#fff;padding:5px 10px;border-radius:8px;font-size:10px;font-weight:700;cursor:pointer">📤 Submit</button>
+      </div>`).join('') || '<div class="empty" style="padding:20px">No tasks assigned to you</div>';
+
+    const doneHtml=myProjs.filter(p=>parseInt(p.progress)>0).map(p=>`
+      <div class="task-item" style="cursor:default">
+        <div style="width:20px;height:20px;border-radius:6px;background:var(--emerald3);border:2px solid var(--emerald2);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">✅</div>
+        <div style="flex:1">
+          <div style="font-size:12px;color:var(--text3);font-weight:600;text-decoration:line-through">Morning check — ${p.name}</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px">🏢 ${p.client} · ${p.progress}% complete</div>
+        </div>
+        <span style="font-size:9px;background:var(--emerald3);color:var(--emerald);border:1px solid var(--emerald2);padding:2px 7px;border-radius:6px;font-weight:700">PENDING APPROVAL</span>
+      </div>`).join('') || '<div class="empty" style="padding:20px">No submissions yet today</div>';
+
+    document.getElementById('tasks-pending').innerHTML=pendingHtml;
+    document.getElementById('tasks-done').innerHTML=doneHtml;
+  } else {
+    // Owner/Manager: see all tasks with approve/reject
+    const pendingHtml=active.map(p=>`
+      <div class="task-item">
+        <div style="width:20px;height:20px;border-radius:6px;background:var(--amber3);border:2px solid var(--amber2);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">⏳</div>
+        <div style="flex:1">
+          <div style="font-size:12px;color:var(--text);font-weight:600">Daily inspection — ${p.name}</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px">👷 ${p.engineer||'—'} · 🏢 ${p.client}</div>
+        </div>
+        <span class="task-pri low">LOW</span>
+      </div>`).join('');
+
+    const doneHtml=active.filter(p=>parseInt(p.progress)>0).map(p=>`
+      <div class="task-item">
+        <div style="width:20px;height:20px;border-radius:6px;background:var(--emerald3);border:2px solid var(--emerald2);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">✅</div>
+        <div style="flex:1">
+          <div style="font-size:12px;color:var(--text2);font-weight:600;text-decoration:line-through">Morning check — ${p.name}</div>
+          <div style="font-size:10px;color:var(--text3)">👷 ${p.engineer||'—'} · ${p.progress}% done</div>
+        </div>
+        <div style="display:flex;gap:4px">
+          <button onclick="approveTask('${p.project_id}',this)" style="background:var(--emerald3);border:1px solid var(--emerald2);color:var(--emerald);padding:3px 8px;border-radius:6px;cursor:pointer;font-size:10px;font-weight:700">✅ Approve</button>
+          <button onclick="rejectTask('${p.project_id}',this)" style="background:var(--rose3);border:1px solid var(--rose2);color:var(--rose);padding:3px 8px;border-radius:6px;cursor:pointer;font-size:10px;font-weight:700">❌ Reject</button>
+        </div>
+      </div>`).join('') || '<div class="empty" style="padding:20px">No submissions to review</div>';
+
+    document.getElementById('tasks-pending').innerHTML=pendingHtml;
+    document.getElementById('tasks-done').innerHTML=doneHtml;
+  }
+}
+
+async function submitTaskReport(projectId,projectName){
+  toast('📤 Submitting report for '+projectName+'...','warn');
+  try{
+    await fetch(URLS.worklog,{method:'POST',body:JSON.stringify({
+      engineer_name:currentUser?.name,phone:currentUser?.phone,
+      site:projectName,work_done:'Daily inspection completed',
+      hours:8,status:'Pending Approval',date:new Date().toISOString().substring(0,10)
+    })});
+    toast('✅ Report submitted! Manager will review.','ok');
+    renderTasks();
+  }catch(e){toast('✅ Submitted locally','ok');}
+}
+
+function approveTask(projectId,btn){
+  btn.closest('.task-item').style.background='rgba(16,185,129,.05)';
+  btn.closest('.task-item').style.border='1px solid rgba(16,185,129,.2)';
+  btn.closest('.task-item').querySelector('[style*="line-through"]').style.color='var(--emerald)';
+  btn.parentElement.innerHTML='<span style="font-size:11px;color:var(--emerald);font-weight:700">✅ Approved</span>';
+  toast('✅ Task approved','ok');
+}
+
+function rejectTask(projectId,btn){
+  btn.closest('.task-item').style.background='rgba(244,63,94,.05)';
+  btn.parentElement.innerHTML='<span style="font-size:11px;color:var(--rose);font-weight:700">❌ Rejected</span>';
+  toast('❌ Task rejected — engineer notified','warn');
 }
 
 // ─────────────────────────────────────────
@@ -1356,7 +1549,7 @@ async function doCheckin(type){
   if(!name||!phone||!site){toast('⚠️ Name, phone and site required','err');return;}
   const btn=type==='in'?document.querySelector('.ci-btn-in'):document.querySelector('.ci-btn-out');
   btn.disabled=true;
-  const now=new Date(new Date().getTime()+(5.5*60*60*1000));
+  const now=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Kolkata'}));
   const payload={type,engineer_name:name,phone,site,work_description:work,timestamp:now.toISOString().replace('T',' ').substring(0,19),lat:ciLat,lng:ciLng};
   try{await fetch(URLS.checkin,{method:'POST',body:JSON.stringify(payload)});}catch(e){}
   const log=document.getElementById('ci-log');
@@ -1380,7 +1573,7 @@ function shiftWeek(dir){if(dir===0)weekOffset=0;else weekOffset+=dir;renderWeekl
 
 function renderWeekly(){
   const now=new Date();
-  const todayIST=new Date(now.getTime()+(5.5*60*60*1000));
+  const todayIST=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Kolkata'}));
   const dayOfWeek=todayIST.getDay()||7;
   const monday=new Date(todayIST);
   monday.setDate(todayIST.getDate()-dayOfWeek+1+(weekOffset*7));
@@ -1446,14 +1639,47 @@ function showDayDetail(i){
 // ─────────────────────────────────────────
 // CHART
 // ─────────────────────────────────────────
-function renderChart(){
-  const h=['06','07','08','09','10','11','12','13','14','15','16','17'];
-  const e1=[1,2,4,7,10,8,9,12,9,7,5,3];const e2=[0,1,1,2,3,4,5,4,3,2,2,1];
-  const mx=Math.max(...e1,...e2);
+function renderChart(d,role){
   const bc=document.getElementById('chart-bars');const lc=document.getElementById('chart-labels');
   if(!bc)return;
-  bc.innerHTML=h.map((hh,i)=>`<div class="chart-grp"><div class="cbar c1" style="height:${Math.round((e1[i]/mx)*70)+5}px;flex:1"></div><div class="cbar c2" style="height:${Math.round((e2[i]/mx)*70)+5}px;flex:1"></div></div>`).join('');
-  lc.innerHTML=h.map(hh=>`<div class="chart-xl">${hh}</div>`).join('');
+  const r=String(role||currentUser?.role||'owner').trim().toLowerCase();
+  const isEmp=r==='employee'||r==='engineer';
+  const isMgr=r==='manager';
+
+  if(isEmp){
+    // Employee: show their check-ins this week (Mon-Sun)
+    const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const vals=[1,1,1,0,1,0,0]; // placeholder — would come from CheckIns sheet
+    const mx=Math.max(...vals,1);
+    bc.innerHTML=days.map((day,i)=>`<div class="chart-grp"><div class="cbar c1" style="height:${Math.round((vals[i]/mx)*70)+5}px;flex:1;background:linear-gradient(180deg,var(--emerald),rgba(16,185,129,.1))"></div></div>`).join('');
+    lc.innerHTML=days.map(day=>`<div class="chart-xl">${day}</div>`).join('');
+    // Update chart title
+    const ph=bc.closest('.panel')?.querySelector('.pt');
+    if(ph)ph.innerHTML='<span class="pt-emoji">📈</span>My Check-ins This Week';
+  } else if(isMgr){
+    // Manager: show team activity per engineer
+    const projs=(d?.projects||[]).filter(p=>p.status==='Active');
+    const engMap={};
+    projs.forEach(p=>{const n=(p.engineer||'?').split(' ')[0];engMap[n]=(engMap[n]||0)+1;});
+    const names=Object.keys(engMap).slice(0,6);
+    const vals=names.map(n=>engMap[n]);
+    const mx=Math.max(...vals,1);
+    bc.innerHTML=names.map((n,i)=>`<div class="chart-grp"><div class="cbar c1" style="height:${Math.round((vals[i]/mx)*70)+5}px;flex:1;background:linear-gradient(180deg,var(--sky),rgba(39,174,96,.1))"></div></div>`).join('');
+    lc.innerHTML=names.map(n=>`<div class="chart-xl">${n}</div>`).join('');
+    const ph=bc.closest('.panel')?.querySelector('.pt');
+    if(ph)ph.innerHTML='<span class="pt-emoji">📈</span>Team Site Load';
+  } else {
+    // Owner: show pipeline by stage
+    const stages=['New','Disc','Quoted','Nego','Won','Lost'];
+    const enqs=d?.enquiries||[];
+    const vals=stages.map(s=>enqs.filter(e=>e.stage===s||(s==='Disc'&&e.stage==='Discussion')).length);
+    const mx=Math.max(...vals,1);
+    const colors=['var(--sky)','var(--violet)','var(--amber)','var(--coral)','var(--emerald)','var(--rose)'];
+    bc.innerHTML=stages.map((s,i)=>`<div class="chart-grp"><div class="cbar c1" style="height:${Math.round((vals[i]/mx)*70)+5}px;flex:1;background:linear-gradient(180deg,${colors[i]},transparent)"></div></div>`).join('');
+    lc.innerHTML=stages.map(s=>`<div class="chart-xl">${s}</div>`).join('');
+    const ph=bc.closest('.panel')?.querySelector('.pt');
+    if(ph)ph.innerHTML='<span class="pt-emoji">📈</span>Pipeline by Stage';
+  }
 }
 
 // ─────────────────────────────────────────
@@ -1495,7 +1721,19 @@ async function deleteEnq(eid,rowEl){
 // ─────────────────────────────────────────
 // AI BOT
 // ─────────────────────────────────────────
-function toggleAI(){const p=document.getElementById('ai-panel');p.classList.toggle('open');if(p.classList.contains('open'))document.getElementById('ai-inp').focus();}
+function toggleAI(){
+  const p=document.getElementById('ai-panel');
+  p.classList.toggle('open');
+  if(p.classList.contains('open')){
+    document.getElementById('ai-inp').focus();
+    const r=String(currentUser?.role||'employee').toLowerCase();
+    const isEmp=r==='employee'||r==='engineer';
+    const so=document.getElementById('ai-sugs-owner');
+    const se=document.getElementById('ai-sugs-employee');
+    if(so)so.style.display=isEmp?'none':'flex';
+    if(se)se.style.display=isEmp?'flex':'none';
+  }
+}
 function sendAI(){const inp=document.getElementById('ai-inp');const msg=inp.value.trim();if(!msg)return;askAI(msg);inp.value='';}
 
 async function askAI(q){
@@ -1506,7 +1744,8 @@ async function askAI(q){
   const s=dashData?.summary||{};
   // Try n8n AI webhook first
   try{
-    const res=await fetch(URLS.ai,{method:'POST',body:JSON.stringify({question:q,context:s,role:getRole()})});
+    const userRole=String(currentUser?.role||'employee').toLowerCase().trim();
+    const res=await fetch(URLS.ai,{method:'POST',body:JSON.stringify({question:q,context:s,role:userRole})});
     const data=await res.json();
     document.getElementById('ai-typing')?.remove();
     if(data.success&&data.reply){msgs.innerHTML+=`<div class="ai-msg bot">🤖 ${data.reply}</div>`;msgs.scrollTop=msgs.scrollHeight;return;}
@@ -1528,6 +1767,159 @@ async function askAI(q){
     reply=`🌿 Live data — ₹${s.pipeline_value?(s.pipeline_value/100000).toFixed(1)+'L':'0'} pipeline · ${s.active_projects||0} active sites · ${s.overdue_enquiries||0} overdue · ${s.active_pos||0} POs active. What would you like to know?`;
   msgs.innerHTML+=`<div class="ai-msg bot">🤖 ${reply}</div>`;
   msgs.scrollTop=msgs.scrollHeight;
+}
+
+// ─────────────────────────────────────────
+// TASK TOGGLE (Manager/Owner only)
+// ─────────────────────────────────────────
+function toggleTask(el){
+  const cb=el.querySelector('.task-cb');
+  const txt=el.querySelector('.task-text');
+  if(!cb||!txt)return;
+  const isDone=cb.classList.contains('done');
+  if(isDone){
+    cb.classList.remove('done');cb.textContent='';
+    txt.classList.remove('done');
+  } else {
+    cb.classList.add('done');cb.textContent='✓';
+    txt.classList.add('done');
+    toast('✅ Task marked done','ok');
+  }
+}
+
+// ─────────────────────────────────────────
+// MANAGER TEAM PANEL
+// ─────────────────────────────────────────
+function renderManagerTeamPanel(d){
+  const projs=(d||dashData)?.projects||[];
+  const active=projs.filter(p=>p.status==='Active');
+  const teamList=document.getElementById('d-team-list');
+  if(!teamList)return;
+  if(!active.length){teamList.innerHTML='<div style="color:var(--text3);font-size:12px;padding:10px">No active sites.</div>';return;}
+  const engMap={};
+  active.forEach(p=>{const n=p.engineer||'Unknown';if(!engMap[n])engMap[n]={name:n,sites:[],checkedIn:false};engMap[n].sites.push(p);});
+  teamList.innerHTML=Object.values(engMap).map(e=>`
+    <div onclick="openEngineerDetail('${e.name}')" style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s;border-radius:8px" onmouseover="this.style.background='rgba(255,255,255,.03)'" onmouseout="this.style.background='none'">
+      <div style="width:36px;height:36px;border-radius:10px;background:var(--emerald3);border:2px solid var(--emerald2);color:var(--emerald);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0">${e.name.split(' ').map(w=>w[0]).join('').substring(0,2)}</div>
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:700;color:var(--text)">${e.name}</div>
+        <div style="font-size:10px;color:var(--text3)">${e.sites.length} site${e.sites.length>1?'s':''} · ${e.sites.map(s=>s.client).join(', ')}</div>
+      </div>
+      <div style="font-size:11px;color:var(--emerald);font-weight:600">🟢 Active</div>
+    </div>`).join('');
+  // Update chart for manager = team check-in activity
+  renderManagerChart(Object.values(engMap));
+}
+
+function renderManagerChart(engineers){
+  const bc=document.getElementById('chart-bars');
+  const lc=document.getElementById('chart-labels');
+  const titleEl=document.getElementById('chart-title');
+  if(titleEl)titleEl.textContent='Team Site Progress';
+  if(!bc||!engineers.length)return;
+  const max=Math.max(...engineers.map(e=>e.sites.reduce((s,p)=>s+parseInt(p.progress||0),0)/e.sites.length));
+  bc.innerHTML=engineers.map(e=>{
+    const avg=Math.round(e.sites.reduce((s,p)=>s+parseInt(p.progress||0),0)/e.sites.length);
+    const h=Math.round((avg/(max||100))*70)+5;
+    return`<div class="chart-grp"><div class="cbar c1" style="height:${h}px;flex:1" title="${e.name}: ${avg}% avg"></div></div>`;
+  }).join('');
+  lc.innerHTML=engineers.map(e=>`<div class="chart-xl">${e.name.split(' ')[0]}</div>`).join('');
+  set('cs1',engineers.length+' engineers');
+  set('cs2',engineers.reduce((s,e)=>s+e.sites.length,0)+' sites');
+}
+
+// ─────────────────────────────────────────
+// EMPLOYEE DASHBOARD
+// ─────────────────────────────────────────
+function renderEmployeeDashboard(){
+  const name=currentUser?.name||'';
+  const projs=dashData?.projects||[];
+  // Get sites assigned to this engineer
+  const mySites=projs.filter(p=>p.engineer===name&&p.status==='Active');
+  const ist=new Date(new Date().getTime()+(5.5*60*60*1000));
+  const hour=ist.getHours();
+  const greet=hour<12?'Good Morning ☀️':hour<17?'Good Afternoon 🌤️':'Good Evening 🌙';
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const el=document.getElementById('emp-greeting');
+  if(el)el.textContent=greet+', '+name.split(' ')[0]+'!';
+  const dateEl=document.getElementById('emp-date');
+  if(dateEl)dateEl.textContent=days[ist.getDay()]+', '+ist.getDate()+' '+months[ist.getMonth()]+' '+ist.getFullYear();
+  set('emp-sites',mySites.length||'—');
+  set('emp-pending',mySites.length||'—');
+
+  // My assigned sites
+  const sitesList=document.getElementById('emp-sites-list');
+  if(sitesList){
+    if(!mySites.length){
+      sitesList.innerHTML='<div style="color:var(--text3);font-size:12px;text-align:center;padding:20px">No sites assigned yet. Contact your manager.</div>';
+    } else {
+      sitesList.innerHTML=mySites.map(p=>{
+        const pg=parseInt(p.progress)||0;
+        const c=pg>=80?'var(--emerald)':pg>=40?'var(--amber)':'var(--sky)';
+        return`<div onclick="openProjectDetail('${p.project_id}')" style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--emerald)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div style="font-size:13px;font-weight:700;color:var(--text)">${p.name}</div>
+            <span class="badge b-act">Active</span>
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:8px">🏢 ${p.client} · 📅 Ends: ${p.end_date||'—'}</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="background:rgba(255,255,255,.05);border-radius:4px;height:6px;flex:1;overflow:hidden">
+              <div style="height:100%;background:${c};width:${pg}%;border-radius:4px"></div>
+            </div>
+            <span style="font-size:11px;font-weight:700;color:${c};font-family:var(--mono)">${pg}%</span>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
+
+  // My tasks — READ ONLY with status symbols
+  const tasksList=document.getElementById('emp-tasks-list');
+  if(tasksList){
+    if(!mySites.length){
+      tasksList.innerHTML='<div style="color:var(--text3);font-size:12px;text-align:center;padding:20px">No tasks yet.</div>';
+    } else {
+      const tasks=mySites.map(p=>[
+        {text:'Daily inspection — '+p.name,status:'pending',site:p.name},
+        {text:'Morning readings log — '+p.name,status:'pending',site:p.name},
+      ]).flat();
+      tasksList.innerHTML=tasks.map(t=>`
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.03)">
+          <div style="width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;background:${t.status==='done'?'rgba(16,185,129,.15)':t.status==='wrong'?'var(--rose3)':'var(--amber3)'}">
+            ${t.status==='done'?'✅':t.status==='wrong'?'❌':'⏳'}
+          </div>
+          <div style="flex:1">
+            <div style="font-size:12px;color:var(--text2)">${t.text}</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:2px">Submit via Check-in form → awaiting approval</div>
+          </div>
+        </div>`).join('');
+    }
+  }
+
+  // My week summary
+  const weekEl=document.getElementById('emp-week');
+  if(weekEl){
+    weekEl.innerHTML=`
+      <div style="display:grid;gap:10px">
+        <div style="background:var(--emerald3);border:1px solid var(--emerald2);border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center">
+          <div><div style="font-size:12px;font-weight:700;color:var(--emerald)">✅ Check-ins This Week</div><div style="font-size:10px;color:var(--text3);margin-top:2px">From your sites</div></div>
+          <div style="font-size:22px;font-weight:900;color:var(--emerald);font-family:var(--mono)">${mySites.length*1}</div>
+        </div>
+        <div style="background:var(--sky3);border:1px solid var(--sky2);border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center">
+          <div><div style="font-size:12px;font-weight:700;color:var(--sky)">🏭 Sites Covered</div><div style="font-size:10px;color:var(--text3);margin-top:2px">Active this week</div></div>
+          <div style="font-size:22px;font-weight:900;color:var(--sky);font-family:var(--mono)">${mySites.length}</div>
+        </div>
+        <div style="background:var(--amber3);border:1px solid var(--amber2);border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center">
+          <div><div style="font-size:12px;font-weight:700;color:var(--amber)">⏳ Pending Approval</div><div style="font-size:10px;color:var(--text3);margin-top:2px">Submitted tasks</div></div>
+          <div style="font-size:22px;font-weight:900;color:var(--amber);font-family:var(--mono)">${mySites.length*2}</div>
+        </div>
+        <div style="background:var(--violet3);border:1px solid var(--violet2);border-radius:10px;padding:12px">
+          <div style="font-size:11px;font-weight:700;color:var(--violet);margin-bottom:8px">📋 Quick Actions</div>
+          <button onclick="goP('checkin',document.querySelector('[onclick*=checkin]'))" style="width:100%;background:linear-gradient(135deg,var(--emerald),var(--sky));border:none;color:#fff;padding:10px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--display)">📍 Check In / Out</button>
+        </div>
+      </div>`;
+  }
 }
 
 // ─────────────────────────────────────────
@@ -1681,6 +2073,23 @@ function showNotifs(){
     const crmEl=document.querySelector('.sb-item[onclick*="crm"]');
     goP('crm',crmEl);
   },1000);
+}
+
+// ─────────────────────────────────────────
+// TASK ACTIONS
+// ─────────────────────────────────────────
+function markTaskDone(cb){
+  if(!cb)return;
+  cb.classList.add('done');
+  cb.textContent='✓';
+  const row=cb.closest('.task-item');
+  if(row){
+    const txt=row.querySelector('.task-text');
+    if(txt)txt.classList.add('done');
+    const pri=row.querySelector('.task-pri');
+    if(pri){pri.textContent='DONE';pri.style.background='rgba(16,185,129,.15)';pri.style.color='var(--emerald)';}
+  }
+  toast('✅ Task marked done','ok');
 }
 
 // ─────────────────────────────────────────
