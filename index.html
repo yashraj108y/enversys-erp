@@ -420,6 +420,15 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
 .info-box h4{color:var(--violet);font-size:13px;font-weight:700;margin-bottom:6px}
 .code-block{background:rgba(0,0,0,.4);border:1px solid var(--border2);border-radius:8px;padding:10px 13px;font-family:var(--mono);font-size:11px;color:var(--emerald);margin:8px 0;word-break:break-all}
 
+/* ROLE-BASED VISIBILITY */
+body.role-manager td.am{color:transparent!important;position:relative;}
+body.role-manager td.am::after{content:'₹ ••••';color:var(--text3);position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:700;letter-spacing:2px;}
+body.role-manager button[onclick*="deleteEnq"],body.role-manager button[onclick*="deleteClient"]{display:none!important;}
+body.role-manager #d-pv{color:transparent!important;position:relative;}
+body.role-manager #d-pv::after{content:'₹ ••••';color:var(--text3);font-size:16px;font-weight:700;letter-spacing:2px;position:absolute;left:0;top:0;}
+body.role-manager #po-val,body.role-manager #svc-value{color:transparent!important;position:relative;}
+body.role-manager #po-val::after,body.role-manager #svc-value::after{content:'₹ ••••';color:var(--text3);font-size:16px;font-weight:700;letter-spacing:2px;position:absolute;left:0;top:0;}
+
 /* MOBILE */
 .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:149}
 .empty{text-align:center;padding:50px;color:var(--text3);font-size:12px}
@@ -916,11 +925,13 @@ function isOwner(){return getRole().toLowerCase()==='owner';}
 function isManager(){return getRole().toLowerCase()==='manager'||isOwner();}
 
 function applyRoleView(role){
-  const r=(role||'employee').trim().toLowerCase();
+  const r=String(role||'employee').trim().toLowerCase();
   const isEmp=r==='engineer'||r==='employee';
   const isMgr=r==='manager';
-  const isOwn=r==='owner';
+  // Remove any previous role classes
+  document.body.classList.remove('role-manager','role-employee');
   if(isEmp){
+    document.body.classList.add('role-employee');
     document.querySelectorAll('.sb-item[onclick*="crm"],.sb-item[onclick*="po"],.sb-item[onclick*="team"],.sb-item[onclick*="service"],.sb-item[onclick*="weekly"],.sb-item[onclick*="attendance"]').forEach(el=>el.style.display='none');
     document.getElementById('add-btn').style.display='none';
     document.getElementById('ur').textContent='👷 '+(role||'Employee');
@@ -929,21 +940,14 @@ function applyRoleView(role){
     document.getElementById('ur').textContent='🔑 Manager';
     applyManagerStyle();
   } else {
+    // Owner — full access, no restrictions
     document.getElementById('ur').textContent='👑 Owner';
   }
 }
 
 function applyManagerStyle(){
-  const s=document.createElement('style');
-  s.textContent=`
-    td.am{color:transparent!important;position:relative;}
-    td.am::after{content:'₹ ••••';color:var(--text3);position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:700;letter-spacing:2px;}
-    button[onclick*="deleteEnq"],button[onclick*="deleteClient"]{display:none!important;}
-    #d-pv{visibility:hidden;position:relative;}
-    #d-pv::after{content:'₹ ••••';visibility:visible;position:absolute;left:0;color:var(--text3);font-size:18px;letter-spacing:2px;}
-    #po-val,#svc-value{visibility:hidden;}
-  `;
-  document.head.appendChild(s);
+  // Add class to body — CSS only applies when body has .role-manager
+  document.body.classList.add('role-manager');
 }
 
 // ─────────────────────────────────────────
