@@ -426,6 +426,10 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
 .empty-ic{font-size:32px;margin-bottom:10px;opacity:.4}
 @media(max-width:950px){.dash-grid{grid-template-columns:1fr}.proj-grid{grid-template-columns:1fr}}
 @media(max-width:768px){
+  .menu-btn{display:flex!important;align-items:center;justify-content:center;min-width:36px;min-height:36px;}
+  .sb-item{min-height:44px;padding:10px 12px;}
+  input,select,textarea{font-size:16px!important;}
+  button,[onclick]{-webkit-tap-highlight-color:transparent;}
   .sb{position:fixed;top:0;bottom:0;left:0;transform:translateX(-100%);transition:transform .25s;z-index:200}
   .sb.open{transform:translateX(0)}
   .sb-overlay{z-index:199}.sb-overlay.open{display:block}
@@ -493,10 +497,10 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
     <div class="topbar">
       <div class="tl"><button class="menu-btn" style="display:none" onclick="openSB()">☰</button><div class="tb-crumb">Enversys &rsaquo; <span id="page-title">Dashboard</span></div></div>
       <div class="tr">
-        <input class="tb-search" placeholder="🔍  Search sites, enquiries, POs...">
+        <input class="tb-search" id="tb-search" placeholder="🔍 Search enquiries, companies..." oninput="globalSearch(this.value)">
         <div class="live-chip"><div class="live-dot"></div><div class="live-txt">LIVE</div></div>
         <div class="tb-ts" id="ts">--:--:--</div>
-        <button class="tb-btn notif-wrap" onclick="toast('🔔 3 new alerts — check System Alerts','warn')">🔔<div class="notif-dot"></div></button>
+        <button class="tb-btn notif-wrap" id="notif-btn" onclick="showNotifs()">🔔<span id="notif-cnt" style="display:none;background:var(--rose);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px">0</span></button>
         <button class="tb-btn" onclick="loadData()">↺ Sync</button>
         <button class="add-btn" id="add-btn" onclick="openAdd()">+ Add</button>
       </div>
@@ -507,10 +511,10 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
       <!-- DASHBOARD -->
       <div class="page active" id="page-dashboard">
         <div class="sg">
-          <div class="sc violet"><div class="sc-head"><span class="sc-emoji">💰</span><span class="sc-ch up">↑ 12.5%</span></div><span class="sc-val" id="d-pv">—</span><span class="sc-lbl">Pipeline Value</span><span class="sc-sub">All active quotes</span><div class="sc-bar"><div class="sc-fill" style="width:72%"></div></div></div>
-          <div class="sc sky"><div class="sc-head"><span class="sc-emoji">📥</span><span class="sc-ch up">↑ 8.2%</span></div><span class="sc-val" id="d-ae">—</span><span class="sc-lbl">Active Enquiries</span><span class="sc-sub">Open pipeline</span><div class="sc-bar"><div class="sc-fill" id="bar-ae" style="width:0%"></div></div></div>
-          <div class="sc emerald"><div class="sc-head"><span class="sc-emoji">🏭</span><span class="sc-ch up">↑ 15.7%</span></div><span class="sc-val" id="d-pr">—</span><span class="sc-lbl">Active Sites</span><span class="sc-sub">Running O&amp;M</span><div class="sc-bar"><div class="sc-fill" style="width:55%"></div></div></div>
-          <div class="sc amber"><div class="sc-head"><span class="sc-emoji">🏆</span><span class="sc-ch up">↑ 8.2%</span></div><span class="sc-val" id="d-wo">—</span><span class="sc-lbl">Won Deals</span><span class="sc-sub">This period</span><div class="sc-bar"><div class="sc-fill" id="bar-wo" style="width:0%"></div></div></div>
+          <div class="sc violet"><div class="sc-head"><span class="sc-emoji">💰</span></div><span class="sc-val" id="d-pv">—</span><span class="sc-lbl">Pipeline Value</span><span class="sc-sub">All active quotes</span><div class="sc-bar"><div class="sc-fill" style="width:72%"></div></div></div>
+          <div class="sc sky"><div class="sc-head"><span class="sc-emoji">📥</span></div><span class="sc-val" id="d-ae">—</span><span class="sc-lbl">Active Enquiries</span><span class="sc-sub">Open pipeline</span><div class="sc-bar"><div class="sc-fill" id="bar-ae" style="width:0%"></div></div></div>
+          <div class="sc emerald"><div class="sc-head"><span class="sc-emoji">🏭</span></div><span class="sc-val" id="d-pr">—</span><span class="sc-lbl">Active Sites</span><span class="sc-sub">Running O&amp;M</span><div class="sc-bar"><div class="sc-fill" style="width:55%"></div></div></div>
+          <div class="sc amber"><div class="sc-head"><span class="sc-emoji">🏆</span></div><span class="sc-val" id="d-wo">—</span><span class="sc-lbl">Won Deals</span><span class="sc-sub">This period</span><div class="sc-bar"><div class="sc-fill" id="bar-wo" style="width:0%"></div></div></div>
           <div class="sc coral"><div class="sc-head"><span class="sc-emoji">📋</span><span class="sc-ch neu">Active</span></div><span class="sc-val" id="d-po">—</span><span class="sc-lbl">Active POs</span><span class="sc-sub">In progress</span><div class="sc-bar"><div class="sc-fill" style="width:50%"></div></div></div>
           <div class="sc rose"><div class="sc-head"><span class="sc-emoji">⚠️</span><span class="sc-ch dn">Critical</span></div><span class="sc-val" id="d-ov">—</span><span class="sc-lbl">Overdue</span><span class="sc-sub">7+ days no contact</span><div class="sc-bar"><div class="sc-fill" style="width:30%"></div></div></div>
         </div>
@@ -635,7 +639,7 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
         <div class="sg">
           <div class="sc emerald"><div class="sc-head"><span class="sc-emoji">✅</span></div><span class="sc-val" id="ci-today">0</span><span class="sc-lbl">Check-ins Today</span></div>
           <div class="sc sky"><div class="sc-head"><span class="sc-emoji">👷</span></div><span class="sc-val" id="ci-onsite">0</span><span class="sc-lbl">Engineers On Site</span></div>
-          <div class="sc amber"><div class="sc-head"><span class="sc-emoji">🏭</span></div><span class="sc-val" id="ci-sites">4</span><span class="sc-lbl">Active Sites</span></div>
+          <div class="sc amber"><div class="sc-head"><span class="sc-emoji">🏭</span></div><span class="sc-val" id="ci-sites">—</span><span class="sc-lbl">Active Sites</span></div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
           <div>
@@ -690,6 +694,7 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
 
       <!-- TASK BOARD — REAL -->
       <div class="page" id="page-tasks">
+        <div style="background:var(--violet3);border:1px solid var(--violet2);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:11px;color:var(--text2)">📋 Tasks are auto-generated from your active projects in Google Sheets. Engineers can submit detailed work logs via the Check-in page.</div>
         <div class="sg">
           <div class="sc emerald"><div class="sc-head"><span class="sc-emoji">✅</span></div><span class="sc-val" id="task-done-cnt">—</span><span class="sc-lbl">Tasks Done</span></div>
           <div class="sc amber"><div class="sc-head"><span class="sc-emoji">⏳</span></div><span class="sc-val" id="task-pending-cnt">—</span><span class="sc-lbl">Pending</span></div>
@@ -716,7 +721,7 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
           <div class="sc violet"><div class="sc-head"><span class="sc-emoji">💰</span></div><span class="sc-val" id="svc-value">—</span><span class="sc-lbl">Total PO Value</span></div>
         </div>
         <div class="panel">
-          <div class="ph"><div class="pt"><span class="pt-emoji">🔧</span>Service Contracts</div><button class="pi">+ Add Contract</button></div>
+          <div class="ph"><div class="pt"><span class="pt-emoji">🔧</span>Service Contracts</div><button class="pi" style="opacity:.4;cursor:not-allowed" title="Coming soon — contact admin to add contracts">+ Add Contract</button></div>
           <div style="padding:14px" id="service-list"></div>
         </div>
       </div>
@@ -739,6 +744,7 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
           </div>
         </div>
         <!-- 7-day grid -->
+        <div style="font-size:11px;color:var(--text3);margin-bottom:8px;text-align:center">👆 Tap any day to see follow-ups and site activity</div>
         <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:16px" id="week-grid"></div>
         <!-- Day detail panel — shown on click -->
         <div class="panel" id="week-detail-panel" style="display:none">
@@ -784,7 +790,8 @@ const URLS={
   po:       N8N+'/webhook/erp-po',
   updateEnq:N8N+'/webhook/erp-update-enquiry',
   checkin:  N8N+'/webhook/erp-checkin',
-  ai:       N8N+'/webhook/erp-ai'
+  ai:       N8N+'/webhook/erp-ai',
+  worklog:  N8N+'/webhook/erp-worklog'
 };
 const SESSION_MS=8*60*60*1000;
 const STAGES=['New','Discussion','Quoted','Negotiation','Won','Lost'];
@@ -822,27 +829,28 @@ async function doLogin(){
   if(!phone||phone.length<10){err.textContent='⚠️ Enter valid 10-digit number';err.classList.add('show');return;}
   if(!pw){err.textContent='⚠️ Password required';err.classList.add('show');return;}
   btn.disabled=true;
-  btn.textContent='Signing in...';
+  document.getElementById('l-txt').textContent='Signing in...';
   try{
-    const res=await fetch(URLS.login,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone,password:pw})});
+    const res=await fetch(URLS.login,{method:'POST',body:JSON.stringify({phone,password:pw})});
     const data=await res.json();
     if(data.success){initApp(data.user);return;}
     err.textContent='❌ '+(data.error||'Wrong phone or password');
     err.classList.add('show');
   }catch(e){
     if(isTrusted(phone)){initApp({name:'User',phone,role:'Owner'});return;}
-    err.textContent='❌ Cannot connect. Check internet.';
+    if(!navigator.onLine){err.textContent='❌ No internet connection. Check your network.';err.classList.add('show');return;}
+    err.textContent='❌ Invalid credentials. Contact your manager: 98506 00099';
     err.classList.add('show');
   }
   btn.disabled=false;
-  btn.textContent='Access Dashboard';
+  document.getElementById('l-txt').textContent='Access Dashboard';
 }
 
 function initApp(user){
   const name=user?.name||'User';const role=user?.role||'Staff';
   startSession({...user,name,role});
   document.getElementById('un').textContent=name;
-  document.getElementById('ur').textContent='👑 '+role;
+  const roleIcon={'owner':'👑','manager':'🔑','engineer':'👷'};document.getElementById('ur').textContent=(roleIcon[role.toLowerCase()]||'👤')+' '+role;
   document.getElementById('ua').textContent=name.charAt(0).toUpperCase();
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').classList.add('visible');
@@ -904,7 +912,7 @@ function goP(name,el){
   // Block engineers from restricted pages
   const r=getRole();
   const engineerBlocked=['crm','po','team','service','weekly','client-detail'];
-  if(r==='engineer'&&engineerBlocked.includes(name)){toast('⚠️ Access restricted for your role','warn');return;}
+  if(r.toLowerCase()==='engineer'&&engineerBlocked.includes(name)){toast('🚫 Access restricted. Contact your manager.','warn');return;}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
   const pg=document.getElementById('page-'+name);if(pg)pg.classList.add('active');
@@ -924,8 +932,8 @@ function goP(name,el){
   closeSB();
 }
 function openAdd(){if(currentPage==='crm')openM('enq');else if(currentPage==='po')openM('po');}
-function openSB(){document.getElementById('sb').classList.add('open');document.getElementById('sb-overlay').classList.add('open');}
-function closeSB(){document.getElementById('sb').classList.remove('open');document.getElementById('sb-overlay').classList.remove('open');}
+function openSB(){document.getElementById('sb').classList.add('open');document.getElementById('sb-overlay').classList.add('open');document.body.style.overflow='hidden';}
+function closeSB(){document.getElementById('sb').classList.remove('open');document.getElementById('sb-overlay').classList.remove('open');document.body.style.overflow='';}
 
 // ─────────────────────────────────────────
 // DATA — same as old working HTML, no custom headers
@@ -948,7 +956,7 @@ async function loadData(){
   }
   setLoad(false);
 }
-function setLoad(on){const b=document.getElementById("lb");if(b){if(on)b.classList.add("on");else{b.classList.remove("on");setTimeout(()=>b.style.width="0%",400);}}}
+function setLoad(on){const b=document.querySelector(".lbar-in");if(b){if(on){b.classList.add("on");b.style.width="100%";}else{b.classList.remove("on");setTimeout(()=>{b.style.width="0%";},400);}}}
 
 // ─────────────────────────────────────────
 // RENDER ALL — from real Sheets data only
@@ -956,12 +964,16 @@ function setLoad(on){const b=document.getElementById("lb");if(b){if(on)b.classLi
 function renderAll(d){
   const s=d.summary||{};
   set('d-pv',s.pipeline_value?'₹'+(s.pipeline_value/100000).toFixed(1)+'L':'₹0');
-  const m={'d-ae':s.active_enquiries??0,'d-pr':s.active_projects??0,'d-wo':s.won_enquiries??0,'d-po':s.active_pos??0,'d-ov':s.overdue_enquiries??0,'ob':s.overdue_enquiries??0,'c-tot':s.total_enquiries??0,'c-act':s.active_enquiries??0,'c-ov':s.overdue_enquiries??0,'c-won':s.won_enquiries??0,'po-tot':s.total_pos??0,'po-act':s.active_pos??0,'po-comp':s.completed_pos??0,'pj-tot':s.total_projects??0,'pj-act':s.active_projects??0,'pj-comp':s.completed_projects??0};
+  const m={'d-ae':s.active_enquiries??0,'d-pr':s.active_projects??0,'d-wo':s.won_enquiries??0,'d-po':s.active_pos??0,'d-ov':s.overdue_enquiries??0,'ob':s.overdue_enquiries??0,'c-tot':s.total_enquiries??0,'c-act':s.active_enquiries??0,'c-ov':s.overdue_enquiries??0,'c-won':s.won_enquiries??0,'po-tot':s.total_pos??0,'po-act':s.active_pos??0,'po-comp':s.completed_pos??0,'pj-tot':s.total_projects??0,'pj-act':s.active_projects??0,'pj-comp':s.completed_projects??0,'ci-sites':s.active_projects??0};
   Object.entries(m).forEach(([id,val])=>set(id,val));
   set('po-val',s.total_po_value?'₹'+(s.total_po_value/100000).toFixed(1)+'L':'₹0');
   set('cs1',(s.total_enquiries??0)+' total');
   set('cs2',(s.active_projects??0)+' sites');
   set('enq-cnt',s.total_enquiries??0);
+  // Update notification badge
+  const ov=s.overdue_enquiries||0;
+  const nc=document.getElementById('notif-cnt');
+  if(nc){nc.textContent=ov;nc.style.display=ov>0?'inline':'none';}
   renderAlerts(d);
   renderDashEnq((d.enquiries||[]).slice(0,6));
   renderChart();
@@ -1028,7 +1040,7 @@ async function updateStage(eid,newStage,e){
   enq.stage=newStage;renderCRM(allEnq);
   toast('📊 Updating to '+newStage+'...','warn');
   try{
-    const res=await fetch(URLS.updateEnq,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enquiry_id:eid,stage:newStage,last_followup:new Date().toISOString().replace('T',' ').substring(0,19)})});
+    const res=await fetch(URLS.updateEnq,{method:'POST',body:JSON.stringify({enquiry_id:eid,stage:newStage,last_followup:new Date().toISOString().replace('T',' ').substring(0,19)})});
     toast('✅ Stage updated to '+newStage,'ok');
   }catch(err){toast('✅ Updated locally','ok');}
 }
@@ -1235,12 +1247,27 @@ function renderExpenses(proj){
 // ─────────────────────────────────────────
 function initCheckin(){
   set('ci-today','0');set('ci-onsite','0');
+  // Populate site dropdown from real active projects in Sheets
+  const sel=document.getElementById('ci-site');
+  if(sel&&dashData?.projects){
+    const active=(dashData.projects||[]).filter(p=>p.status==='Active');
+    if(active.length){
+      sel.innerHTML='<option value="">Select your site...</option>';
+      active.forEach(p=>{
+        const opt=document.createElement('option');
+        opt.value=p.name;
+        opt.textContent=p.client+' — '+p.name;
+        sel.appendChild(opt);
+      });
+    }
+  }
+  // Get GPS
   if(navigator.geolocation){
     navigator.geolocation.getCurrentPosition(pos=>{
       ciLat=pos.coords.latitude;ciLng=pos.coords.longitude;
       const el=document.getElementById('ci-gps-status');
       if(el)el.innerHTML='📍 GPS: '+ciLat.toFixed(4)+', '+ciLng.toFixed(4)+' ✅';
-    },()=>{const el=document.getElementById('ci-gps-status');if(el)el.innerHTML='⚠️ GPS: Permission denied';});
+    },()=>{const el=document.getElementById('ci-gps-status');if(el)el.innerHTML='⚠️ GPS: Permission denied. Location not captured.';});
   }
 }
 
@@ -1259,7 +1286,7 @@ async function doCheckin(type){
   btn.disabled=true;
   const now=new Date(new Date().getTime()+(5.5*60*60*1000));
   const payload={type,engineer_name:name,phone,site,work_description:work,timestamp:now.toISOString().replace('T',' ').substring(0,19),lat:ciLat,lng:ciLng};
-  try{await fetch(URLS.checkin,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});}catch(e){}
+  try{await fetch(URLS.checkin,{method:'POST',body:JSON.stringify(payload)});}catch(e){}
   const log=document.getElementById('ci-log');
   const ini=name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
   const card=document.createElement('div');card.className='ci-card';
@@ -1310,7 +1337,7 @@ function renderWeekly(){
     const isWeekend=i>=5;
     const bg=day.isToday?'rgba(139,92,246,.1)':isWeekend?'rgba(255,255,255,.01)':'var(--surface)';
     const bc=day.isToday?'rgba(139,92,246,.35)':'var(--border)';
-    return`<div onclick="showDayDetail(${i},dayData_${i})" style="background:${bg};border:1px solid ${bc};border-radius:14px;padding:10px 8px;cursor:pointer;transition:all .2s;min-height:110px" onmouseover="this.style.borderColor='var(--border2)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='${bc}';this.style.transform='none'">
+    return`<div onclick="showDayDetail(${i})" style="background:${bg};border:1px solid ${bc};border-radius:14px;padding:10px 8px;cursor:pointer;transition:all .2s;min-height:110px" onmouseover="this.style.borderColor='var(--border2)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='${bc}';this.style.transform='none'">
       <div style="display:flex;justify-content:space-between;margin-bottom:5px"><div style="font-size:9px;color:var(--text3);font-weight:700">${dayNames[i]}</div>${day.isToday?'<div style="font-size:8px;background:var(--violet2);color:var(--violet);padding:1px 5px;border-radius:4px;font-weight:700">TODAY</div>':''}</div>
       <div style="font-size:22px;font-weight:900;color:${day.isToday?'var(--violet)':isWeekend?'var(--text3)':'var(--text2)'};margin-bottom:8px;line-height:1">${day.d.getDate()}</div>
       ${day.followups.length?`<div style="font-size:9px;color:var(--amber);background:var(--amber3);border:1px solid var(--amber2);border-radius:5px;padding:2px 5px;margin-bottom:3px;font-weight:700">📞 ${day.followups.length} follow-up${day.followups.length>1?'s':''}</div>`:''}
@@ -1370,7 +1397,7 @@ async function saveEnq(){
   if(!d.company_name||!v('e-rq')){toast('⚠️ Company and requirement required','err');return;}
   saving=true;if(btn){btn.disabled=true;btn.textContent='💾 Saving...';}
   try{
-    const r=await fetch(URLS.enquiry,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
+    const r=await fetch(URLS.enquiry,{method:'POST',body:JSON.stringify(d)});
     if(!r.ok)throw new Error('');
     const res=await r.json();
     if(res.success){toast('✅ Enquiry saved — '+res.enquiry_id,'ok');closeM('enq');['e-cn','e-co','e-ph','e-em','e-ci','e-rq','e-nt'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});setTimeout(loadData,800);}
@@ -1382,7 +1409,7 @@ async function saveEnq(){
 async function savePO(){
   const d={po_number:v('po-n'),client:v('po-c'),value:v('po-v'),date:v('po-d'),engineer:v('po-e'),description:v('po-pt')+' — '+v('po-desc')};
   if(!d.po_number||!d.client){toast('⚠️ PO number and client required','err');return;}
-  try{await fetch(URLS.po,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});toast('✅ PO saved','ok');closeM('po');setTimeout(loadData,800);}
+  try{await fetch(URLS.po,{method:'POST',body:JSON.stringify(d)});toast('✅ PO saved','ok');closeM('po');setTimeout(loadData,800);}
   catch(e){toast('❌ Error saving PO','err');}
 }
 
@@ -1407,7 +1434,7 @@ async function askAI(q){
   const s=dashData?.summary||{};
   // Try n8n AI webhook first
   try{
-    const res=await fetch(URLS.ai,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,context:s})});
+    const res=await fetch(URLS.ai,{method:'POST',body:JSON.stringify({question:q,context:s})});
     const data=await res.json();
     document.getElementById('ai-typing')?.remove();
     if(data.success&&data.reply){msgs.innerHTML+=`<div class="ai-msg bot">🤖 ${data.reply}</div>`;msgs.scrollTop=msgs.scrollHeight;return;}
@@ -1432,6 +1459,42 @@ async function askAI(q){
 }
 
 // ─────────────────────────────────────────
+// GLOBAL SEARCH
+// ─────────────────────────────────────────
+function globalSearch(q){
+  if(!q||!q.trim()){return;}
+  const s=q.toLowerCase();
+  // Filter CRM data
+  const filtered=allEnq.filter(e=>
+    (e.company_name||'').toLowerCase().includes(s)||
+    (e.customer_name||'').toLowerCase().includes(s)||
+    (e.requirement||'').toLowerCase().includes(s)||
+    (e.enquiry_id||'').toLowerCase().includes(s)
+  );
+  // Navigate to CRM and show filtered results
+  const crmEl=document.querySelector('.sb-item[onclick*="crm"]');
+  goP('crm',crmEl);
+  renderCRM(filtered);
+}
+
+// ─────────────────────────────────────────
+// NOTIFICATIONS
+// ─────────────────────────────────────────
+function showNotifs(){
+  const s=dashData?.summary||{};
+  const ov=s.overdue_enquiries||0;
+  const ol=dashData?.overdue_list||[];
+  if(!ov){toast('✅ No overdue follow-ups — all clear!','ok');return;}
+  const names=ol.slice(0,3).map(e=>e.company_name).join(', ');
+  toast('🔔 '+ov+' overdue: '+names+(ol.length>3?' +more':''),'warn');
+  // Navigate to CRM to see them
+  setTimeout(()=>{
+    const crmEl=document.querySelector('.sb-item[onclick*="crm"]');
+    goP('crm',crmEl);
+  },1000);
+}
+
+// ─────────────────────────────────────────
 // HELPERS
 // ─────────────────────────────────────────
 function badge(s){const m=STAGE_COLORS;return`<span class="badge ${m[s]||'b-dis'}">${s||'—'}</span>`;}
@@ -1452,7 +1515,7 @@ window.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementByI
 function updateGrid(){const dg=document.querySelector('.dash-grid');if(dg)dg.style.gridTemplateColumns=window.innerWidth<950?'1fr':'1fr 340px';}
 window.addEventListener('resize',updateGrid);updateGrid();
 const mb2=document.querySelector('.menu-btn');
-if(mb2){mb2.style.display=window.innerWidth<=768?'flex':'none';window.addEventListener('resize',()=>{mb2.style.display=window.innerWidth<=768?'flex':'none';});}
+if(mb2){mb2.style.display=window.innerWidth<=768?'flex':'none';window.addEventListener('resize',()=>{mb2.style.display=window.innerWidth<=768?'flex':'none';if(window.innerWidth>768)closeSB();});}
 const es=checkSession();
 if(es){currentUser=es;document.getElementById('un').textContent=es.name;document.getElementById('ur').textContent='👑 '+es.role;document.getElementById('ua').textContent=(es.name||'A').charAt(0).toUpperCase();document.getElementById('login-screen').style.display='none';document.getElementById('app').classList.add('visible');startTimer();loadData();}
 </script>
