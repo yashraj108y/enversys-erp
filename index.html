@@ -70,7 +70,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;back
 /* APP LAYOUT */
 #app{display:none;height:100vh;flex-direction:row;position:relative;z-index:1}
 #app.visible{display:flex}
-.sb{width:240px;min-width:240px;height:100vh;background:rgba(9,9,15,.96);backdrop-filter:blur(20px);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;position:relative;z-index:50;flex-shrink:0}
+.sb{width:240px;min-width:240px;height:100vh;background:rgba(9,9,15,.96);backdrop-filter:blur(20px);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;position:relative;z-index:50;flex-shrink:0;transform:none!important}
 .sb-logo{padding:16px 16px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
 .sb-icon{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--violet),var(--sky));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;box-shadow:0 0 16px rgba(139,92,246,.3)}
 .sb-brand h2{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.3px}
@@ -458,10 +458,10 @@ body.role-employee #d-enq-tb tr td:last-child{display:none!important;}
   .sb-item{min-height:48px;padding:10px 14px;}
   input,select,textarea{font-size:16px!important;}
   button{-webkit-tap-highlight-color:transparent;}
-  .sb{position:fixed;top:0;bottom:0;left:0;width:260px;transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);z-index:300;box-shadow:4px 0 24px rgba(0,0,0,.5)}
-  .sb.open{transform:translateX(0);-webkit-overflow-scrolling:touch}
+  .sb{position:fixed;top:0;bottom:0;left:0;width:260px;transform:translateX(-100%)!important;transition:transform .25s cubic-bezier(.4,0,.2,1);z-index:300;box-shadow:4px 0 32px rgba(0,0,0,.6)}
+  .sb.open{transform:translateX(0)!important}
   .sb-overlay{z-index:299}.sb-overlay.open{display:block}
-  .main{width:100vw;position:relative}
+  .main{width:100vw}
   .sg{grid-template-columns:repeat(2,1fr)}
   .tb-ts,.tb-search{display:none}
   .content{padding:12px}
@@ -1065,7 +1065,7 @@ setInterval(updateClock,1000);updateClock();
 // NAV
 // ─────────────────────────────────────────
 const ADD_LABELS={crm:'➕ Add Enquiry',po:'➕ Add PO'};
-const PAGE_TITLES={dashboard:'🏠 Dashboard','client-detail':'🏢 Client Detail','project-detail':'🏗️ Site Detail',crm:'🤝 CRM',po:'📋 Purchase Orders',projects:'🏗️ Sites & Projects',team:'👷 Field Engineers',attendance:'📅 Attendance',attendance:'📅 Attendance',weekly:'📅 Weekly View',service:'🔧 Service Contracts',tasks:'✅ Task Board',checkin:'📍 Engineer Check-in'};
+const PAGE_TITLES={dashboard:'🏠 Dashboard','client-detail':'🏢 Client Detail','project-detail':'🏗️ Site Detail',crm:'🤝 CRM',po:'📋 Purchase Orders',projects:'🏗️ Sites & Projects',team:'👷 Field Engineers',attendance:'📅 Attendance',weekly:'📅 Weekly View',service:'🔧 Service Contracts',tasks:'✅ Task Board',checkin:'📍 Engineer Check-in'};
 
 function goP(name,el){
   // Block engineers from restricted pages
@@ -1082,6 +1082,7 @@ function goP(name,el){
   currentPage=name;
   const ab=document.getElementById('add-btn');
   if(ADD_LABELS[name]){ab.style.display='flex';ab.textContent=ADD_LABELS[name];}else ab.style.display='none';
+  // Render page content
   if(name==='crm'&&dashData)renderCRM(allEnq);
   if(name==='po'&&dashData)renderPO(dashData.pos||[]);
   if(name==='projects'&&dashData)renderProjects(dashData.projects||[]);
@@ -1091,7 +1092,7 @@ function goP(name,el){
   if(name==='service'&&dashData)renderService();
   if(name==='checkin')initCheckin();
   if(name==='attendance')loadAttendance();
-  // Only close sidebar on mobile
+  // Close sidebar on mobile only
   if(window.innerWidth<=768)closeSB();
 }
 function openAdd(){if(currentPage==='crm')openM('enq');else if(currentPage==='po')openM('po');}
@@ -1106,8 +1107,20 @@ function goBack(){
     goP('dashboard',document.querySelector('[onclick*=dashboard]'));
   }
 }
-function openSB(){document.getElementById('sb').classList.add('open');document.getElementById('sb-overlay').classList.add('open');document.body.style.overflow='hidden';document.body.style.position='fixed';document.body.style.width='100%';}
-function closeSB(){document.getElementById('sb').classList.remove('open');document.getElementById('sb-overlay').classList.remove('open');document.body.style.overflow='';document.body.style.position='';document.body.style.width='';}
+function openSB(){
+  const sb=document.getElementById('sb');
+  const ov=document.getElementById('sb-overlay');
+  sb.classList.add('open');
+  ov.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeSB(){
+  const sb=document.getElementById('sb');
+  const ov=document.getElementById('sb-overlay');
+  sb.classList.remove('open');
+  ov.classList.remove('open');
+  document.body.style.overflow='';
+}
 
 // ─────────────────────────────────────────
 // DATA — same as old working HTML, no custom headers
