@@ -844,8 +844,47 @@ function initApp(user){
   document.getElementById('ua').textContent=name.charAt(0).toUpperCase();
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').classList.add('visible');
+  applyRoleView(role);
   loadData();
   toast('👋 Welcome, '+name.split(' ')[0]+'!','ok');
+}
+
+// ROLE-BASED VIEW
+// Owner   = full access
+// Manager = no delete, financial values hidden  
+// Engineer= only check-in + projects, no CRM/PO
+function getRole(){return currentUser?.role||'Engineer';}
+function isOwner(){return getRole()==='Owner';}
+function isManager(){return getRole()==='Manager'||isOwner();}
+
+function applyRoleView(role){
+  const r=(role||'Engineer').trim();
+  if(r==='Engineer'){
+    // Hide nav items not needed for engineer
+    document.querySelectorAll('.sb-item[onclick*="crm"],.sb-item[onclick*="po"],.sb-item[onclick*="team"],.sb-item[onclick*="service"],.sb-item[onclick*="weekly"]').forEach(el=>el.style.display='none');
+    document.getElementById('add-btn').style.display='none';
+    document.getElementById('ur').textContent='👷 Engineer';
+    setTimeout(()=>goP('checkin',null),400);
+  } else if(r==='Manager'){
+    document.getElementById('ur').textContent='🔑 Manager';
+    applyManagerStyle();
+  } else {
+    document.getElementById('ur').textContent='👑 Owner';
+  }
+}
+}
+
+function applyManagerStyle(){
+  // Managers can see pages but not financial values or delete
+  const s=document.createElement('style');
+  s.textContent=`
+    td.am{color:var(--text3)!important;}
+    td.am::after{content:' (hidden)';}
+    td.am span,td.am *{display:none!important;}
+    button[onclick*="deleteEnq"],button[onclick*="deleteClient"]{display:none!important;}
+    #d-pv,#po-val,#svc-value{visibility:hidden;}
+  `;
+  document.head.appendChild(s);
 }
 
 // ─────────────────────────────────────────
@@ -861,6 +900,10 @@ const ADD_LABELS={crm:'➕ Add Enquiry',po:'➕ Add PO'};
 const PAGE_TITLES={dashboard:'🏠 Dashboard','client-detail':'🏢 Client Detail','project-detail':'🏗️ Site Detail',crm:'🤝 CRM',po:'📋 Purchase Orders',projects:'🏗️ Sites & Projects',team:'👷 Field Engineers',weekly:'📅 Weekly View',service:'🔧 Service Contracts',tasks:'✅ Task Board',checkin:'📍 Engineer Check-in'};
 
 function goP(name,el){
+  // Block engineers from restricted pages
+  const r=getRole();
+  const engineerBlocked=['crm','po','team','service','weekly','client-detail'];
+  if(r==='Engineer'&&engineerBlocked.includes(name)){toast('⚠️ Access restricted for your role','warn');return;}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
   const pg=document.getElementById('page-'+name);if(pg)pg.classList.add('active');
@@ -905,7 +948,7 @@ async function loadData(){
   }
   setLoad(false);
 }
-function setLoad(on){const b=document.getElementById('lb');if(on){b.children[0].classList.add('on');}else{b.children[0].classList.remove('on');setTimeout(()=>b.children[0].style.width='0%',400);}}
+function setLoad(on){const b=document.getElementById("lb");if(b){if(on)b.classList.add("on");else{b.classList.remove("on");setTimeout(()=>b.style.width="0%",400);}}}
 
 // ─────────────────────────────────────────
 // RENDER ALL — from real Sheets data only
