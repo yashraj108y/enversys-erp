@@ -370,7 +370,7 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
 /* AI BOT */
 .ai-fab{position:fixed;bottom:24px;right:24px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--violet),var(--sky));box-shadow:0 4px 24px rgba(139,92,246,.5);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:23px;border:none;z-index:1000;transition:transform .25s,box-shadow .25s}
 .ai-fab:hover{transform:scale(1.1)}
-.ai-panel{position:fixed;bottom:90px;right:24px;width:min(320px,calc(100vw - 32px));height:min(420px,calc(100vh - 120px));background:#0f0f1a;backdrop-filter:blur(24px);border:1px solid rgba(139,92,246,.2);border-radius:20px;z-index:999;display:none;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.7)}
+.ai-panel{position:fixed;bottom:90px;right:24px;width:min(320px,calc(100vw - 32px));height:min(420px,calc(100vh - 120px));background:#0d0d1f;border:1px solid rgba(139,92,246,.3);border-radius:20px;z-index:999;display:none;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.8)}
 .ai-panel.open{display:flex}
 .ai-head{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .ai-av{width:28px;height:28px;border-radius:10px;background:linear-gradient(135deg,var(--violet),var(--sky));display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
@@ -441,6 +441,8 @@ body.role-employee #alerts,body.role-employee .al-list,body.role-employee [id="a
 body.role-employee .sc.violet,body.role-employee .sc.rose{display:none!important;}
 body.role-employee #notif-btn{display:none!important;}
 body.role-employee #tb-search{display:none!important;}
+body.role-owner .sc{display:block!important;}
+body.role-owner #alerts-panel{display:block!important;}
 /* Employee restrictions */
 body.role-employee .al-list,body.role-employee #alerts,body.role-employee .al{display:none!important;}
 body.role-employee #notif-btn{display:none!important;}
@@ -450,7 +452,7 @@ body.role-employee .dash-grid>div:last-child{display:none!important;}
 body.role-employee #d-enq-tb tr td:last-child{display:none!important;}
 
 /* MOBILE */
-.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:149}
+.sb-overlay{display:none;position:fixed;top:0;bottom:0;right:0;left:240px;background:rgba(0,0,0,.75);z-index:149}
 .empty{text-align:center;padding:50px;color:var(--text3);font-size:12px}
 .empty-ic{font-size:32px;margin-bottom:10px;opacity:.4}
 @media(max-width:950px){.dash-grid{grid-template-columns:1fr}.proj-grid{grid-template-columns:1fr}}
@@ -461,7 +463,7 @@ body.role-employee #d-enq-tb tr td:last-child{display:none!important;}
   button{-webkit-tap-highlight-color:transparent;}
   .sb{position:fixed;top:0;bottom:0;left:0;width:280px;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);z-index:300;box-shadow:4px 0 32px rgba(0,0,0,.6);background:#09090f!important;backdrop-filter:none!important}
   .sb.open{transform:translateX(0)}
-  .sb-overlay{z-index:299}.sb-overlay.open{display:block}
+  .sb-overlay{z-index:299;left:0}.sb-overlay.open{display:block}
   .main{width:100vw}
   .sg{grid-template-columns:repeat(2,1fr)}
   .tb-ts,.tb-search{display:none}
@@ -1033,7 +1035,10 @@ function applyRoleView(role){
   } else if(isMgr){
     document.body.classList.add('role-manager');
     document.getElementById('ur').textContent='🔑 Manager';
-    // Manager sees biz view with team panel
+    // Manager sees all tabs
+    document.querySelectorAll('.sb-item').forEach(el=>el.style.display='');
+    const tbSearch=document.getElementById('tb-search');if(tbSearch)tbSearch.style.display='';
+    const notifBtn=document.getElementById('notif-btn');if(notifBtn)notifBtn.style.display='';
     if(bizView)bizView.style.display='block';
     if(empView)empView.style.display='none';
     if(enqPanel)enqPanel.style.display='none';
@@ -1042,7 +1047,11 @@ function applyRoleView(role){
   } else {
     document.body.classList.add('role-owner');
     document.getElementById('ur').textContent='👑 Owner';
-    // Owner sees full biz dashboard
+    // Owner sees EVERYTHING — restore all hidden tabs
+    document.querySelectorAll('.sb-item').forEach(el=>el.style.display='');
+    const tbSearch=document.getElementById('tb-search');if(tbSearch)tbSearch.style.display='';
+    const notifBtn=document.getElementById('notif-btn');if(notifBtn)notifBtn.style.display='';
+    const addBtn=document.getElementById('add-btn');if(addBtn)addBtn.style.display='flex';
     if(bizView)bizView.style.display='block';
     if(empView)empView.style.display='none';
     if(enqPanel)enqPanel.style.display='block';
@@ -1131,7 +1140,7 @@ function closeSB(){
 async function loadData(){
   setLoad(true);
   try{
-    const res=await fetch(URLS.dashboard,{method:'GET'});
+    const res=await fetch(URLS.dashboard,{method:'GET',headers:{'Content-Type':'application/json'}});
     const text=await res.text();
     dashData=JSON.parse(text);
     allEnq=dashData.enquiries||[];
@@ -1932,7 +1941,8 @@ async function askAI(q){
   // Try n8n AI webhook first
   try{
     const userRole=String(currentUser?.role||'employee').toLowerCase().trim();
-    const res=await fetch(URLS.ai,{method:'POST',body:JSON.stringify({question:q,context:s,role:userRole})});
+    console.log('[AI] Sending role:',userRole,'question:',q.substring(0,30));
+    const res=await fetch(URLS.ai,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,context:s,role:userRole})});
     const data=await res.json();
     document.getElementById('ai-typing')?.remove();
     if(data.success&&data.reply){msgs.innerHTML+=`<div class="ai-msg bot">🤖 ${data.reply}</div>`;msgs.scrollTop=msgs.scrollHeight;return;}
