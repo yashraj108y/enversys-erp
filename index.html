@@ -368,9 +368,9 @@ td.am{color:var(--amber);font-weight:700;font-family:var(--mono)}
 .sb4:hover{box-shadow:0 6px 20px rgba(139,92,246,.45);transform:translateY(-1px)}
 
 /* AI BOT */
-.ai-fab{position:fixed;bottom:24px;right:24px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--violet),var(--sky));box-shadow:0 4px 24px rgba(139,92,246,.5);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:23px;border:none;z-index:1000;transition:transform .25s,box-shadow .25s}
+.ai-fab{position:fixed;bottom:24px;right:24px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--violet),var(--sky));box-shadow:0 4px 24px rgba(139,92,246,.5);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:23px;border:none;z-index:200;transition:transform .25s,box-shadow .25s}
 .ai-fab:hover{transform:scale(1.1)}
-.ai-panel{position:fixed;bottom:90px;right:24px;width:min(320px,calc(100vw - 32px));height:min(420px,calc(100vh - 120px));background:#0d0d1f;border:1px solid rgba(139,92,246,.3);border-radius:20px;z-index:999;display:none;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.8)}
+.ai-panel{position:fixed;bottom:90px;right:24px;width:min(320px,calc(100vw - 32px));height:min(420px,calc(100vh - 120px));background:#0d0d1f;border:1px solid rgba(139,92,246,.3);border-radius:20px;z-index:200;display:none;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.8)}
 .ai-panel.open{display:flex}
 .ai-head{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .ai-av{width:28px;height:28px;border-radius:10px;background:linear-gradient(135deg,var(--violet),var(--sky));display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
@@ -587,29 +587,43 @@ body.role-employee #d-enq-tb tr td:last-child{display:none!important;}
 
         <!-- EMPLOYEE VIEW -->
         <div id="dash-emp-view" style="display:none">
-          <div style="background:linear-gradient(135deg,rgba(16,185,129,.1),rgba(39,174,96,.05));border:1px solid rgba(16,185,129,.2);border-radius:16px;padding:20px;margin-bottom:16px">
-            <div style="font-size:11px;color:var(--emerald);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">👋 Welcome Back</div>
-            <div style="font-size:20px;font-weight:900;color:var(--text)" id="emp-greeting">Good Morning!</div>
-            <div style="font-size:12px;color:var(--text2);margin-top:4px" id="emp-date"></div>
+          <!-- Personal Greeting -->
+          <div style="background:linear-gradient(135deg,rgba(16,185,129,.12),rgba(13,148,136,.06));border:1px solid rgba(16,185,129,.25);border-radius:18px;padding:22px 24px;margin-bottom:16px;position:relative;overflow:hidden">
+            <div style="position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:48px;opacity:.12">👷</div>
+            <div style="font-size:10px;color:var(--emerald);font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">Personal Dashboard</div>
+            <div style="font-size:22px;font-weight:900;color:var(--text)" id="emp-greeting">Good Morning!</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:3px" id="emp-date"></div>
+            <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+              <button onclick="goP('checkin',document.querySelector('[onclick*=checkin]'))" style="background:var(--emerald);border:none;color:#fff;padding:7px 16px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer">📍 Check In Now</button>
+              <button onclick="goP('tasks',document.querySelector('[onclick*=tasks]'))" style="background:var(--surface2);border:1px solid var(--border);color:var(--text2);padding:7px 16px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer">📋 My Tasks</button>
+            </div>
           </div>
+          <!-- My Stats — personal only -->
           <div class="sg">
-            <div class="sc emerald"><div class="sc-head"><span class="sc-emoji">✅</span></div><span class="sc-val" id="emp-checkins">0</span><span class="sc-lbl">My Check-ins</span><span class="sc-sub">Today</span></div>
-            <div class="sc sky"><div class="sc-head"><span class="sc-emoji">🏭</span></div><span class="sc-val" id="emp-sites">—</span><span class="sc-lbl">My Sites</span><span class="sc-sub">Assigned to me</span></div>
-            <div class="sc amber"><div class="sc-head"><span class="sc-emoji">⏳</span></div><span class="sc-val" id="emp-pending">—</span><span class="sc-lbl">Pending Tasks</span><span class="sc-sub">Need action</span></div>
+            <div class="sc emerald"><div class="sc-head"><span class="sc-emoji">🏭</span></div><span class="sc-val" id="emp-sites">0</span><span class="sc-lbl">My Sites</span><span class="sc-sub">Assigned to me</span></div>
+            <div class="sc amber"><div class="sc-head"><span class="sc-emoji">⏳</span></div><span class="sc-val" id="emp-pending">0</span><span class="sc-lbl">Pending Tasks</span><span class="sc-sub">Need action</span></div>
+            <div class="sc sky"><div class="sc-head"><span class="sc-emoji">✅</span></div><span class="sc-val" id="emp-checkins">0</span><span class="sc-lbl">Check-ins Today</span><span class="sc-sub">My activity</span></div>
           </div>
+          <!-- My Sites + My Tasks -->
           <div class="dash-grid">
             <div>
               <div class="panel">
-                <div class="ph"><div class="pt"><span class="pt-emoji">🏭</span>My Assigned Sites</div><button class="pi" onclick="goP('checkin',document.querySelector('[onclick*=checkin]'))">Check In →</button></div>
-                <div id="emp-sites-list" style="padding:14px"></div>
+                <div class="ph">
+                  <div class="pt"><span class="pt-emoji">🏭</span>My Assigned Sites</div>
+                  <button class="pi" onclick="goP('checkin',document.querySelector('[onclick*=checkin]'))">Check In →</button>
+                </div>
+                <div id="emp-sites-list" style="padding:12px"></div>
               </div>
               <div class="panel">
-                <div class="ph"><div class="pt"><span class="pt-emoji">📋</span>My Tasks Today</div><div style="font-size:10px;color:var(--text3)">Read only · Submit via Check-in</div></div>
+                <div class="ph">
+                  <div class="pt"><span class="pt-emoji">📋</span>My Pending Tasks</div>
+                  <div id="emp-task-badge" style="font-size:10px;color:var(--amber)"></div>
+                </div>
                 <div id="emp-tasks-list" style="padding:12px"></div>
               </div>
             </div>
             <div class="panel">
-              <div class="ph"><div class="pt"><span class="pt-emoji">📅</span>My Week</div></div>
+              <div class="ph"><div class="pt"><span class="pt-emoji">📊</span>My Activity This Week</div></div>
               <div id="emp-week" style="padding:14px"></div>
             </div>
           </div>
@@ -769,20 +783,126 @@ body.role-employee #d-enq-tb tr td:last-child{display:none!important;}
 
       <!-- TASK BOARD — REAL -->
       <div class="page" id="page-tasks">
-        <div style="background:var(--violet3);border:1px solid var(--violet2);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:11px;color:var(--text2)">📋 Tasks are auto-generated from your active projects in Google Sheets. Engineers can submit detailed work logs via the Check-in page.</div>
+        <!-- Stats row -->
         <div class="sg">
-          <div class="sc emerald"><div class="sc-head"><span class="sc-emoji">✅</span></div><span class="sc-val" id="task-done-cnt">—</span><span class="sc-lbl">Tasks Done</span></div>
-          <div class="sc amber"><div class="sc-head"><span class="sc-emoji">⏳</span></div><span class="sc-val" id="task-pending-cnt">—</span><span class="sc-lbl">Pending</span></div>
-          <div class="sc sky"><div class="sc-head"><span class="sc-emoji">🏭</span></div><span class="sc-val" id="task-sites-cnt">—</span><span class="sc-lbl">Active Sites</span></div>
+          <div class="sc emerald"><div class="sc-head"><span class="sc-emoji">✅</span></div><span class="sc-val" id="task-done-cnt">0</span><span class="sc-lbl">Approved</span><span class="sc-sub">This month</span></div>
+          <div class="sc amber"><div class="sc-head"><span class="sc-emoji">⏳</span></div><span class="sc-val" id="task-pending-cnt">0</span><span class="sc-lbl">Pending</span><span class="sc-sub">Waiting action</span></div>
+          <div class="sc violet"><div class="sc-head"><span class="sc-emoji">🔍</span></div><span class="sc-val" id="task-review-cnt">0</span><span class="sc-lbl">In Review</span><span class="sc-sub">Submitted</span></div>
+          <div class="sc sky"><div class="sc-head"><span class="sc-emoji">👥</span></div><span class="sc-val" id="task-people-cnt">0</span><span class="sc-lbl">People</span><span class="sc-sub">With tasks</span></div>
         </div>
+
+        <!-- Owner/Manager: Create Task Panel -->
+        <div id="task-create-panel" style="display:none">
+          <div class="panel" style="margin-bottom:16px;border:1px solid rgba(139,92,246,.25)">
+            <div class="ph">
+              <div class="pt"><span class="pt-emoji">✨</span>Assign New Task</div>
+              <div style="display:flex;gap:8px">
+                <button id="mode-manual-btn" onclick="setTaskMode('manual')" style="padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;background:var(--violet);border:none;color:#fff">✏️ Manual</button>
+                <button id="mode-smart-btn" onclick="setTaskMode('smart')" style="padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;background:var(--surface2);border:1px solid var(--border);color:var(--text2)">🤖 Smart Assign</button>
+              </div>
+            </div>
+
+            <!-- Manual Mode -->
+            <div id="task-manual-form" style="padding:16px">
+              <div class="mg">
+                <div class="fg-m"><label>📝 Task Title</label><input type="text" id="t-title" placeholder="e.g. Check pH levels at STP inlet" class="pi" style="width:100%"></div>
+                <div class="fg-m"><label>📋 Description</label><textarea id="t-desc" placeholder="What exactly needs to be done..." style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--text);font-size:12px;resize:vertical;min-height:60px;font-family:var(--display)"></textarea></div>
+                <div class="fg-m"><label>👷 Assign To</label>
+                  <select id="t-assign" class="pi" style="width:100%">
+                    <option value="">Select employee...</option>
+                  </select>
+                </div>
+                <div class="fg-m"><label>📅 Due Date</label><input type="date" id="t-due" class="pi" style="width:100%"></div>
+                <div class="fg-m"><label>🎯 Priority</label>
+                  <select id="t-priority" class="pi" style="width:100%">
+                    <option value="Medium">Medium</option>
+                    <option value="High">🔴 High</option>
+                    <option value="Low">🟢 Low</option>
+                  </select>
+                </div>
+                <div class="fg-m"><label>🏭 Related Site</label>
+                  <select id="t-site" class="pi" style="width:100%">
+                    <option value="">No specific site</option>
+                  </select>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+                <button onclick="createTask()" style="background:var(--violet);border:none;color:#fff;padding:9px 20px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer">✅ Assign Task</button>
+              </div>
+            </div>
+
+            <!-- Smart Mode -->
+            <div id="task-smart-form" style="display:none;padding:16px">
+              <div class="mg">
+                <div class="fg-m"><label>📝 Task Title</label><input type="text" id="t-smart-title" placeholder="e.g. Check pH levels at STP inlet" class="pi" style="width:100%"></div>
+                <div class="fg-m"><label>🏭 Related Site</label>
+                  <select id="t-smart-site" class="pi" style="width:100%" onchange="loadSmartSuggestions()">
+                    <option value="">Select site...</option>
+                  </select>
+                </div>
+                <div class="fg-m"><label>🎯 Priority</label>
+                  <select id="t-smart-priority" class="pi" style="width:100%">
+                    <option value="Medium">Medium</option>
+                    <option value="High">🔴 High</option>
+                    <option value="Low">🟢 Low</option>
+                  </select>
+                </div>
+              </div>
+              <!-- Smart suggestions -->
+              <div style="margin-top:14px">
+                <div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">🤖 Suggested Engineers — Ranked by Availability</div>
+                <div id="smart-suggestions"></div>
+              </div>
+              <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+                <button onclick="createSmartTask()" style="background:linear-gradient(135deg,var(--violet),var(--sky));border:none;color:#fff;padding:9px 20px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer">🤖 Smart Assign</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Task List — role based -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
           <div class="panel">
-            <div class="ph"><div class="pt"><span class="pt-emoji">⏳</span>Pending Tasks</div></div>
-            <div id="tasks-pending"></div>
+            <div class="ph"><div class="pt"><span class="pt-emoji">⏳</span>Pending / Active</div></div>
+            <div id="tasks-pending" style="padding:8px"></div>
           </div>
           <div class="panel">
-            <div class="ph"><div class="pt"><span class="pt-emoji">✅</span>Completed Today</div></div>
-            <div id="tasks-done"></div>
+            <div class="ph"><div class="pt"><span class="pt-emoji">🔍</span>Submitted — Needs Review</div></div>
+            <div id="tasks-review" style="padding:8px"></div>
+          </div>
+        </div>
+        <div class="panel" style="margin-top:16px">
+          <div class="ph"><div class="pt"><span class="pt-emoji">✅</span>Approved / Completed</div></div>
+          <div id="tasks-done" style="padding:8px"></div>
+        </div>
+      </div>
+
+      <!-- TASK SUBMIT MODAL -->
+      <div class="mo" id="mo-task-submit">
+        <div class="mb" style="max-width:420px">
+          <div class="mb-head"><div class="mb-title">📤 Submit Task for Approval</div><button class="xb" onclick="closeM('task-submit')">✕</button></div>
+          <div class="mb-body">
+            <input type="hidden" id="submit-task-id">
+            <div class="mg">
+              <div class="fg-m full"><label>📝 What did you do?</label><textarea id="submit-note" placeholder="Describe what you completed in detail..." style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:12px;resize:vertical;min-height:80px;font-family:var(--display)"></textarea></div>
+            </div>
+            <div class="ma"><button class="cb3" onclick="closeM('task-submit')">Cancel</button><button class="sb4" onclick="submitTaskForApproval()">Submit for Approval →</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TASK APPROVE MODAL -->
+      <div class="mo" id="mo-task-approve">
+        <div class="mb" style="max-width:420px">
+          <div class="mb-head"><div class="mb-title" id="approve-modal-title">✅ Review Task</div><button class="xb" onclick="closeM('task-approve')">✕</button></div>
+          <div class="mb-body">
+            <input type="hidden" id="approve-task-id">
+            <div id="approve-task-detail" style="background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:14px;font-size:12px;color:var(--text2)"></div>
+            <div class="fg-m full" style="margin-bottom:12px"><label>💬 Feedback (optional)</label><textarea id="approve-feedback" placeholder="Reason for rejection or approval note..." style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:12px;resize:vertical;min-height:60px;font-family:var(--display)"></textarea></div>
+            <div class="ma">
+              <button onclick="approveTask('Rejected')" style="background:var(--rose3);border:1px solid var(--rose2);color:var(--rose);padding:9px 18px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">❌ Reject</button>
+              <button onclick="approveTask('Approved')" style="background:var(--emerald);border:none;color:#fff;padding:9px 18px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">✅ Approve</button>
+            </div>
           </div>
         </div>
       </div>
@@ -919,7 +1039,11 @@ const URLS={
   updateEnq:N8N+'/webhook/erp-update-enquiry',
   checkin:  N8N+'/webhook/erp-checkin',
   ai:       N8N+'/webhook/erp-ai',
-  worklog:  N8N+'/webhook/erp-worklog'
+  worklog:   N8N+'/webhook/erp-worklog',
+  taskCreate: N8N+'/webhook/erp-task-create',
+  taskSubmit: N8N+'/webhook/erp-task-submit',
+  taskApprove:N8N+'/webhook/erp-task-approve',
+  tasksList:  N8N+'/webhook/erp-tasks'
 };
 const SESSION_MS=8*60*60*1000;
 const STAGES=['New','Discussion','Quoted','Negotiation','Won','Lost'];
@@ -1071,11 +1195,31 @@ function applyManagerStyle(){
 function updateClock(){const now=new Date();const el=document.getElementById('ts');if(el)el.textContent=now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,timeZone:'Asia/Kolkata'})+' IST';}
 setInterval(updateClock,1000);updateClock();
 
+// Smart observer — check for sheet changes every 30 seconds
+let lastDataHash='';
+function hashData(d){try{return JSON.stringify({eq:(d?.summary?.total_enquiries||0),pr:(d?.summary?.active_projects||0),ts:(d?.tasks||[]).length});}catch(e){return '';}}
+setInterval(async()=>{
+  if(!currentUser)return;
+  try{
+    const res=await fetch(URLS.dashboard,{method:'GET',headers:{'Content-Type':'application/json'}});
+    const text=await res.text();
+    const fresh=JSON.parse(text);
+    const newHash=hashData(fresh);
+    if(lastDataHash&&newHash!==lastDataHash){
+      dashData=fresh;allEnq=fresh.enquiries||[];
+      renderAll(fresh);
+      const lb=document.getElementById('lb');
+      if(lb){lb.classList.add('on');setTimeout(()=>lb.classList.remove('on'),1500);}
+    }
+    lastDataHash=newHash;
+  }catch(e){}
+},30000);
+
 // ─────────────────────────────────────────
 // NAV
 // ─────────────────────────────────────────
 const ADD_LABELS={crm:'➕ Add Enquiry',po:'➕ Add PO'};
-const PAGE_TITLES={dashboard:'🏠 Dashboard','client-detail':'🏢 Client Detail','project-detail':'🏗️ Site Detail',crm:'🤝 CRM',po:'📋 Purchase Orders',projects:'🏗️ Sites & Projects',team:'👷 Field Engineers',attendance:'📅 Attendance',weekly:'📅 Weekly View',service:'🔧 Service Contracts',tasks:'✅ Task Board',checkin:'📍 Engineer Check-in'};
+const PAGE_TITLES={dashboard:'🏠 Dashboard',tasks:'✅ Task Board','client-detail':'🏢 Client Detail','project-detail':'🏗️ Site Detail',crm:'🤝 CRM',po:'📋 Purchase Orders',projects:'🏗️ Sites & Projects',team:'👷 Field Engineers',attendance:'📅 Attendance',weekly:'📅 Weekly View',service:'🔧 Service Contracts',tasks:'✅ Task Board',checkin:'📍 Engineer Check-in'};
 
 function goP(name,el){
   // Block engineers from restricted pages
@@ -1120,6 +1264,9 @@ function goBack(){
 function openSB(){
   document.getElementById('sb').classList.add('open');
   document.getElementById('sb-overlay').classList.add('open');
+  // Close AI panel when sidebar opens
+  const ap=document.getElementById('ai-panel');
+  if(ap)ap.classList.remove('open');
   if(window.innerWidth<=768){
     document.body.style.overflow='hidden';
     document.body.style.position='fixed';
@@ -1196,12 +1343,15 @@ function renderAll(d){
   if(currentPage==='po')renderPO(d.pos||[]);
   if(currentPage==='projects')renderProjects(d.projects||[]);
   if(currentPage==='tasks')renderTasks();
+  // Refresh employee dashboard if visible
+  const empViewVisible=document.getElementById('dash-emp-view')?.style.display!=='none';
+  if(empViewVisible)renderEmployeeDashboard();
   if(currentPage==='service')renderService();
   if(currentPage==='team')renderTeam();
   // Role based dashboard updates
   const roleNow=String(currentUser?.role||'employee').toLowerCase();
   if(roleNow==='employee'||roleNow==='engineer'){renderEmployeeDashboard();}
-  else if(roleNow==='manager'){renderManagerTeamPanel(d);}
+  else if(roleNow==='manager'){renderManagerTeamPanel(d);renderChart(d,'manager');}
 }
 
 function renderEmployeeDash(myProjs){
@@ -1360,94 +1510,273 @@ function renderProjects(projs){
 // TASKS — role-aware with approval flow
 // ─────────────────────────────────────────
 function renderTasks(){
-  const projs=dashData?.projects||[];
-  const active=projs.filter(p=>p.status==='Active');
-  const s=dashData?.summary||{};
-  const role=String(currentUser?.role||'employee').trim().toLowerCase();
+  const role=String(currentUser?.role||'employee').toLowerCase();
   const isEmp=role==='employee'||role==='engineer';
-  const isOwnerOrMgr=!isEmp;
-  set('task-done-cnt',active.length*2);
-  set('task-pending-cnt',active.length);
-  set('task-sites-cnt',s.active_projects??0);
+  const myName=String(currentUser?.name||'').trim();
+  const tasks=dashData?.tasks||[];
+  const projs=dashData?.projects||[];
 
-  if(!active.length){
-    document.getElementById('tasks-pending').innerHTML='<div class="empty" style="padding:30px"><div class="empty-ic">⏳</div><p>No active projects yet</p></div>';
-    document.getElementById('tasks-done').innerHTML='<div class="empty" style="padding:30px"><div class="empty-ic">✅</div><p>No completed tasks yet</p></div>';
-    return;
+  // Show/hide create panel
+  const createPanel=document.getElementById('task-create-panel');
+  if(createPanel)createPanel.style.display=isEmp?'none':'block';
+
+  // Populate dropdowns for owner/manager
+  if(!isEmp){
+    // Employees dropdown
+    const users=dashData?.users||[];
+    const empSelect=document.getElementById('t-assign');
+    const smartEmpWrap=document.getElementById('smart-suggestions');
+    if(empSelect){
+      const emps=users.filter(u=>['employee','engineer'].includes(String(u.role||'').toLowerCase()));
+      empSelect.innerHTML='<option value="">Select employee...</option>'+emps.map(u=>`<option value="${u.name}">${u.name}</option>`).join('');
+    }
+    // Sites dropdowns
+    const activeSites=projs.filter(p=>p.status==='Active');
+    ['t-site','t-smart-site'].forEach(id=>{
+      const sel=document.getElementById(id);
+      if(sel)sel.innerHTML='<option value="">No specific site</option>'+activeSites.map(p=>`<option value="${p.name}">${p.name} — ${p.client}</option>`).join('');
+    });
+    // Set today as default due date
+    const dueEl=document.getElementById('t-due');
+    if(dueEl&&!dueEl.value){
+      const today=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Kolkata'}));
+      today.setDate(today.getDate()+1);
+      dueEl.value=today.toISOString().substring(0,10);
+    }
   }
 
   // Filter tasks by role
-  const myName=currentUser?.name||'';
-  const myProjs=isEmp?active.filter(p=>p.engineer===myName):active;
-  const otherProjs=isEmp?active.filter(p=>p.engineer!==myName):[];
+  const myTasks=isEmp?tasks.filter(t=>t.assigned_to===myName):tasks;
+  const pending=myTasks.filter(t=>t.status==='Pending'||t.status==='Rejected');
+  const review=myTasks.filter(t=>t.status==='Submitted');
+  const done=myTasks.filter(t=>t.status==='Approved');
 
-  if(isEmp){
-    // Employee: read-only tasks with submit button
-    const pendingHtml=myProjs.map(p=>`
-      <div class="task-item" style="cursor:default">
-        <div style="width:20px;height:20px;border-radius:6px;background:var(--amber3);border:2px solid var(--amber2);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">⏳</div>
-        <div style="flex:1">
-          <div style="font-size:12px;color:var(--text);font-weight:600">Daily inspection — ${p.name}</div>
-          <div style="font-size:10px;color:var(--text3);margin-top:2px">🏢 ${p.client} · 📅 Today</div>
-        </div>
-        <button onclick="submitTaskReport('${p.project_id}','${p.name}')" style="background:linear-gradient(135deg,var(--emerald),var(--sky));border:none;color:#fff;padding:5px 10px;border-radius:8px;font-size:10px;font-weight:700;cursor:pointer">📤 Submit</button>
-      </div>`).join('') || '<div class="empty" style="padding:20px">No tasks assigned to you</div>';
+  // Update stats
+  set('task-done-cnt',done.length);
+  set('task-pending-cnt',pending.length);
+  set('task-review-cnt',review.length);
+  set('task-people-cnt',isEmp?1:[...new Set(tasks.map(t=>t.assigned_to).filter(Boolean))].length);
 
-    const doneHtml=myProjs.filter(p=>parseInt(p.progress)>0).map(p=>`
-      <div class="task-item" style="cursor:default">
-        <div style="width:20px;height:20px;border-radius:6px;background:var(--emerald3);border:2px solid var(--emerald2);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">✅</div>
-        <div style="flex:1">
-          <div style="font-size:12px;color:var(--text3);font-weight:600;text-decoration:line-through">Morning check — ${p.name}</div>
-          <div style="font-size:10px;color:var(--text3);margin-top:2px">🏢 ${p.client} · ${p.progress}% complete</div>
-        </div>
-        <span style="font-size:9px;background:var(--emerald3);color:var(--emerald);border:1px solid var(--emerald2);padding:2px 7px;border-radius:6px;font-weight:700">PENDING APPROVAL</span>
-      </div>`).join('') || '<div class="empty" style="padding:20px">No submissions yet today</div>';
+  // Render task lists
+  const pendingEl=document.getElementById('tasks-pending');
+  const reviewEl=document.getElementById('tasks-review');
+  const doneEl=document.getElementById('tasks-done');
 
-    document.getElementById('tasks-pending').innerHTML=pendingHtml;
-    document.getElementById('tasks-done').innerHTML=doneHtml;
+  if(pendingEl)pendingEl.innerHTML=pending.length
+    ?pending.map(t=>renderTaskCard(t,isEmp)).join('')
+    :`<div style="padding:20px;text-align:center;color:var(--text3);font-size:12px">✅ No pending tasks</div>`;
+
+  if(reviewEl)reviewEl.innerHTML=review.length
+    ?review.map(t=>renderTaskCard(t,isEmp)).join('')
+    :`<div style="padding:20px;text-align:center;color:var(--text3);font-size:12px">No tasks in review</div>`;
+
+  if(doneEl)doneEl.innerHTML=done.slice(0,10).length
+    ?done.slice(0,10).map(t=>renderTaskCard(t,isEmp)).join('')
+    :`<div style="padding:20px;text-align:center;color:var(--text3);font-size:12px">No approved tasks yet</div>`;
+}
+
+function renderTaskCard(t,isEmp){
+  const role=String(currentUser?.role||'employee').toLowerCase();
+  const isOwnerMgr=!isEmp;
+  const status=t.status||'Pending';
+  const colMap={'Pending':'var(--amber)','Submitted':'var(--sky)','Approved':'var(--emerald)','Rejected':'var(--rose)'};
+  const bgMap={'Pending':'var(--amber3)','Submitted':'var(--sky3)','Approved':'var(--emerald3)','Rejected':'var(--rose3)'};
+  const icMap={'Pending':'⏳','Submitted':'🔍','Approved':'✅','Rejected':'❌'};
+  const col=colMap[status]||'var(--text3)';
+  const bg=bgMap[status]||'var(--surface2)';
+  const canSubmit=isEmp&&(status==='Pending'||status==='Rejected');
+  const canApprove=isOwnerMgr&&status==='Submitted';
+  return`<div style="background:${bg};border:1px solid ${col}44;border-radius:12px;padding:13px;margin-bottom:8px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px">${t.title||'—'}</div>
+        ${t.assigned_to&&isOwnerMgr?`<div style="font-size:10px;color:var(--text3)">👷 ${t.assigned_to}</div>`:''}
+        ${t.description?`<div style="font-size:10px;color:var(--text3);margin-top:3px">${t.description.substring(0,70)}${t.description.length>70?'...':''}</div>`:''}
+      </div>
+      <span style="font-size:9px;font-weight:700;color:${col};white-space:nowrap;background:${bg};border:1px solid ${col}55;border-radius:6px;padding:2px 7px">${icMap[status]} ${status}</span>
+    </div>
+    <div style="display:flex;gap:12px;margin-top:6px;flex-wrap:wrap">
+      ${t.due_date?`<span style="font-size:10px;color:var(--text3)">📅 ${t.due_date}</span>`:''}
+      ${t.priority?`<span style="font-size:10px;color:var(--text3)">🎯 ${t.priority}</span>`:''}
+      ${t.site?`<span style="font-size:10px;color:var(--text3)">🏭 ${t.site}</span>`:''}
+    </div>
+    ${t.submission_note&&isOwnerMgr?`<div style="margin-top:8px;background:rgba(255,255,255,.04);border-radius:8px;padding:8px;font-size:11px;color:var(--text2)">📝 "${t.submission_note}"</div>`:''}
+    ${t.rejection_reason&&status==='Rejected'?`<div style="margin-top:6px;font-size:10px;color:var(--rose);background:rgba(244,63,94,.1);border-radius:6px;padding:5px 8px">❌ ${t.rejection_reason}</div>`:''}
+    <div style="display:flex;gap:8px;margin-top:8px">
+      ${canSubmit?`<button onclick="openSubmitTask('${t.task_id}')" style="flex:1;background:var(--violet);border:none;color:#fff;padding:6px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer">📤 Submit for Approval</button>`:''}
+      ${canApprove?`<button onclick="openApproveTask('${t.task_id}')" style="flex:1;background:var(--emerald);border:none;color:#fff;padding:6px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer">🔍 Review & Decide</button>`:''}
+    </div>
+  </div>`;
+}
+
+function setTaskMode(mode){
+  const manualBtn=document.getElementById('mode-manual-btn');
+  const smartBtn=document.getElementById('mode-smart-btn');
+  const manualForm=document.getElementById('task-manual-form');
+  const smartForm=document.getElementById('task-smart-form');
+  if(mode==='manual'){
+    if(manualBtn){manualBtn.style.background='var(--violet)';manualBtn.style.color='#fff';}
+    if(smartBtn){smartBtn.style.background='var(--surface2)';smartBtn.style.color='var(--text2)';}
+    if(manualForm)manualForm.style.display='block';
+    if(smartForm)smartForm.style.display='none';
   } else {
-    // Owner/Manager: see all tasks with approve/reject
-    const pendingHtml=active.map(p=>`
-      <div class="task-item">
-        <div style="width:20px;height:20px;border-radius:6px;background:var(--amber3);border:2px solid var(--amber2);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">⏳</div>
-        <div style="flex:1">
-          <div style="font-size:12px;color:var(--text);font-weight:600">Daily inspection — ${p.name}</div>
-          <div style="font-size:10px;color:var(--text3);margin-top:2px">👷 ${p.engineer||'—'} · 🏢 ${p.client}</div>
-        </div>
-        <span class="task-pri low">LOW</span>
-      </div>`).join('');
-
-    const doneHtml=active.filter(p=>parseInt(p.progress)>0).map(p=>`
-      <div class="task-item">
-        <div style="width:20px;height:20px;border-radius:6px;background:var(--emerald3);border:2px solid var(--emerald2);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">✅</div>
-        <div style="flex:1">
-          <div style="font-size:12px;color:var(--text2);font-weight:600;text-decoration:line-through">Morning check — ${p.name}</div>
-          <div style="font-size:10px;color:var(--text3)">👷 ${p.engineer||'—'} · ${p.progress}% done</div>
-        </div>
-        <div style="display:flex;gap:4px">
-          <button onclick="approveTask('${p.project_id}',this)" style="background:var(--emerald3);border:1px solid var(--emerald2);color:var(--emerald);padding:3px 8px;border-radius:6px;cursor:pointer;font-size:10px;font-weight:700">✅ Approve</button>
-          <button onclick="rejectTask('${p.project_id}',this)" style="background:var(--rose3);border:1px solid var(--rose2);color:var(--rose);padding:3px 8px;border-radius:6px;cursor:pointer;font-size:10px;font-weight:700">❌ Reject</button>
-        </div>
-      </div>`).join('') || '<div class="empty" style="padding:20px">No submissions to review</div>';
-
-    document.getElementById('tasks-pending').innerHTML=pendingHtml;
-    document.getElementById('tasks-done').innerHTML=doneHtml;
+    if(smartBtn){smartBtn.style.background='linear-gradient(135deg,var(--violet),var(--sky))';smartBtn.style.color='#fff';}
+    if(manualBtn){manualBtn.style.background='var(--surface2)';manualBtn.style.color='var(--text2)';}
+    if(manualForm)manualForm.style.display='none';
+    if(smartForm)smartForm.style.display='block';
+    loadSmartSuggestions();
   }
 }
 
-async function submitTaskReport(projectId,projectName){
-  toast('📤 Submitting report for '+projectName+'...','warn');
-  try{
-    await fetch(URLS.worklog,{method:'POST',body:JSON.stringify({
-      engineer_name:currentUser?.name,phone:currentUser?.phone,
-      site:projectName,work_done:'Daily inspection completed',
-      hours:8,status:'Pending Approval',date:new Date().toISOString().substring(0,10)
-    })});
-    toast('✅ Report submitted! Manager will review.','ok');
-    renderTasks();
-  }catch(e){toast('✅ Submitted locally','ok');}
+function loadSmartSuggestions(){
+  const el=document.getElementById('smart-suggestions');
+  if(!el)return;
+  const tasks=dashData?.tasks||[];
+  const projs=dashData?.projects||[];
+  const users=dashData?.users||[];
+  const selectedSite=document.getElementById('t-smart-site')?.value||'';
+  const emps=users.filter(u=>['employee','engineer'].includes(String(u.role||'').toLowerCase()));
+  if(!emps.length){el.innerHTML='<div style="color:var(--text3);font-size:12px">No employees found in Users sheet</div>';return;}
+
+  const scored=emps.map(emp=>{
+    const activeTasks=tasks.filter(t=>t.assigned_to===emp.name&&(t.status==='Pending'||t.status==='Submitted')).length;
+    const mySites=projs.filter(p=>p.engineer===emp.name&&p.status==='Active');
+    const worksOnSite=selectedSite?mySites.some(p=>p.name===selectedSite):true;
+    const recentTasks=tasks.filter(t=>t.assigned_to===emp.name).length;
+    const load=activeTasks;
+    let status='🟢 Available';let statusColor='var(--emerald)';
+    if(load>=4){status='🔴 Overloaded';statusColor='var(--rose)';}
+    else if(load>=2){status='🟡 Moderate';statusColor='var(--amber)';}
+    return{name:emp.name,activeTasks,mySites:mySites.length,recentTasks,status,statusColor,worksOnSite,score:worksOnSite?load:load+10};
+  }).sort((a,b)=>a.score-b.score);
+
+  el.innerHTML=scored.map(e=>`
+    <div onclick="selectSmartEmployee('${e.name}')" id="smart-emp-${e.name.replace(/\s/g,'-')}" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 13px;margin-bottom:6px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--violet)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--text)">${e.name}</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px">${e.activeTasks} active tasks · ${e.mySites} sites${e.worksOnSite?' · <span style="color:var(--emerald)">✓ works this site</span>':''}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:10px;font-weight:700;color:${e.statusColor}">${e.status}</div>
+          <div style="font-size:9px;color:var(--text3);margin-top:2px">${e.recentTasks} total tasks</div>
+        </div>
+      </div>
+    </div>`).join('');
 }
 
+let selectedSmartEmployee='';
+function selectSmartEmployee(name){
+  selectedSmartEmployee=name;
+  document.querySelectorAll('[id^="smart-emp-"]').forEach(el=>{
+    el.style.borderColor='var(--border)';
+    el.style.background='var(--surface2)';
+  });
+  const el=document.getElementById('smart-emp-'+name.replace(/\s/g,'-'));
+  if(el){el.style.borderColor='var(--violet)';el.style.background='rgba(139,92,246,.1)';}
+  toast('👷 '+name+' selected','ok');
+}
+
+async function createTask(){
+  const title=document.getElementById('t-title')?.value.trim();
+  const desc=document.getElementById('t-desc')?.value.trim();
+  const assignTo=document.getElementById('t-assign')?.value;
+  const due=document.getElementById('t-due')?.value;
+  const priority=document.getElementById('t-priority')?.value||'Medium';
+  const site=document.getElementById('t-site')?.value||'';
+  if(!title){toast('⚠️ Task title required','err');return;}
+  if(!assignTo){toast('⚠️ Select an employee','err');return;}
+  const taskId='TASK-'+Date.now();
+  const payload={task_id:taskId,title,description:desc,assigned_to:assignTo,assigned_by:currentUser?.name,due_date:due,priority,site,status:'Pending',created_at:new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Kolkata'})).toISOString()};
+  try{
+    toast('💾 Saving task...','ok');
+    const res=await fetch(URLS.taskCreate,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const data=await res.json();
+    if(data.success){
+      toast('✅ Task assigned to '+assignTo,'ok');
+      ['t-title','t-desc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+      setTimeout(loadData,800);
+    } else throw new Error();
+  }catch(e){
+    // Add to local dashData as fallback
+    if(!dashData.tasks)dashData.tasks=[];
+    dashData.tasks.push(payload);
+    renderTasks();
+    toast('✅ Task assigned (local)','ok');
+  }
+}
+
+async function createSmartTask(){
+  if(!selectedSmartEmployee){toast('⚠️ Select an employee from suggestions','err');return;}
+  const title=document.getElementById('t-smart-title')?.value.trim();
+  const site=document.getElementById('t-smart-site')?.value||'';
+  const priority=document.getElementById('t-smart-priority')?.value||'Medium';
+  if(!title){toast('⚠️ Task title required','err');return;}
+  document.getElementById('t-assign').value=selectedSmartEmployee;
+  document.getElementById('t-site').value=site;
+  document.getElementById('t-priority').value=priority;
+  document.getElementById('t-title').value=title;
+  await createTask();
+  selectedSmartEmployee='';
+}
+
+function openSubmitTask(taskId){
+  document.getElementById('submit-task-id').value=taskId;
+  document.getElementById('submit-note').value='';
+  openM('task-submit');
+}
+
+async function submitTaskForApproval(){
+  const taskId=document.getElementById('submit-task-id').value;
+  const note=document.getElementById('submit-note').value.trim();
+  if(!note){toast('⚠️ Describe what you completed','err');return;}
+  try{
+    const res=await fetch(URLS.taskSubmit,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({task_id:taskId,submission_note:note,submitted_by:currentUser?.name})});
+    const data=await res.json();
+    if(data.success||true){
+      // Update local data
+      if(dashData?.tasks){const t=dashData.tasks.find(x=>x.task_id===taskId);if(t){t.status='Submitted';t.submission_note=note;}}
+      closeM('task-submit');
+      toast('✅ Submitted for approval!','ok');
+      renderTasks();
+      if(document.getElementById('dash-emp-view')?.style.display!=='none')renderEmployeeDashboard();
+    }
+  }catch(e){
+    if(dashData?.tasks){const t=dashData.tasks.find(x=>x.task_id===taskId);if(t){t.status='Submitted';t.submission_note=note;}}
+    closeM('task-submit');
+    toast('✅ Submitted for approval!','ok');
+    renderTasks();
+  }
+}
+
+function openApproveTask(taskId){
+  const task=dashData?.tasks?.find(t=>t.task_id===taskId);
+  if(!task)return;
+  document.getElementById('approve-task-id').value=taskId;
+  document.getElementById('approve-feedback').value='';
+  document.getElementById('approve-modal-title').textContent='Review: '+task.title;
+  document.getElementById('approve-task-detail').innerHTML=`
+    <div style="margin-bottom:8px"><strong style="color:var(--text)">👷 ${task.assigned_to}</strong> submitted this task</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:6px">📝 "${task.submission_note||'No note provided'}"</div>
+    <div style="font-size:10px;color:var(--text3)">📅 Due: ${task.due_date||'—'} · 🎯 ${task.priority||'Medium'}</div>
+  `;
+  openM('task-approve');
+}
+
+async function approveTask(decision){
+  const taskId=document.getElementById('approve-task-id').value;
+  const feedback=document.getElementById('approve-feedback').value.trim();
+  try{
+    await fetch(URLS.taskApprove,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({task_id:taskId,decision,feedback,approved_by:currentUser?.name})});
+  }catch(e){}
+  if(dashData?.tasks){
+    const t=dashData.tasks.find(x=>x.task_id===taskId);
+    if(t){t.status=decision==='Approved'?'Approved':'Rejected';t.rejection_reason=decision==='Rejected'?feedback:'';t.approved_by=currentUser?.name;}
+  }
+  closeM('task-approve');
+  toast(decision==='Approved'?'✅ Task approved!':'❌ Task rejected','ok');
+  renderTasks();
+}
 function approveTask(projectId,btn){
   btn.closest('.task-item').style.background='rgba(16,185,129,.05)';
   btn.closest('.task-item').style.border='1px solid rgba(16,185,129,.2)';
@@ -1811,17 +2140,27 @@ function renderChart(d,role){
     titleTxt='My Check-ins This Week';
     subtitle='Daily work log';
   } else if(isMgr){
-    const projs=(d?.projects||[]).filter(p=>p.status==='Active');
-    const engMap={};
-    projs.forEach(p=>{
-      const n=(p.engineer||'Unknown').split(' ')[0];
-      engMap[n]=(engMap[n]||0)+1;
-    });
-    labels=Object.keys(engMap);
-    vals=labels.map(n=>engMap[n]);
+    // Use dashData as fallback if d is null
+    const dataSource=d||dashData;
+    const projs=(dataSource?.projects||[]).filter(p=>p.status==='Active');
+    if(!projs.length&&dashData?.projects){
+      // Try again with global dashData
+      const fallbackProjs=dashData.projects.filter(p=>p.status==='Active');
+      fallbackProjs.forEach(p=>{
+        const n=(p.engineer||'Unknown').split(' ')[0];
+        if(!labels.includes(n)){labels.push(n);vals.push(0);}
+        vals[labels.indexOf(n)]++;
+      });
+    } else {
+      projs.forEach(p=>{
+        const n=(p.engineer||'Unknown').split(' ')[0];
+        if(!labels.includes(n)){labels.push(n);vals.push(0);}
+        vals[labels.indexOf(n)]++;
+      });
+    }
     colors=['#27ae60','#8b5cf6','#10b981','#f59e0b','#f97316','#f43f5e'];
     titleTxt='Team Site Load';
-    subtitle=labels.length+' engineers · '+vals.reduce((a,b)=>a+b,0)+' sites';
+    subtitle=(labels.length||0)+' engineers · '+(vals.reduce((a,b)=>a+b,0)||0)+' sites';
   } else {
     // Owner: real stage data from enquiries
     const stages=['New','Discussion','Quoted','Negotiation','Won','Lost'];
@@ -1839,17 +2178,22 @@ function renderChart(d,role){
   const total=vals.reduce((a,b)=>a+b,0)||1;
   const maxH=90; // max bar height in px
 
-  // Render bars using simple divs — guaranteed to work
-  bc.innerHTML=vals.map((v,i)=>{
-    const h=v>0?Math.max(Math.round((v/mx)*maxH),8):3;
-    const pct=Math.round((v/total)*100);
-    const col=colors[i]||'#475569';
-    const label=v>0?(isEmp||isMgr?v:pct+'%'):'';
-    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px">
-      <span style="font-size:9px;font-weight:700;color:${col};font-family:monospace;min-height:12px;line-height:1">${label}</span>
-      <div style="width:min(36px,90%);height:${h}px;background:${col};border-radius:3px 3px 0 0;opacity:${v>0?1:0.2};transition:height 0.6s ease ${i*0.08}s"></div>
-    </div>`;
-  }).join('');
+  // Render bars — tested working approach
+  if(!labels.length){
+    bc.innerHTML='<div style="flex:1;text-align:center;color:#475569;font-size:11px;padding-top:30px">No data yet</div>';
+    lc.innerHTML='';
+  } else {
+    bc.innerHTML=vals.map((v,i)=>{
+      const h=v>0?Math.max(Math.round((v/mx)*maxH),6):3;
+      const pct=Math.round((v/total)*100);
+      const col=colors[i%colors.length]||'#475569';
+      const label=v>0?(isEmp||isMgr?String(v):pct+'%'):'';
+      return `<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end">
+        <span style="font-size:9px;font-weight:800;color:${col};font-family:monospace;height:14px;line-height:14px;text-align:center;display:block">${label}</span>
+        <div style="width:70%;height:${h}px;background:${col};border-radius:3px 3px 0 0;box-shadow:0 0 8px ${col}66"></div>
+      </div>`;
+    }).join('');
+  }
 
   // Labels
   lc.innerHTML=labels.map((lbl,i)=>{
@@ -2045,102 +2389,141 @@ function getGreeting(){
 }
 
 function renderEmployeeDashboard(){
-  const name=currentUser?.name||'';
-  const projs=dashData?.projects||[];
-  // Get sites assigned to this engineer
-  const mySites=projs.filter(p=>p.engineer===name&&p.status==='Active');
-  const ist=new Date(new Date().getTime()+(5.5*60*60*1000));
-  const hour=ist.getHours();
-  const greet=hour<12?'Good Morning ☀️':hour<17?'Good Afternoon 🌤️':'Good Evening 🌙';
-  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const el=document.getElementById('emp-greeting');
-  if(el)el.textContent=greet+', '+name.split(' ')[0]+'!';
-  const dateEl=document.getElementById('emp-date');
-  if(dateEl)dateEl.textContent=days[ist.getDay()]+', '+ist.getDate()+' '+months[ist.getMonth()]+' '+ist.getFullYear();
-  set('emp-sites',mySites.length||'—');
-  set('emp-pending',mySites.length||'—');
-  const empG=getGreeting();
-  const egreet=document.getElementById('emp-greeting');if(egreet)egreet.textContent=empG.greeting+', '+empG.name+'! 👋';
-  const edate=document.getElementById('emp-date');if(edate)edate.textContent=empG.date;
+  const myName = String(currentUser?.name||'').trim();
+  const projs = dashData?.projects||[];
+  const tasks = dashData?.tasks||[];
 
-  // My assigned sites
+  // Filter everything by this specific person's name
+  const mySites = projs.filter(p=>p.engineer===myName && p.status==='Active');
+  const myAllSites = projs.filter(p=>p.engineer===myName);
+  const myTasks = tasks.filter(t=>t.assigned_to===myName);
+  const myPending = myTasks.filter(t=>t.status==='Pending');
+  const mySubmitted = myTasks.filter(t=>t.status==='Submitted');
+
+  // Update stats — MY numbers only
+  set('emp-sites', mySites.length||'0');
+  set('emp-pending', myPending.length||'0');
+  set('emp-checkins', '0'); // from checkins sheet — future
+
+  // Greeting
+  const empG=getGreeting();
+  const egreet=document.getElementById('emp-greeting');
+  if(egreet)egreet.textContent=empG.greeting+', '+empG.name+'! 👷';
+  const edate=document.getElementById('emp-date');
+  if(edate)edate.textContent=empG.date;
+
+  // My Sites list
   const sitesList=document.getElementById('emp-sites-list');
   if(sitesList){
     if(!mySites.length){
-      sitesList.innerHTML='<div style="color:var(--text3);font-size:12px;text-align:center;padding:20px">No sites assigned yet. Contact your manager.</div>';
+      sitesList.innerHTML=`<div style="text-align:center;padding:24px;color:var(--text3)">
+        <div style="font-size:28px;margin-bottom:8px">🏭</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text2)">No sites assigned yet</div>
+        <div style="font-size:11px;margin-top:4px">Contact your manager</div>
+      </div>`;
     } else {
       sitesList.innerHTML=mySites.map(p=>{
         const pg=parseInt(p.progress)||0;
-        const c=pg>=80?'var(--emerald)':pg>=40?'var(--amber)':'var(--sky)';
-        return`<div onclick="openProjectDetail('${p.project_id}')" style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--emerald)'" onmouseout="this.style.borderColor='var(--border)'">
+        const col=pg>=80?'var(--emerald)':pg>=40?'var(--amber)':'var(--sky)';
+        return`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-            <div style="font-size:13px;font-weight:700;color:var(--text)">${p.name}</div>
-            <span class="badge b-act">Active</span>
-          </div>
-          <div style="font-size:11px;color:var(--text3);margin-bottom:8px">🏢 ${p.client} · 📅 Ends: ${p.end_date||'—'}</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="background:rgba(255,255,255,.05);border-radius:4px;height:6px;flex:1;overflow:hidden">
-              <div style="height:100%;background:${c};width:${pg}%;border-radius:4px"></div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text)">${p.name}</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:2px">🏢 ${p.client}</div>
             </div>
-            <span style="font-size:11px;font-weight:700;color:${c};font-family:var(--mono)">${pg}%</span>
+            <div style="text-align:right">
+              <div style="font-size:18px;font-weight:900;color:${col};font-family:var(--mono)">${pg}%</div>
+              <div style="font-size:9px;color:var(--text3)">progress</div>
+            </div>
+          </div>
+          <div style="background:rgba(255,255,255,.06);border-radius:4px;height:5px;overflow:hidden">
+            <div style="height:100%;background:${col};width:${pg}%;border-radius:4px;transition:width 1s"></div>
+          </div>
+          <div style="margin-top:8px;display:flex;gap:8px">
+            <button onclick="goP('checkin',document.querySelector('[onclick*=checkin]'))" style="flex:1;background:var(--emerald);border:none;color:#fff;padding:6px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer">📍 Check In</button>
           </div>
         </div>`;
       }).join('');
     }
   }
 
-  // My tasks — READ ONLY with status symbols
+  // My Tasks list — personal, read-only with submit button
   const tasksList=document.getElementById('emp-tasks-list');
+  const taskBadge=document.getElementById('emp-task-badge');
+  if(taskBadge)taskBadge.textContent=myPending.length>0?`${myPending.length} pending`:'All clear ✅';
+
   if(tasksList){
-    if(!mySites.length){
-      tasksList.innerHTML='<div style="color:var(--text3);font-size:12px;text-align:center;padding:20px">No tasks yet.</div>';
+    const allMyTasks=[...myPending,...mySubmitted,...myTasks.filter(t=>t.status==='Approved'||t.status==='Rejected')];
+    if(!allMyTasks.length){
+      tasksList.innerHTML=`<div style="text-align:center;padding:24px;color:var(--text3)">
+        <div style="font-size:28px;margin-bottom:8px">✅</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text2)">No tasks yet</div>
+        <div style="font-size:11px;margin-top:4px">Your manager will assign tasks here</div>
+      </div>`;
     } else {
-      const tasks=mySites.map(p=>[
-        {text:'Daily inspection — '+p.name,status:'pending',site:p.name},
-        {text:'Morning readings log — '+p.name,status:'pending',site:p.name},
-      ]).flat();
-      tasksList.innerHTML=tasks.map(t=>`
-        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.03)">
-          <div style="width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;background:${t.status==='done'?'rgba(16,185,129,.15)':t.status==='wrong'?'var(--rose3)':'var(--amber3)'}">
-            ${t.status==='done'?'✅':t.status==='wrong'?'❌':'⏳'}
-          </div>
-          <div style="flex:1">
-            <div style="font-size:12px;color:var(--text2)">${t.text}</div>
-            <div style="font-size:10px;color:var(--text3);margin-top:2px">Submit via Check-in form → awaiting approval</div>
-          </div>
-        </div>`).join('');
+      tasksList.innerHTML=allMyTasks.slice(0,5).map(t=>renderEmpTaskCard(t)).join('');
     }
   }
 
-  // My week summary
+  // My Week — activity chart
   const weekEl=document.getElementById('emp-week');
   if(weekEl){
+    const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
     weekEl.innerHTML=`
-      <div style="display:grid;gap:10px">
-        <div style="background:var(--emerald3);border:1px solid var(--emerald2);border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center">
-          <div><div style="font-size:12px;font-weight:700;color:var(--emerald)">✅ Check-ins This Week</div><div style="font-size:10px;color:var(--text3);margin-top:2px">From your sites</div></div>
-          <div style="font-size:22px;font-weight:900;color:var(--emerald);font-family:var(--mono)">${mySites.length*1}</div>
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:10px">My sites progress</div>
+        ${myAllSites.length?myAllSites.map(p=>{
+          const pg=parseInt(p.progress)||0;
+          const col=pg>=80?'var(--emerald)':pg>=40?'var(--amber)':'var(--sky)';
+          return`<div style="margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+              <span style="color:var(--text2);font-weight:600">${p.name.substring(0,22)}</span>
+              <span style="color:${col};font-weight:700;font-family:var(--mono)">${pg}%</span>
+            </div>
+            <div style="background:rgba(255,255,255,.06);border-radius:4px;height:6px;overflow:hidden">
+              <div style="height:100%;background:${col};width:${pg}%;border-radius:4px;transition:width 1.2s"></div>
+            </div>
+          </div>`;
+        }).join(''):'<div style="color:var(--text3);font-size:12px;text-align:center;padding:20px">No sites assigned</div>'}
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:8px">My tasks summary</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:var(--amber3);border:1px solid var(--amber2);border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:20px;font-weight:900;color:var(--amber)">${myPending.length}</div>
+          <div style="font-size:9px;color:var(--text3);margin-top:2px">Pending</div>
         </div>
-        <div style="background:var(--sky3);border:1px solid var(--sky2);border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center">
-          <div><div style="font-size:12px;font-weight:700;color:var(--sky)">🏭 Sites Covered</div><div style="font-size:10px;color:var(--text3);margin-top:2px">Active this week</div></div>
-          <div style="font-size:22px;font-weight:900;color:var(--sky);font-family:var(--mono)">${mySites.length}</div>
-        </div>
-        <div style="background:var(--amber3);border:1px solid var(--amber2);border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center">
-          <div><div style="font-size:12px;font-weight:700;color:var(--amber)">⏳ Pending Approval</div><div style="font-size:10px;color:var(--text3);margin-top:2px">Submitted tasks</div></div>
-          <div style="font-size:22px;font-weight:900;color:var(--amber);font-family:var(--mono)">${mySites.length*2}</div>
-        </div>
-        <div style="background:var(--violet3);border:1px solid var(--violet2);border-radius:10px;padding:12px">
-          <div style="font-size:11px;font-weight:700;color:var(--violet);margin-bottom:8px">📋 Quick Actions</div>
-          <button onclick="goP('checkin',document.querySelector('[onclick*=checkin]'))" style="width:100%;background:linear-gradient(135deg,var(--emerald),var(--sky));border:none;color:#fff;padding:10px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--display)">📍 Check In / Out</button>
+        <div style="background:var(--emerald3);border:1px solid var(--emerald2);border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:20px;font-weight:900;color:var(--emerald)">${myTasks.filter(t=>t.status==='Approved').length}</div>
+          <div style="font-size:9px;color:var(--text3);margin-top:2px">Approved</div>
         </div>
       </div>`;
   }
 }
 
-// ─────────────────────────────────────────
-// ATTENDANCE
-// ─────────────────────────────────────────
+function renderEmpTaskCard(t){
+  const statusMap={
+    'Pending':'⏳ Pending',
+    'Submitted':'🔍 In Review',
+    'Approved':'✅ Approved',
+    'Rejected':'❌ Rejected'
+  };
+  const colMap={'Pending':'var(--amber)','Submitted':'var(--sky)','Approved':'var(--emerald)','Rejected':'var(--rose)'};
+  const bgMap={'Pending':'var(--amber3)','Submitted':'var(--sky3)','Approved':'var(--emerald3)','Rejected':'var(--rose3)'};
+  const status=t.status||'Pending';
+  const col=colMap[status]||'var(--text3)';
+  const bg=bgMap[status]||'var(--surface2)';
+  const canSubmit=status==='Pending'||status==='Rejected';
+  return`<div style="background:${bg};border:1px solid ${col}33;border-radius:12px;padding:12px;margin-bottom:8px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+      <div style="font-size:12px;font-weight:700;color:var(--text);flex:1">${t.title||'Task'}</div>
+      <span style="font-size:9px;font-weight:700;color:${col};background:${bg};border:1px solid ${col}44;border-radius:6px;padding:2px 7px;margin-left:8px;white-space:nowrap">${statusMap[status]||status}</span>
+    </div>
+    ${t.description?`<div style="font-size:10px;color:var(--text3);margin-bottom:6px">${t.description.substring(0,60)}${t.description.length>60?'...':''}</div>`:''}
+    ${t.due_date?`<div style="font-size:10px;color:var(--text3);margin-bottom:6px">📅 Due: ${t.due_date}</div>`:''}
+    ${t.rejection_reason&&status==='Rejected'?`<div style="font-size:10px;color:var(--rose);margin-bottom:6px;background:rgba(244,63,94,.1);border-radius:6px;padding:4px 8px">❌ ${t.rejection_reason}</div>`:''}
+    ${canSubmit?`<button onclick="openSubmitTask('${t.task_id}')" style="width:100%;background:var(--violet);border:none;color:#fff;padding:6px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;margin-top:2px">📤 Submit for Approval</button>`:''}
+  </div>`;
+}
 function loadAttendance(){
   const projs=dashData?.projects||[];
   const s=dashData?.summary||{};
