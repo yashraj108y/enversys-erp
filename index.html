@@ -1291,12 +1291,27 @@ async function loadData(){
     const text=await res.text();
     dashData=JSON.parse(text);
     allEnq=dashData.enquiries||[];
+    // Build users list from projects engineers if not in dashData
+    if(!dashData.users||!dashData.users.length){
+      const engNames=[...new Set((dashData.projects||[]).map(p=>p.engineer).filter(Boolean))];
+      dashData.users=engNames.map(n=>({name:n,role:'Employee',status:'Active'}));
+      // Also add current known users from session
+      if(currentUser)dashData.users.push({name:currentUser.name,role:currentUser.role,status:'Active'});
+    }
+    // Add tasks if missing
+    if(!dashData.tasks)dashData.tasks=[];
     renderAll(dashData);
     toast('✅ Data loaded','ok');
   }catch(e){
     console.warn('loadData error:',e.message);
     toast('⚠️ Cannot reach server','warn');
-    dashData={summary:{},enquiries:[],pos:[],projects:[],overdue_list:[]};
+    dashData={summary:{},enquiries:[],pos:[],projects:[],overdue_list:[],tasks:[],
+      users:[
+        {name:'Ravi Kumar',role:'Employee',status:'Active'},
+        {name:'Suresh Patil',role:'Employee',status:'Active'},
+        {name:'Manoj Desai',role:'Employee',status:'Active'},
+        {name:'Suraj',role:'Employee',status:'Active'}
+      ]};
     allEnq=[];
     renderAll(dashData);
   }
@@ -1522,13 +1537,18 @@ function renderTasks(){
 
   // Populate dropdowns for owner/manager
   if(!isEmp){
-    // Employees dropdown
-    const users=dashData?.users||[];
+    // Employees dropdown — build from users sheet + project engineers
+    let users=dashData?.users||[];
+    if(!users.length){
+      // Fallback: extract engineers from projects
+      const engNames=[...new Set((dashData?.projects||[]).map(p=>p.engineer).filter(Boolean))];
+      users=engNames.map(n=>({name:n,role:'Employee',status:'Active'}));
+    }
     const empSelect=document.getElementById('t-assign');
     const smartEmpWrap=document.getElementById('smart-suggestions');
     if(empSelect){
-      const emps=users.filter(u=>['employee','engineer'].includes(String(u.role||'').toLowerCase()));
-      empSelect.innerHTML='<option value="">Select employee...</option>'+emps.map(u=>`<option value="${u.name}">${u.name}</option>`).join('');
+      const emps=users.filter(u=>u.name&&u.name.trim());
+      empSelect.innerHTML='<option value="">Select employee...</option>'+emps.map(u=>`<option value="${u.name}">${u.name} (${u.role||'Employee'})</option>`).join('');
     }
     // Sites dropdowns
     const activeSites=projs.filter(p=>p.status==='Active');
@@ -1635,8 +1655,13 @@ function loadSmartSuggestions(){
   const projs=dashData?.projects||[];
   const users=dashData?.users||[];
   const selectedSite=document.getElementById('t-smart-site')?.value||'';
-  const emps=users.filter(u=>['employee','engineer'].includes(String(u.role||'').toLowerCase()));
-  if(!emps.length){el.innerHTML='<div style="color:var(--text3);font-size:12px">No employees found in Users sheet</div>';return;}
+  let emps=users.filter(u=>u.name&&u.name.trim());
+  if(!emps.length){
+    // Fallback from projects
+    const engNames=[...new Set((dashData?.projects||[]).map(p=>p.engineer).filter(Boolean))];
+    emps=engNames.map(n=>({name:n,role:'Employee',status:'Active'}));
+  }
+  if(!emps.length){el.innerHTML='<div style="color:var(--text3);font-size:12px">No employees found. Add engineers to Projects sheet.</div>';return;}
 
   const scored=emps.map(emp=>{
     const activeTasks=tasks.filter(t=>t.assigned_to===emp.name&&(t.status==='Pending'||t.status==='Submitted')).length;
